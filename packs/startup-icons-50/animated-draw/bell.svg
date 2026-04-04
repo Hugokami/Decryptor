@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-bell">
+<style>
+  @keyframes draw-bell {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-bell path, #draw-bell line, #draw-bell polyline, #draw-bell polygon, 
+  #draw-bell rect, #draw-bell circle, #draw-bell ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-bell 2s ease-out forwards;
+  }
+</style><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-bell 2s ease-out forwards"><path d="M13.73 21a2 2 0 0 1-3.46 0"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-bell 2s ease-out forwards"></svg>

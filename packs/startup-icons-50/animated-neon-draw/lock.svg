@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-lock">
+  <defs>
+    <filter id="glow-lock" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-lock {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-lock); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-lock); opacity: 1; }
+    }
+    #neon-lock path, #neon-lock line, #neon-lock polyline, #neon-lock polygon, 
+    #neon-lock rect, #neon-lock circle, #neon-lock ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-lock 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><path d="M7 11V7a5 5 0 0 1 10 0v4"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

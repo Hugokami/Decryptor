@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="float-file_text">
+  <style>
+    @keyframes float-file_text {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      33% { transform: translateY(-4px) rotate(3deg) scale(1.05); }
+      66% { transform: translateY(2px) rotate(-2deg) scale(0.98); }
+    }
+    #float-file_text {
+      animation: float-file_text 4s cubic-bezier(0.45, 0, 0.15, 1) infinite;
+      transform-origin: center;
+      overflow: visible;
+    }
+    #float-file_text * {
+      stroke: currentColor;
+      stroke-width: 2;
+      transition: stroke 0.3s ease;
+    }
+  </style><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>

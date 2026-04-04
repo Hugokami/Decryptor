@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-target">
+  <defs>
+    <filter id="glow-target" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-target {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-target); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-target); opacity: 1; }
+    }
+    #neon-target path, #neon-target line, #neon-target polyline, #neon-target polygon, 
+    #neon-target rect, #neon-target circle, #neon-target ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-target 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><circle cx="12" cy="12" r="10"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><circle cx="12" cy="12" r="6"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><circle cx="12" cy="12" r="2"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

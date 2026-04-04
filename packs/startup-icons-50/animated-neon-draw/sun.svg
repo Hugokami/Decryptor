@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-sun">
+  <defs>
+    <filter id="glow-sun" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-sun {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-sun); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-sun); opacity: 1; }
+    }
+    #neon-sun path, #neon-sun line, #neon-sun polyline, #neon-sun polygon, 
+    #neon-sun rect, #neon-sun circle, #neon-sun ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-sun 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><circle cx="12" cy="12" r="5"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="12" y1="1" x2="12" y2="3"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="12" y1="21" x2="12" y2="23"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="1" y1="12" x2="3" y2="12"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="21" y1="12" x2="23" y2="12"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

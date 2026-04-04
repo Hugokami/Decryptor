@@ -1,0 +1,22 @@
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" data-ag-state="idle">
+  <!-- Gas Pump Body -->
+  <g class="ag-main-part" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M70 80 L30 80 L30 30 L70 30 Z" />
+    <path d="M70 40 L85 55 L85 75 L70 70" />
+    <rect x="40" y="40" width="20" height="15" rx="1" />
+  </g>
+
+  <!-- Gas Flame (Dynamic) -->
+  <g class="ag-dynamic-part" fill="#ffaa00" opacity="0.8">
+    <path d="M50 25 C55 15 45 5 50 0 C55 5 45 15 50 25" id="gas-flame" />
+  </g>
+  
+  <style>
+    [data-ag-state="signing"] #gas-flame { animation: ag-flicker 0.2s infinite alternate; }
+    [data-ag-state="pending"] #gas-flame { fill: var(--ag-web3-pending, #33aaff); transform: scale(1.2); }
+    @keyframes ag-flicker {
+      from { opacity: 0.5; transform: translateY(2px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</svg>

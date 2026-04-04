@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-hexagon">
+<style>
+  @keyframes draw-hexagon {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-hexagon path, #draw-hexagon line, #draw-hexagon polyline, #draw-hexagon polygon, 
+  #draw-hexagon rect, #draw-hexagon circle, #draw-hexagon ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-hexagon 2s ease-out forwards;
+  }
+</style><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-hexagon 2s ease-out forwards"></svg>

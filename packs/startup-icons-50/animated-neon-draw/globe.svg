@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-globe">
+  <defs>
+    <filter id="glow-globe" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-globe {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-globe); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-globe); opacity: 1; }
+    }
+    #neon-globe path, #neon-globe line, #neon-globe polyline, #neon-globe polygon, 
+    #neon-globe rect, #neon-globe circle, #neon-globe ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-globe 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><circle cx="12" cy="12" r="10"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="2" y1="12" x2="22" y2="12"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

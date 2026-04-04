@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-rocket">
+  <defs>
+    <filter id="glow-rocket" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-rocket {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-rocket); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-rocket); opacity: 1; }
+    }
+    #neon-rocket path, #neon-rocket line, #neon-rocket polyline, #neon-rocket polygon, 
+    #neon-rocket rect, #neon-rocket circle, #neon-rocket ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-rocket 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2l.5-.5a5.4 5.4 0 0 0 5.4 0l.5.5c1.26 1.5 5 2 5 2s-.5-3.74-2-5l-.5-.5a5.4 5.4 0 0 0 0-5.4l-.5-.5C14.74 3.5 11 3 11 3s-3.74.5-5 2l-.5.5a5.4 5.4 0 0 0 0 5.4l-.5.5Z"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><path d="m12 15 3.5-3.5"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><path d="M2 22v-3l4-4 3 3-4 4H2Z"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><path d="M22 2h-3l-4 4 3 3 4-4V2Z"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

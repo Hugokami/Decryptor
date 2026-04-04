@@ -1,0 +1,141 @@
+/* 
+   AG-WEB3-STATES.CSS (Industrial Decryptor Edition)
+   High-contrast, brutalist technical animations for elite dApps.
+*/
+
+:root {
+    /* Industrial Decryptor Palette */
+    --ag-bg-core: #050505;      /* Obsidian Night */
+    --ag-accent: #f4ff4d;       /* Cyber Lime - Electric */
+    --ag-neutral-light: #ffffff;
+    --ag-neutral-muted: #333333; /* Increased contrast from #222222 */
+    --ag-border-width: 2px;
+    
+    /* Semantic Transaction States */
+    --ag-state-idle: var(--ag-neutral-muted);
+    --ag-state-signing: var(--ag-accent);
+    --ag-state-pending: var(--ag-accent);
+    --ag-state-success: #00ff41; /* Matrix Green */
+    --ag-state-error: #ff0000;   /* Signal Red */
+    
+    /* Industrial Interaction Tokens */
+    --ag-shadow-hard: 6px 6px 0px #1a1a1a;
+    --ag-ease-robot: steps(4);
+    --ag-ease-industrial: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Core Logic-Ready Container */
+.ag-web3-container {
+    background: var(--ag-bg-core);
+    border: var(--ag-border-width) solid var(--ag-neutral-muted);
+    padding: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.4s var(--ag-ease-industrial);
+    box-shadow: var(--ag-shadow-hard);
+    border-radius: 0px !important;
+}
+
+/* Base Industrial SVG Styles */
+.ag-web3-container svg {
+    width: 64px;
+    height: 64px;
+    stroke-width: 2; /* Slightly thicker for better visibility */
+    fill: none;
+    transition: all 0.3s var(--ag-ease-industrial);
+}
+
+/* State-Based Manipulation Engine */
+[data-ag-state="idle"] .ag-main-part { stroke: var(--ag-neutral-muted); }
+[data-ag-state="idle"] .ag-dynamic-part { stroke: var(--ag-neutral-muted); opacity: 0.3; }
+
+/* SIGNING - Alert State */
+[data-ag-state="signing"] .ag-web3-container { border-color: var(--ag-accent); box-shadow: 0 0 20px rgba(244, 255, 77, 0.2); }
+[data-ag-state="signing"] .ag-main-part { stroke: var(--ag-accent); }
+[data-ag-state="signing"] .ag-dynamic-part { 
+    stroke: var(--ag-accent);
+    animation: ag-glitch-pulse 0.4s infinite alternate var(--ag-ease-robot);
+}
+
+/* PENDING - Draw-Erase */
+[data-ag-state="pending"] .ag-web3-container { border-color: var(--ag-accent); }
+[data-ag-state="pending"] .ag-main-part { stroke: var(--ag-accent); opacity: 0.5; }
+[data-ag-state="pending"] .ag-dynamic-part {
+    stroke: var(--ag-accent);
+    stroke-dasharray: 0.3 0.7;
+    animation: ag-draw-erase 2.5s infinite linear;
+}
+
+/* SUCCESS - Draw-In */
+[data-ag-state="success"] .ag-web3-container { border-color: var(--ag-state-success); box-shadow: 0 0 20px rgba(0, 255, 65, 0.2); }
+[data-ag-state="success"] .ag-main-part { stroke: var(--ag-state-success); }
+[data-ag-state="success"] .ag-dynamic-part {
+    stroke: var(--ag-state-success);
+    /* pathLength="1" required on SVG elements */
+    animation: ag-draw-in 0.8s forwards var(--ag-ease-industrial);
+}
+
+/* ERROR - Signal Breakdown */
+[data-ag-state="error"] .ag-web3-container { border-color: var(--ag-state-error); box-shadow: 0 0 20px rgba(255, 0, 0, 0.2); }
+[data-ag-state="error"] .ag-main-part { stroke: var(--ag-state-error); }
+[data-ag-state="error"] .ag-dynamic-part {
+    stroke: var(--ag-state-error);
+    animation: ag-shake-break 0.4s infinite var(--ag-ease-robot);
+}
+
+/* Industrial Animation Frames */
+@keyframes ag-glitch-pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.05); opacity: 0.7; }
+}
+
+@keyframes ag-draw-erase {
+    0% { stroke-dashoffset: 0; }
+    50% { stroke-dashoffset: -1; }
+    100% { stroke-dashoffset: -2; }
+}
+
+@keyframes ag-draw-in {
+    from { stroke-dashoffset: 1; opacity: 0; }
+    to { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes ag-shake-break {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-2px, 2px); }
+    50% { transform: translate(2px, -2px); }
+    75% { transform: translate(-1px, -1px); }
+}
+
+@keyframes ag-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* CRT Scan Line Overlay */
+.ag-web3-container::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: rgba(244, 255, 77, 0.3);
+    box-shadow: 0 0 10px var(--ag-accent);
+    animation: ag-crt-scan 3s infinite linear;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 10;
+}
+[data-ag-state="pending"] .ag-web3-container::after { opacity: 1; }
+
+@keyframes ag-crt-scan {
+    from { top: 0; }
+    to { top: 100%; }
+}
+
+/* Utility for the icons to support draw animation */
+/* Crucial: Elements must have pathLength="1" for this to work perfectly */
+[pathLength="1"] {
+    stroke-linecap: square;
+    stroke-linejoin: miter;
+}

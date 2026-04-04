@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-pie_chart">
+  <defs>
+    <filter id="glow-pie_chart" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-pie_chart {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-pie_chart); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-pie_chart); opacity: 1; }
+    }
+    #neon-pie_chart path, #neon-pie_chart line, #neon-pie_chart polyline, #neon-pie_chart polygon, 
+    #neon-pie_chart rect, #neon-pie_chart circle, #neon-pie_chart ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-pie_chart 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><path d="M22 12A10 10 0 0 0 12 2v10z"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

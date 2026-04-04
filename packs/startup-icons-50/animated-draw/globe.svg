@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-globe">
+<style>
+  @keyframes draw-globe {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-globe path, #draw-globe line, #draw-globe polyline, #draw-globe polygon, 
+  #draw-globe rect, #draw-globe circle, #draw-globe ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-globe 2s ease-out forwards;
+  }
+</style><circle cx="12" cy="12" r="10"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-globe 2s ease-out forwards"><line x1="2" y1="12" x2="22" y2="12"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-globe 2s ease-out forwards"><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-globe 2s ease-out forwards"></svg>

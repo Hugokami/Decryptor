@@ -1,0 +1,32 @@
+{
+  "name": "decryptor",
+  "version": "1.0.0-DECRYPTOR-OS",
+  "description": "Industrial Vector IDE // High-Performance Web3 Assets",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "svg",
+    "vector",
+    "industrial",
+    "brutalist",
+    "web3"
+  ],
+  "author": "Lyan (typomaxx)",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "codemirror": "^5.65.21",
+    "electron-is-dev": "^3.0.1",
+    "gsap": "^3.14.2",
+    "lucide-static": "^1.7.0",
+    "tailwindcss": "^4.2.2"
+  },
+  "type": "commonjs"
+}

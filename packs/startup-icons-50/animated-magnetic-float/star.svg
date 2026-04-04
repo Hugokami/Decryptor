@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="float-star">
+  <style>
+    @keyframes float-star {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      33% { transform: translateY(-4px) rotate(3deg) scale(1.05); }
+      66% { transform: translateY(2px) rotate(-2deg) scale(0.98); }
+    }
+    #float-star {
+      animation: float-star 4s cubic-bezier(0.45, 0, 0.15, 1) infinite;
+      transform-origin: center;
+      overflow: visible;
+    }
+    #float-star * {
+      stroke: currentColor;
+      stroke-width: 2;
+      transition: stroke 0.3s ease;
+    }
+  </style><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>

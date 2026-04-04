@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-bell">
+  <defs>
+    <filter id="glow-bell" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-bell {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-bell); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-bell); opacity: 1; }
+    }
+    #neon-bell path, #neon-bell line, #neon-bell polyline, #neon-bell polygon, 
+    #neon-bell rect, #neon-bell circle, #neon-bell ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-bell 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><path d="M13.73 21a2 2 0 0 1-3.46 0"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

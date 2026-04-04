@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-cloud_upload">
+<style>
+  @keyframes draw-cloud_upload {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-cloud_upload path, #draw-cloud_upload line, #draw-cloud_upload polyline, #draw-cloud_upload polygon, 
+  #draw-cloud_upload rect, #draw-cloud_upload circle, #draw-cloud_upload ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-cloud_upload 2s ease-out forwards;
+  }
+</style><path d="M20 16.2A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.2"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-cloud_upload 2s ease-out forwards"><polyline points="16 16 12 12 8 16"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-cloud_upload 2s ease-out forwards"><line x1="12" y1="12" x2="12" y2="21"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-cloud_upload 2s ease-out forwards"></svg>

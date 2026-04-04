@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-bluetooth">
+  <defs>
+    <filter id="glow-bluetooth" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-bluetooth {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-bluetooth); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-bluetooth); opacity: 1; }
+    }
+    #neon-bluetooth path, #neon-bluetooth line, #neon-bluetooth polyline, #neon-bluetooth polygon, 
+    #neon-bluetooth rect, #neon-bluetooth circle, #neon-bluetooth ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-bluetooth 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><polyline points="6.5 6.5 17.5 17.5 12 23 12 1 17.5 6.5 6.5 17.5"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

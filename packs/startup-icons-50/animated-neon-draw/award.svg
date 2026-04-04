@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-award">
+  <defs>
+    <filter id="glow-award" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-award {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-award); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-award); opacity: 1; }
+    }
+    #neon-award path, #neon-award line, #neon-award polyline, #neon-award polygon, 
+    #neon-award rect, #neon-award circle, #neon-award ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-award 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><circle cx="12" cy="8" r="7"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

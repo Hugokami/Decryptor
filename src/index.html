@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG STUDIO // EDITOR v2.0</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Tailwind CSS (Keep CDN for simplicity for now, or bundle) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icon Pack Data (This will be moved to dynamic loading later) -->
+    <script src="../icons_data.js"></script>
+
+    <!-- UI Core Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Draggable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- CodeMirror Core and Theme -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-darker.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/xml/xml.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Moon Walk', 'sans-serif'],
+                        display: ['Moon Walk', 'sans-serif'],
+                        tech: ['Moon Walk', 'sans-serif'],
+                        mono: ['Moon Walk', 'ui-monospace', 'monospace']
+                    },
+                    colors: {
+                        bg: '#050505',
+                        panel: '#111111',
+                        border: '#333333',
+                        accent: '#E5FF00',
+                        muted: '#666666'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-bg text-gray-100 h-screen flex flex-col overflow-hidden font-sans">
+
+    <!-- CRT Noise -->
+    <div class="noise-overlay"></div>
+
+    <!-- Intro Overlay -->
+    <div id="intro-overlay" class="fixed inset-0 z-[100000] bg-bg flex flex-col items-center justify-center overflow-hidden">
+        <div id="intro-content" class="text-center relative flex flex-col items-center">
+            <div class="overflow-hidden mb-4">
+                <div id="intro-logo" class="text-white text-5xl font-display font-light tracking-[0.2em] opacity-0">
+                    <span class="font-black text-accent mr-2">■</span>SVG STUDIO
+                </div>
+            </div>
+            <div class="w-full max-w-[200px] h-[1px] bg-border relative overflow-hidden">
+                <div id="intro-line" class="absolute top-0 left-0 h-full w-full bg-accent"></div>
+            </div>
+            <div class="overflow-hidden mt-4">
+                <div id="intro-status" class="text-muted text-[10px] uppercase font-tech tracking-[0.3em] opacity-0">
+                    INITIALIZING WORKSPACE
+                </div>
+            </div>
+        </div>
+        <div id="intro-glow" class="absolute w-1/2 h-1/2 bg-accent/5 blur-[120px] rounded-full pointer-events-none opacity-0 mix-blend-screen"></div>
+    </div>
+
+    <!-- Global Header -->
+    <header
+        class="flex justify-between items-center px-4 py-0 bg-bg border-b-2 border-border z-50 shrink-0 h-12 relative">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-accent text-lg">■</span>
+                <span class="font-display text-sm font-bold tracking-wider text-white uppercase">SVG STUDIO</span>
+            </div>
+            <span class="text-muted text-xs font-tech uppercase tracking-widest hidden sm:inline">// EDITOR v2.0</span>
+        </div>
+        <div class="flex gap-2 items-center">
+            <div class="relative z-50" id="templatesWrapper">
+                <button id="templatesBtn" class="btn-brutal">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6z">
+                        </path>
+                    </svg>
+                    Templates
+                </button>
+                <div id="templatesDropdown" class="templates-dropdown hidden"></div>
+            </div>
+            <button id="libraryBtn" class="btn-brutal">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+                Local Assets
+            </button>
+            <button id="historyBtn" class="btn-brutal">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                History
+            </button>
+            <button id="layersBtn" class="btn-brutal">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                    </path>
+                </svg>
+                Layers
+            </button>
+            <button id="selectModeBtn" class="btn-brutal text-accent relative overflow-hidden group">
+                <svg class="w-3.5 h-3.5 relative z-10 group-[.active]:text-bg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
+                </svg>
+                <span class="relative z-10 group-[.active]:text-bg font-bold tracking-wider">SELECT: OFF</span>
+                <div class="absolute inset-0 bg-accent translate-y-full transition-transform duration-200 group-[.active]:translate-y-0 z-0"></div>
+            </button>
+            <button id="animBtn" class="btn-brutal">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Animations
+            </button>
+            <button id="settingsBtn" class="btn-brutal">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                    </path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                Settings
+            </button>
+            <button id="walkthroughBtn" class="btn-brutal">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                    </path>
+                </svg>
+                Guide
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex flex-row h-[calc(100vh-3.5rem)] relative overflow-hidden">
+
+        <!-- Editor Section -->
+        <section id="editorSection" class="flex flex-col bg-bg border-r-2 border-border h-full relative min-w-0"
+            style="flex: 0 0 35%;">
+            
+            <!-- Global Action Bar (Undo, Delete All) -->
+            <div class="flex items-center justify-between px-2 py-1 bg-panel border-b border-border shrink-0">
+                <div class="flex items-center gap-0.5">
+                    <button id="duplicateBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2"></path>
+                        </svg><span class="tooltip-text">Duplicate (Ctrl+D)</span>
+                    </button>
+                    <button id="undoBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors"><svg
+                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 10h10a5 5 0 015 5v2M3 10l6 6m-6-6l6-6"></path>
+                        </svg><span class="tooltip-text">Undo (Ctrl+Z)</span></button>
+                    <button id="redoBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a5 5 0 00-5 5v2M21 10l-6 6m6-6l-6-6"></path>
+                        </svg><span class="tooltip-text">Redo (Ctrl+Y)</span>
+                    </button>
+                    <button id="deleteAllBtn"
+                        class="tooltip p-1.5 text-muted hover:text-rose-400 transition-colors"><svg class="w-4 h-4"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                            </path>
+                        </svg><span class="tooltip-text">Delete All</span></button>
+                    <button id="stripAllAnimBtn"
+                        class="tooltip p-1.5 text-muted hover:text-amber-400 transition-colors"><svg class="w-4 h-4"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636">
+                            </path>
+                        </svg><span class="tooltip-text">Strip All Animations</span></button>
+                </div>
+                <span class="text-[9px] text-muted font-tech uppercase tracking-wider">SVG STUDIO</span>
+            </div>
+
+            <!-- Left Panel Tabs Header -->
+            <div class="flex items-center bg-panel border-b-2 border-border shrink-0">
+                <button class="left-tab-btn active flex-1 py-1.5 font-display text-[10px] font-bold tracking-wider text-accent border-r border-border hover:bg-bg transition-colors" data-tab="code">CODE</button>
+                <button class="left-tab-btn flex-1 py-1.5 font-display text-[10px] font-bold tracking-wider text-muted border-r border-border hover:text-accent hover:bg-bg transition-colors" data-tab="assets">ASSETS</button>
+                <button class="left-tab-btn flex-1 py-1.5 font-display text-[10px] font-bold tracking-wider text-muted border-r border-border hover:text-accent hover:bg-bg transition-colors" data-tab="animations">ANIMS</button>
+                <button class="left-tab-btn flex-1 py-1.5 font-display text-[10px] font-bold tracking-wider text-muted border-r border-border hover:text-accent hover:bg-bg transition-colors" data-tab="tools">TOOLS</button>
+                <button class="left-tab-btn flex-1 py-1.5 font-display text-[10px] font-bold tracking-wider text-muted hover:text-accent hover:bg-bg transition-colors" data-tab="properties">PROPS</button>
+            </div>
+            
+            <!-- Code Tab Content -->
+            <div id="tab-code" class="left-tab-content flex-1 flex flex-col min-h-0">
+                <!-- Editor Toolbar -->
+                <div class="px-3 py-1.5 bg-panel border-b border-border flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-0.5">
+                    <input type="file" id="fileInput" accept=".svg" class="hidden">
+                    <button id="uploadBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors"><svg
+                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg><span class="tooltip-text">Open File</span></button>
+                    <div class="w-px h-4 bg-border mx-1"></div>
+                    <button id="formatBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors"><svg
+                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h7"></path>
+                        </svg><span class="tooltip-text">Format (Ctrl+S)</span></button>
+                    <button id="minifyBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors"><svg
+                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16">
+                            </path>
+                        </svg><span class="tooltip-text">Minify</span></button>
+                    <div class="w-px h-4 bg-border mx-1"></div>
+                    <button id="removeBgBtn" class="tooltip p-1.5 text-muted hover:text-rose-400 transition-colors"><svg
+                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                            </path>
+                        </svg><span class="tooltip-text">Remove BG</span></button>
+                    <div class="w-px h-4 bg-border mx-1"></div>
+                    <button id="randomFontBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors"><svg
+                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
+                        </svg><span class="tooltip-text">Random Font</span></button>
+                    <div class="w-px h-4 bg-border mx-1"></div>
+                    <button id="copyBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors"><svg
+                            class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            </path>
+                        </svg><span class="tooltip-text">Copy Code</span></button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="wrapToggleBtn" class="btn-brutal text-[10px] py-0.5 tooltip">WRAP: OFF<span
+                            class="tooltip-text">Line Wrapping</span></button>
+                    <span id="validationStatus"
+                        class="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 font-tech flex items-center text-emerald-400 bg-emerald-400/10"
+                        title="Valid XML"><span class="status-dot valid"></span>Valid</span>
+                </div>
+            </div>
+            <!-- CodeMirror wrapper -->
+            <div class="flex-1 min-h-0 bg-bg overflow-hidden relative text-sm">
+                <textarea id="svgInput" class="hidden"></textarea>
+            </div>
+            </div> <!-- End tab-code -->
+
+            <!-- Properties Tab Content -->
+            <div id="tab-properties" class="left-tab-content hidden flex-1 flex flex-col min-h-0 bg-panel overflow-y-auto">
+                <!-- Properties UI (Truncated for brevity, normally fully populated) -->
+                 <div id="propsTabContent"></div>
+            </div>
+
+            <!-- Assets Tab Content -->
+            <div id="tab-assets" class="left-tab-content hidden flex-1 flex bg-panel min-h-0 relative overflow-hidden">
+                <div id="assetsGrid" class="flex-1 overflow-y-auto p-2 grid grid-cols-2 2xl:grid-cols-3 gap-2 content-start select-none"></div>
+            </div>
+
+            <!-- Tools Tab Content -->
+            <div id="tab-tools" class="left-tab-content hidden flex-1 flex flex-col min-h-0 bg-panel overflow-y-auto">
+                <div class="p-3 space-y-6">
+                    <div id="shadowGrid" class="grid grid-cols-2 gap-2"></div>
+                    <div id="backgroundGrid" class="grid grid-cols-2 gap-2"></div>
+                    <div id="meshGrid" class="grid grid-cols-2 gap-2"></div>
+                    <div id="clipPathGrid" class="grid grid-cols-2 gap-2"></div>
+                </div>
+            </div>
+
+            <!-- Animations Tab Content -->
+            <div id="tab-animations" class="left-tab-content hidden flex-1 flex flex-col min-h-0 bg-panel p-2">
+                <div id="animateSettingsPanel" class="flex flex-col gap-3 p-4"></div>
+                <div id="animList" class="flex-1 overflow-y-auto flex flex-col gap-2"></div>
+            </div>
+        </section>
+
+        <!-- Draggable Resizer -->
+        <div id="resizer" class="resizer z-20"></div>
+
+        <!-- Preview Section -->
+        <section id="previewSection" class="flex-1 flex flex-col bg-panel h-full relative min-w-0">
+            <!-- Preview Toolbar -->
+            <div class="px-3 py-1.5 bg-panel border-b border-border flex justify-between items-center shrink-0 z-10">
+                <div class="flex items-center gap-0.5 border border-border p-0.5">
+                    <button id="viewFreeBtn" class="px-2 py-0.5 text-[10px] font-tech uppercase tracking-wider text-accent bg-accent/10 border border-accent/30 transition-all">Free</button>
+                    <button id="viewMobileBtn" class="px-2 py-0.5 text-[10px] font-tech uppercase tracking-wider text-muted hover:text-accent transition-all">Mobile</button>
+                    <button id="viewTabletBtn" class="px-2 py-0.5 text-[10px] font-tech uppercase tracking-wider text-muted hover:text-accent transition-all">Tablet</button>
+                </div>
+                <div class="flex items-center gap-0.5">
+                    <button id="exportPngBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg><span class="tooltip-text">Export PNG</span></button>
+                    <button id="downloadBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg><span class="tooltip-text">Download SVG</span></button>
+                    <button id="recordBtn" class="tooltip p-1.5 text-muted hover:text-red-500 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg><span class="tooltip-text">Record WebM</span></button>
+                </div>
+            </div>
+
+            <!-- Output Container (Canvas) -->
+            <div id="svgPreviewContainer" class="flex-1 w-full flex items-center justify-center overflow-hidden tech-grid-bg relative cursor-grab active:cursor-grabbing">
+                <div class="crosshair ch-tl"></div>
+                <div class="crosshair ch-tr"></div>
+                <div class="crosshair ch-bl"></div>
+                <div class="crosshair ch-br"></div>
+                <div id="globalScanLine" class="scan-line"></div>
+                <div id="viewportBox" class="w-full h-full flex items-center justify-center relative">
+                    <div id="svgTransformWrapper"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-panel border-2 border-border text-white px-4 py-2.5 shadow-2xl transform translate-y-10 opacity-0 transition-all duration-200 z-50 flex items-center gap-2.5 text-xs font-tech uppercase tracking-wider">
+        <span id="toastMsg">Action completed!</span>
+    </div>
+
+    <!-- UI Logic -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>

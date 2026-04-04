@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-shield_check">
+<style>
+  @keyframes draw-shield_check {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-shield_check path, #draw-shield_check line, #draw-shield_check polyline, #draw-shield_check polygon, 
+  #draw-shield_check rect, #draw-shield_check circle, #draw-shield_check ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-shield_check 2s ease-out forwards;
+  }
+</style><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-shield_check 2s ease-out forwards"><path d="m9 12 2 2 4-4"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-shield_check 2s ease-out forwards"></svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="float-key">
+  <style>
+    @keyframes float-key {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      33% { transform: translateY(-4px) rotate(3deg) scale(1.05); }
+      66% { transform: translateY(2px) rotate(-2deg) scale(0.98); }
+    }
+    #float-key {
+      animation: float-key 4s cubic-bezier(0.45, 0, 0.15, 1) infinite;
+      transform-origin: center;
+      overflow: visible;
+    }
+    #float-key * {
+      stroke: currentColor;
+      stroke-width: 2;
+      transition: stroke 0.3s ease;
+    }
+  </style><path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"/><path d="m21 2-9.6 9.6"/><circle cx="7.5" cy="15.5" r="5.5"/></svg>

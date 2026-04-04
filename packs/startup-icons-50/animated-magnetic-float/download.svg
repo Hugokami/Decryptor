@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="float-download">
+  <style>
+    @keyframes float-download {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      33% { transform: translateY(-4px) rotate(3deg) scale(1.05); }
+      66% { transform: translateY(2px) rotate(-2deg) scale(0.98); }
+    }
+    #float-download {
+      animation: float-download 4s cubic-bezier(0.45, 0, 0.15, 1) infinite;
+      transform-origin: center;
+      overflow: visible;
+    }
+    #float-download * {
+      stroke: currentColor;
+      stroke-width: 2;
+      transition: stroke 0.3s ease;
+    }
+  </style><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-bar_chart">
+<style>
+  @keyframes draw-bar_chart {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-bar_chart path, #draw-bar_chart line, #draw-bar_chart polyline, #draw-bar_chart polygon, 
+  #draw-bar_chart rect, #draw-bar_chart circle, #draw-bar_chart ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-bar_chart 2s ease-out forwards;
+  }
+</style><line x1="12" y1="20" x2="12" y2="10"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-bar_chart 2s ease-out forwards"><line x1="18" y1="20" x2="18" y2="4"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-bar_chart 2s ease-out forwards"><line x1="6" y1="20" x2="6" y2="16"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-bar_chart 2s ease-out forwards"></svg>

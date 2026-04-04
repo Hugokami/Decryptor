@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AG-WEB3 // INDUSTRIAL COMMAND CENTER</title>
+    <link rel="stylesheet" href="assets/web3/ag-web3-states.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg-deep: #050505;
+            --panel-bg: #0d0d0d;
+            --accent-lime: #f4ff4d;
+            --text-main: #ffffff;
+            --text-dim: #666666;
+            --border-tech: #222222;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            padding: 40px;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 2px 2px, #111 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        .header-system {
+            margin-bottom: 80px;
+            border-left: 4px solid var(--accent-lime);
+            padding-left: 24px;
+        }
+
+        .header-system h1 {
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        .header-system p {
+            color: var(--text-dim);
+            max-width: 600px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            align-items: start;
+        }
+
+        .asset-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-tech);
+            padding: 32px;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .asset-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-lime);
+        }
+
+        .asset-card:nth-child(even) {
+            transform: translateY(40px);
+        }
+
+        .asset-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            font-size: 0.7rem;
+            color: var(--accent-lime);
+        }
+
+        .asset-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .asset-desc {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-bottom: 32px;
+        }
+
+        .asset-visual {
+            display: flex;
+            justify-content: center;
+            padding: 60px 40px;
+            background: rgba(255,255,255,0.01);
+            border: 1px dashed #1a1a1a;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient Technical Glow for definition */
+        .asset-visual::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(244, 255, 77, 0.03) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--border-tech);
+            color: var(--text-dim);
+            padding: 8px;
+            font-family: inherit;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            border-color: var(--accent-lime);
+            color: var(--accent-lime);
+        }
+
+        button.active {
+            background: var(--accent-lime);
+            color: var(--bg-deep);
+            border-color: var(--accent-lime);
+        }
+
+        .telemetry-row {
+            margin-top: 24px;
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            display: flex;
+            gap: 16px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="header-system">
+        <h1>Industrial Decryptor <span style="color:var(--text-dim)">v2.0</span></h1>
+        <p>High-ticket Web3 transaction state library for elite dApps. <br> 
+           [STATUS: OPERATIONAL] [VERSION: 2.0.4-BRUTALIST]</p>
+    </header>
+
+    <div class="command-grid">
+        
+        <!-- ASSET 01: SECURE WALLET -->
+        <article class="asset-card" id="card-wallet">
+            <div class="asset-meta">
+                <span>[ID: 01-SECURE_WL]</span>
+                <span>[NET: ETH_MAIN]</span>
+            </div>
+            <h2 class="asset-title">Secure Wallet</h2>
+            <p class="asset-desc">Multi-sig authorization interface with fragmented security layers.</p>
+            
+            <div class="asset-visual">
+                <div class="ag-web3-container" data-ag-state="idle" id="icon-wallet">
+                    <svg viewBox="0 0 100 100">
+                        <!-- Industrial Housing -->
+                        <rect class="ag-main-part" x="20" y="30" width="60" height="40" stroke-width="2" pathLength="1" />
+                        <path class="ag-main-part" d="M20 45 L80 45" pathLength="1" />
+                        <!-- Crypto Chip (Dynamic) -->
+                        <rect class="ag-dynamic-part" x="65" y="45" width="10" height="10" pathLength="1" />
+                        <path class="ag-dynamic-part" d="M70 55 L70 65" pathLength="1" />
+                        <circle class="ag-dynamic-part" cx="70" cy="40" r="2" pathLength="1" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button onclick="updateState('wallet', 'idle', this)" class="active">Idle</button>
+                <button onclick="updateState('wallet', 'signing', this)">Sign</button>
+                <button onclick="updateState('wallet', 'pending', this)">Wait</button>
+                <button onclick="updateState('wallet', 'success', this)">Pass</button>
+                <button onclick="updateState('wallet', 'error', this)">Fail</button>
+            </div>
+            <div class="telemetry-row">
+                <span>[LOG: SYNCING]</span>
+                <span>[HASH: 0x...8E42]</span>
+            </div>
+        </article>
+
+        <!-- ASSET 02: GAS OPTIMIZER -->
+        <article class="asset-card" id="card-gas">
+            <div class="asset-meta">
+                <span>[ID: 02-FUEL_OP]</span>
+                <span>[NET: ARB_ONE]</span>
+            </div>
+            <h2 class="asset-title">Gas Optimizer</h2>
+            <p class="asset-desc">Segmented fuel gauge for real-time priority gas estimation.</p>
+            
+            <div class="asset-visual">
+                <div class="ag-web3-container" data-ag-state="idle" id="icon-gas">
+                    <svg viewBox="0 0 100 100">
+                        <!-- Gauge Housing -->
+                        <path class="ag-main-part" d="M20 80 A40 40 0 0 1 80 80" stroke-width="2" pathLength="1" />
+                        <rect class="ag-main-part" x="48" y="70" width="4" height="15" pathLength="1" />
+                        <!-- Indicator (Dynamic) -->
+                        <path class="ag-dynamic-part" d="M50 80 L30 40" stroke-width="3" pathLength="1" />
+                        <path class="ag-dynamic-part" d="M20 80 L15 85" pathLength="1" />
+                        <path class="ag-dynamic-part" d="M80 80 L85 85" pathLength="1" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button onclick="updateState('gas', 'idle', this)" class="active">Idle</button>
+                <button onclick="updateState('gas', 'signing', this)">Sign</button>
+                <button onclick="updateState('gas', 'pending', this)">Wait</button>
+                <button onclick="updateState('gas', 'success', this)">Pass</button>
+                <button onclick="updateState('gas', 'error', this)">Fail</button>
+            </div>
+            <div class="telemetry-row">
+                <span>[LOG: CALC]</span>
+                <span>[GWEI: 12.4]</span>
+            </div>
+        </article>
+
+        <!-- ASSET 03: ATOMIC BRIDGE -->
+        <article class="asset-card" id="card-bridge">
+            <div class="asset-meta">
+                <span>[ID: 03-ATOM_BRG]</span>
+                <span>[NET: CROSS_CH]</span>
+            </div>
+            <h2 class="asset-title">Atomic Bridge</h2>
+            <p class="asset-desc">Interlocking protocol interface for cross-chain liquidity flow.</p>
+            
+            <div class="asset-visual">
+                <div class="ag-web3-container" data-ag-state="idle" id="icon-bridge">
+                    <svg viewBox="0 0 100 100">
+                        <!-- Bridge Pillars -->
+                        <rect class="ag-main-part" x="15" y="20" width="10" height="60" pathLength="1" />
+                        <rect class="ag-main-part" x="75" y="20" width="10" height="60" pathLength="1" />
+                        <!-- Liquidity Flow (Dynamic) -->
+                        <path class="ag-dynamic-part" d="M25 40 L75 40" stroke-width="2" pathLength="1" />
+                        <path class="ag-dynamic-part" d="M25 60 L75 60" stroke-width="2" pathLength="1" />
+                        <rect class="ag-dynamic-part" x="45" y="45" width="10" height="10" pathLength="1" />
+                    </svg>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button onclick="updateState('bridge', 'idle', this)" class="active">Idle</button>
+                <button onclick="updateState('bridge', 'signing', this)">Sign</button>
+                <button onclick="updateState('bridge', 'pending', this)">Wait</button>
+                <button onclick="updateState('bridge', 'success', this)">Pass</button>
+                <button onclick="updateState('bridge', 'error', this)">Fail</button>
+            </div>
+            <div class="telemetry-row">
+                <span>[LOG: SWAP]</span>
+                <span>[DST: SOL]</span>
+            </div>
+        </article>
+
+    </div>
+
+    <script src="assets/web3/ag-web3.js"></script>
+    <script>
+        function updateState(iconId, state, btn) {
+            agSetState('#icon-' + iconId, state);
+            const card = btn.closest('.asset-card');
+            const buttons = card.querySelectorAll('button');
+            buttons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            console.log(`[SYSTEM] Asset ${iconId} shifted to ${state}`);
+        }
+    </script>
+</body>
+</html>

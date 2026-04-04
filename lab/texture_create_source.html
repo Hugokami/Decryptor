@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TextureCreate</title>
+  <link rel="icon" type="image/png" href="./favicon.png">
+  <meta name="description" content="WebGL2ベースの高機能テクスチャジェネレーター。50種類以上のTypeとグラジエントランプを搭載。">
+  <script src="./gif.js"></script>
+  <script type="module" crossorigin src="./assets/index--AO9wOAQ.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-C0xfjeVl.css">
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- ヘッダー（ShaderCreate準拠） -->
+    <div id="header">
+      <div id="header-left" style="display:flex; align-items:center; gap: 10px;">
+        <span id="app-title">TextureCreate</span>
+        <span style="font-size: 0.8em; color: #888; display: flex; align-items: center; gap: 8px;">
+          <span>by <a href="https://gameanimation.info/" target="_blank"
+              style="color:#aaa; text-decoration:none;">ゲームUI演出</a></span>
+          <span style="color: #666;">|</span>
+          <a id="link-terms" href="https://gameanimation.info/?p=5200" target="_blank"
+            style="color:#aaa; text-decoration:underline;">利用規約</a>
+          <span style="color: #666;">|</span>
+          <a href="https://gameanimation.booth.pm/items/4334040" target="_blank"
+            style="color:#aaa; text-decoration:underline;">Effect_Ideas_100</a>
+          <span style="color: #666;">|</span>
+          <a href="https://gameanimation.booth.pm/items/3147121" target="_blank"
+            style="color:#aaa; text-decoration:underline;">Texture_Ideas_100</a>
+          <span style="color: #666;">|</span>
+          <a href="https://gameanimation.booth.pm/items/5424271" target="_blank"
+            style="color:#aaa; text-decoration:underline;">Particle_Ideas_100</a>
+        </span>
+      </div>
+      <div id="header-right">
+        <button id="btn-lang-toggle" class="header-btn"
+          style="background:transparent;border:1px solid #444;color:#ccc;cursor:pointer;border-radius:4px;padding:2px 8px;margin-right:12px;font-size:0.8rem;">🌐
+          EN</button>
+        <span id="info-type" class="header-info">Circle</span>
+        <span class="header-sep">·</span>
+        <span id="info-res" class="header-info">512×512</span>
+      </div>
+    </div>
+
+    <!-- メイン4カラム -->
+    <div id="body">
+
+      <!-- レイヤーパネル (新設) -->
+      <div id="layer-panel" class="layer-side-panel">
+        <div class="layer-panel-header">
+          <button id="btn-add-layer-top" class="layer-add-btn" title="Add Layer">+</button>
+        </div>
+        <div id="layer-list-container">
+          <!-- JSからレイヤーアイテムを流し込む -->
+        </div>
+      </div>
+
+      <!-- 左パネル: Type・Params -->
+      <div id="left-panel" class="side-panel">
+        <div id="gui-left">
+          <!-- JS から生成 -->
+        </div>
+      </div>
+
+      <!-- サムネイルパネル -->
+      <div id="thumbnail-panel" class="thumbnail-side-panel">
+        <div id="thumbnail-grid-container">
+          <div id="thumbnail-grid"></div>
+        </div>
+      </div>
+
+      <!-- 中央: TopPanel + Canvas -->
+      <div id="center-column">
+        <!-- TopPanel（エクスポートボタン） -->
+        <div id="top-panel">
+          <button id="btn-save-png" class="export-btn" style="background:#ff9800;">PNG 保存</button>
+          <button id="btn-save-gif" class="export-btn" style="background:#e91e63;">GIF 保存</button>
+          <button id="btn-save-normal" class="export-btn" style="background:#4caf50;">ノーマルマップ保存</button>
+          <button id="btn-open-grid-modal" class="export-btn" style="background:#2196f3;">全タイプ一覧を表示</button>
+          <div class="top-divider"></div>
+          <!-- プリセット セーブ・ロード -->
+          <div class="preset-controls">
+            <button id="btn-save-preset" class="preset-btn">Save Preset</button>
+            <button id="btn-load-preset" class="preset-btn">Load Preset</button>
+            <input type="file" id="input-load-preset" accept=".json" style="display:none;" />
+            <div style="display: flex; flex-wrap: nowrap; gap: 10px; margin-left: auto;">
+              <label
+                style="color: #fff; font-size: 13px; display: flex; align-items: center; cursor: pointer; white-space: nowrap;">
+                <input type="checkbox" id="chk-black-bg" style="margin-right: 5px;" />
+                <span id="label-black-bg">Black Bg</span>
+              </label>
+              <label
+                style="color: #fff; font-size: 13px; display: flex; align-items: center; cursor: pointer; white-space: nowrap;">
+                <input type="checkbox" id="chk-cb-bg" style="margin-right: 5px;" checked />
+                <span id="label-cb-bg">CB Bg</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- キャンバスエリア -->
+        <div id="canvas-area">
+          <div id="preview-canvas-container">
+            <canvas id="preview-canvas" width="512" height="512"></canvas>
+            <div id="canvas-overlay">512 × 512 px</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右パネル: Post-process・Gradient -->
+      <div id="right-panel" class="side-panel">
+        <div id="gui-right">
+          <!-- JS から生成 -->
+        </div>
+
+        <!-- グラジエントランプセクション -->
+        <div id="gradient-section">
+          <div class="category-header" id="grad-cat-header">
+            グラジエントランプ機能
+            <label class="check-label" onclick="event.stopPropagation()">
+              <input type="checkbox" id="grad-enable-toggle" />
+              <span class="grad-enable-text">有効</span>
+            </label>
+          </div>
+          <div id="gradient-editor-area"></div>
+        </div>
+      </div>
+
+    </div><!-- /#body -->
+  </div><!-- /#app -->
+
+  <!-- 全画面テクスチャグリッドモーダル -->
+  <div id="texture-grid-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">テクスチャタイプ一覧</span>
+        <button id="modal-close-btn" class="modal-close">✖</button>
+      </div>
+      <div id="modal-grid-body" class="modal-body">
+        <!-- JSでサムネイルを流し込む -->
+      </div>
+    </div>
+  </div>
+
+  <!-- GIF書き出し用プログレス・オーバーレイ -->
+  <div id="gif-progress-overlay" class="modal-overlay"
+    style="display: none; z-index: 10000; flex-direction: column; justify-content: center; align-items: center;">
+    <div
+      style="background: rgba(30, 30, 30, 0.9); padding: 30px; border-radius: 8px; border: 1px solid #444; text-align: center; min-width: 300px;">
+      <h3 id="gif-progress-text" style="color: #fff; margin-top: 0; margin-bottom: 20px;">GIF 保存中... 0%</h3>
+      <div style="width: 100%; background: #222; height: 10px; border-radius: 5px; overflow: hidden;">
+        <div id="gif-progress-bar" style="width: 0%; height: 100%; background: #e91e63; transition: width 0.1s;"></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

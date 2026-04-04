@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="holo-home">
+  <defs>
+    <linearGradient id="grad-home" x1="0%" y1="0%" x2="200%" y2="200%">
+      <stop offset="0%" stop-color="#FF0080" />
+      <stop offset="33%" stop-color="#7928CA" />
+      <stop offset="66%" stop-color="#4facfe" />
+      <stop offset="100%" stop-color="#00f2fe" />
+      <animate attributeName="x1" values="0%;-100%;0%" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="y1" values="0%;-100%;0%" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="x2" values="200%;100%;200%" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="200%;100%;200%" dur="4s" repeatCount="indefinite" />
+    </linearGradient>
+  </defs>
+  <style>
+    #holo-home * {
+      stroke: url(#grad-home);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+  </style><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="float-sun">
+  <style>
+    @keyframes float-sun {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      33% { transform: translateY(-4px) rotate(3deg) scale(1.05); }
+      66% { transform: translateY(2px) rotate(-2deg) scale(0.98); }
+    }
+    #float-sun {
+      animation: float-sun 4s cubic-bezier(0.45, 0, 0.15, 1) infinite;
+      transform-origin: center;
+      overflow: visible;
+    }
+    #float-sun * {
+      stroke: currentColor;
+      stroke-width: 2;
+      transition: stroke 0.3s ease;
+    }
+  </style><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>

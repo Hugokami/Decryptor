@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-credit_card">
+<style>
+  @keyframes draw-credit_card {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-credit_card path, #draw-credit_card line, #draw-credit_card polyline, #draw-credit_card polygon, 
+  #draw-credit_card rect, #draw-credit_card circle, #draw-credit_card ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-credit_card 2s ease-out forwards;
+  }
+</style><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-credit_card 2s ease-out forwards"><line x1="1" y1="10" x2="23" y2="10"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-credit_card 2s ease-out forwards"></svg>

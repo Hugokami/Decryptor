@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="pulse-clock">
+<style>
+  @keyframes pulse-clock {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  #pulse-clock {
+    animation: pulse-clock 2s ease-in-out infinite;
+    transform-origin: center center;
+    transform-box: fill-box;
+  }
+</style><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>

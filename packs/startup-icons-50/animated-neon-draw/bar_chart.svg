@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-bar_chart">
+  <defs>
+    <filter id="glow-bar_chart" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-bar_chart {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-bar_chart); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-bar_chart); opacity: 1; }
+    }
+    #neon-bar_chart path, #neon-bar_chart line, #neon-bar_chart polyline, #neon-bar_chart polygon, 
+    #neon-bar_chart rect, #neon-bar_chart circle, #neon-bar_chart ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-bar_chart 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><line x1="12" y1="20" x2="12" y2="10"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="18" y1="20" x2="18" y2="4"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="6" y1="20" x2="6" y2="16"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

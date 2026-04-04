@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-star">
+  <defs>
+    <filter id="glow-star" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-star {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-star); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-star); opacity: 1; }
+    }
+    #neon-star path, #neon-star line, #neon-star polyline, #neon-star polygon, 
+    #neon-star rect, #neon-star circle, #neon-star ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-star 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

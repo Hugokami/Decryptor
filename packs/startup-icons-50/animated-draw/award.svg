@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-award">
+<style>
+  @keyframes draw-award {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-award path, #draw-award line, #draw-award polyline, #draw-award polygon, 
+  #draw-award rect, #draw-award circle, #draw-award ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-award 2s ease-out forwards;
+  }
+</style><circle cx="12" cy="8" r="7"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-award 2s ease-out forwards"><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-award 2s ease-out forwards"></svg>

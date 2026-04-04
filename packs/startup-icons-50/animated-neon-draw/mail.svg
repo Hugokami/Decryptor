@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-mail">
+  <defs>
+    <filter id="glow-mail" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-mail {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-mail); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-mail); opacity: 1; }
+    }
+    #neon-mail path, #neon-mail line, #neon-mail polyline, #neon-mail polygon, 
+    #neon-mail rect, #neon-mail circle, #neon-mail ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-mail 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><polyline points="22,6 12,13 2,6"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

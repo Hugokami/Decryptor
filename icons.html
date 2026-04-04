@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ICON PACK // 56,000+ ASSETS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'Moon Walk';
+            src: url('./fonts/moon-walk/Moon Walk.ttf') format('truetype');
+            font-weight: normal;
+            font-display: swap;
+            font-style: normal;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Moon Walk', 'sans-serif'],
+                        mono: ['Moon Walk', 'monospace']
+                    },
+                    colors: {
+                        bg: '#050505',
+                        panel: '#111111',
+                        border: '#222222',
+                        accent: '#E5FF00',
+                        muted: '#666666'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #222; }
+        ::-webkit-scrollbar-thumb:hover { background: #E5FF00; }
+
+        .tech-grid-bg {
+            background-image: 
+                linear-gradient(rgba(229, 255, 0, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(229, 255, 0, 0.02) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+
+        .icon-card {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, border-color, box-shadow;
+            contain: content;
+        }
+        .icon-card:hover {
+            border-color: #E5FF00;
+            background: #111;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(229, 255, 0, 0.1);
+        }
+        .icon-card svg {
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform;
+            transform-box: fill-box;
+            backface-visibility: hidden;
+            pointer-events: none;
+        }
+        .icon-card:hover svg {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 4px rgba(229, 255, 0, 0.5));
+        }
+
+        .icon-card.selection-active {
+            cursor: cell;
+        }
+        .selection-active::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            border: 1px solid rgba(229, 255, 0, 0.5);
+            border-radius: 50%;
+        }
+        .icon-card.ring-accent::after {
+            background: #E5FF00;
+            border-color: #E5FF00;
+            box-shadow: 0 0 10px #E5FF00;
+        }
+
+        .icon-card:hover .btn-action {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .btn-action {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card-enter {
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        .copy-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(229, 255, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .copy-overlay.active {
+            opacity: 1;
+        }
+
+        .toast {
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Motion Overlays */
+        @keyframes motion-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        @keyframes motion-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes motion-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes motion-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+        .motion-pulse { animation: motion-pulse 2s infinite ease-in-out; }
+        .motion-spin { animation: motion-spin 2s infinite linear; }
+        .motion-bounce { animation: motion-bounce 0.6s infinite ease-in-out; }
+        .motion-shake { animation: motion-shake 0.2s infinite linear; }
+
+        #dropZone {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(229, 255, 0, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 4px dashed #E5FF00;
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        #dropZone.active { display: flex; }
+
+        :root {
+            --accent-color: #E5FF00;
+        }
+        .text-accent { color: var(--accent-color) !important; }
+        .bg-accent { background-color: var(--accent-color) !important; }
+        .border-accent { border-color: var(--accent-color) !important; }
+        .ring-accent { --tw-ring-color: var(--accent-color) !important; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-color); }
+    </style>
+</head>
+<body class="bg-bg text-gray-400 font-sans min-h-screen overflow-x-hidden tech-grid-bg flex">
+    
+    <!-- Project Sidebar -->
+    <aside id="projectSidebar" class="w-16 hover:w-64 h-screen sticky top-0 bg-panel border-r border-border z-50 transition-all duration-300 flex flex-col group overflow-hidden shrink-0">
+        <div class="p-4 border-b border-border flex items-center justify-between min-w-[240px]">
+            <span class="text-white font-black italic tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">PROJECTS.EXE</span>
+            <button id="addProjectBtn" class="text-accent hover:scale-110 transition-transform" title="New Collection">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </button>
+        </div>
+        <div id="projectList" class="flex-grow overflow-y-auto py-4 flex flex-col gap-1 items-center group-hover:items-stretch px-2">
+            <!-- Projects injected here -->
+        </div>
+        <div class="p-4 border-t border-border opacity-0 group-hover:opacity-100 transition-opacity min-w-[240px]">
+            <p class="text-[8px] text-muted leading-tight uppercase font-mono">Drag icons here to collect</p>
+        </div>
+    </aside>
+
+    <div class="flex-grow">
+    <!-- Top Nav -->
+    <header class="sticky top-0 z-50 bg-bg/80 backdrop-blur-md border-b border-border px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-accent flex items-center justify-center text-black font-black text-xl">I</div>
+            <div>
+                <h1 class="text-white font-bold leading-none text-lg">ICON PACK <span class="text-muted text-sm font-light">// 56,000+ ASSETS</span></h1>
+                <p class="text-[10px] text-muted tracking-[0.2em] font-mono mt-1 uppercase">PHOSPSHOR + SOLAR + FLUENT + TABLER + LUCIDE + REMIX + CARBON + BOOTSTRAP</p>
+            </div>
+        </div>
+
+        <div class="flex flex-1 max-w-2xl w-full items-center gap-2">
+            <div class="relative flex-1">
+                <input type="text" id="searchInput" placeholder="SEARCH ICONS..." 
+                    class="w-full bg-panel border border-border px-10 py-2 text-white font-mono text-xs focus:outline-none focus:border-accent transition-colors">
+                <svg class="w-4 h-4 absolute left-3 top-2.5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            
+            <select title="Select Icon Library" id="categorySelect" class="bg-panel border border-border px-4 py-2 text-white font-mono text-[10px] focus:outline-none focus:border-accent appearance-none cursor-pointer">
+                <option value="all">ALL LIBRARIES</option>
+                <option value="ph">PHOSPHOR</option>
+                <option value="solar">SOLAR</option>
+                <option value="fluent">FLUENT</option>
+                <option value="tabler">TABLER</option>
+                <option value="lucide">LUCIDE</option>
+                <option value="ri">REMIX</option>
+                <option value="carbon">CARBON</option>
+                <option value="bi">BOOTSTRAP</option>
+                <option value="logos">LOGOS</option>
+                <option value="skill-icons">SKILL ICONS</option>
+                <option value="line-md">LINE MD</option>
+                <option value="fxemoji">EMOJI</option>
+                <option value="svg-spinners">SPINNERS</option>
+                <option value="eos-icons">EOS ICONS</option>
+            </select>
+
+            <select title="Select Category" id="typeSelect" class="bg-panel border border-border px-4 py-2 text-white font-mono text-[10px] focus:outline-none focus:border-accent appearance-none cursor-pointer hover:bg-zinc-800 transition-colors">
+                <option value="all">ALL TYPES</option>
+                <option value="1">SYSTEM (MONO)</option>
+                <option value="2">COLORED (LOGO/EMOJI)</option>
+                <option value="3">ANIMATED (FX/SPINNERS)</option>
+                <option value="interactive">INTERACTIVE</option>
+            </select>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <a href="index.html" title="Back to Dashboard" class="p-2 hover:bg-panel border border-transparent hover:border-border transition-all text-muted hover:text-white">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            </a>
+            <a href="svgviewer.html" title="Open Editor" class="px-3 py-1 bg-white text-black text-[10px] font-bold uppercase tracking-widest hover:brightness-110 transition-all">
+                EDITOR ↗
+            </a>
+            <div class="w-px h-6 bg-border mx-2"></div>
+            <button id="settingsBtn" title="Gallery Settings" class="p-2 hover:bg-panel border border-transparent hover:border-border transition-all">
+                <svg class="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+            <button id="selectionToggle" title="Toggle Selection Mode" class="px-3 py-1 bg-panel border border-border text-[10px] font-mono hover:border-accent transition-colors">
+                SELECT: OFF
+            </button>
+            <span id="resultCount" class="text-[10px] font-mono text-accent">LOADING...</span>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="p-6">
+        <div id="iconGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-3">
+            <!-- Icons injected here -->
+        </div>
+
+        <!-- Skeleton / Loading -->
+        <div id="loadingState" class="flex flex-col items-center justify-center py-20 opacity-50">
+            <div class="w-12 h-12 border-2 border-accent border-t-transparent animate-spin mb-4"></div>
+            <p class="font-mono text-xs tracking-widest text-accent">INITIALIZING DATABASE...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden flex-col items-center justify-center py-20">
+            <p class="font-mono text-xs tracking-widest text-muted">NO ICONS FOUND MATCHING YOUR REQUEST</p>
+        </div>
+    </main>
+    </div> <!-- Close flex-grow -->
+
+    <!-- Drop Zone Overlay -->
+    <div id="dropZone">
+        <div class="text-center">
+            <h2 class="text-accent text-4xl font-black italic tracking-tighter mb-2">IMPORT SVG</h2>
+            <p class="text-white font-mono text-sm opacity-50 uppercase tracking-widest">Release to add to library</p>
+        </div>
+    </div>
+
+    <!-- Batch Toolbar -->
+    <div id="batchToolbar" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[90] scale-90 opacity-0 pointer-events-none transition-all duration-300">
+        <div class="bg-black border border-accent p-2 flex items-center gap-4 shadow-[0_0_30px_rgba(229,255,0,0.2)]">
+            <span id="selectionCount" class="text-accent font-mono text-[10px] ml-2 px-2 border-r border-border">0 SELECTED</span>
+            <button onclick="downloadBatch()" class="bg-accent text-black px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">
+                DOWNLOAD BATCH
+            </button>
+            <button onclick="clearSelection()" class="text-white hover:text-accent px-2 py-1.5 text-[10px] font-mono transition-colors">
+                DESELECT ALL
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="fixed top-0 right-0 h-full w-80 bg-black/95 backdrop-blur-xl border-l border-white/10 z-[60] p-6 transform translate-x-full transition-transform duration-500 ease-out flex flex-col gap-6 overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+            <h3 class="font-black text-xl italic tracking-tighter">CONFIG.SYS</h3>
+            <button onclick="toggleSettings()" class="text-muted hover:text-white" aria-label="Close Settings">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <label class="text-[10px] font-bold text-muted uppercase tracking-widest">Device Optimization</label>
+            <button id="lowSpecToggle" class="w-full h-12 bg-white/5 border border-white/10 flex items-center justify-between px-4 group hover:border-accent transition-colors">
+                <span class="text-xs font-bold uppercase">Low-Spec Mode</span>
+                <div class="w-10 h-5 bg-muted/20 relative rounded-full transition-colors border border-white/10">
+                    <div class="dot w-3 h-3 bg-muted absolute top-1 left-1 rounded-full transition-all duration-300"></div>
+                </div>
+            </button>
+            <p class="text-[9px] text-muted leading-tight mt-1">Saves RAM by unloading invisible icons and disabling heavy filters.</p>
+        </div>
+
+        <div class="flex flex-col gap-4">
+            <label class="text-[10px] font-bold text-muted uppercase tracking-widest">Animation Timings</label>
+            
+            <div class="bg-white/5 p-4 border border-white/5 rounded-sm">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="text-[10px] font-bold uppercase" for="previewDurInput">Preview Loop</label>
+                    <span id="previewDurVal" class="text-accent font-mono text-xs">2.0s</span>
+                </div>
+                <input type="range" id="previewDurInput" min="0.5" max="10.0" step="0.5" value="2.0" title="Adjust Preview Animation Duration" aria-label="Preview Animation Duration" class="w-full accent-accent bg-white/10 h-1 rounded-full appearance-none flex-grow">
+            </div>
+
+            <div class="bg-white/5 p-4 border border-white/5 rounded-sm">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="text-[10px] font-bold uppercase" for="copyDurInput">Export Dur</label>
+                    <span id="copyDurVal" class="text-accent font-mono text-xs">4.0s</span>
+                </div>
+                <input type="range" id="copyDurInput" min="1.0" max="12.0" step="0.5" value="4.0" title="Adjust Export/Copy Animation Duration" aria-label="Export Animation Duration" class="w-full accent-accent bg-white/10 h-1 rounded-full appearance-none flex-grow">
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-4">
+            <label class="text-[10px] font-bold text-muted uppercase tracking-widest">Visual Style & FX</label>
+            
+            <button id="forceLoopToggle" class="w-full h-12 bg-white/5 border border-white/10 flex items-center justify-between px-4 group hover:border-accent transition-colors">
+                <span class="text-xs font-bold uppercase">Always Loop</span>
+                <div class="w-10 h-5 bg-muted/20 relative rounded-full transition-colors border border-white/10">
+                    <div class="dot w-3 h-3 bg-muted absolute top-1 left-1 rounded-full transition-all duration-300"></div>
+                </div>
+            </button>
+
+            <div class="bg-white/5 p-4 border border-white/5 rounded-sm">
+                <label class="text-[10px] font-bold uppercase block mb-3 leading-none" for="fxSelect">Apply Filter / Texture</label>
+                <select id="fxSelect" title="Select Visual Filter or Texture" class="w-full bg-black border border-white/10 text-[11px] font-bold uppercase p-2 focus:border-accent outline-none">
+                    <option value="none" selected>Default (Clean)</option>
+                    <option value="glow">Neon Glow</option>
+                    <option value="grain">Film Grain</option>
+                    <option value="glass">Glass Morph</option>
+                    <option value="duotone">Duotone Cyan</option>
+                    <option value="glitch">Glitch Edge</option>
+                </select>
+            </div>
+
+            <div class="bg-white/5 p-4 border border-white/5 rounded-sm">
+                <label class="text-[10px] font-bold uppercase block mb-3 leading-none" for="motionSelect">Force Animation Overlay</label>
+                <select id="motionSelect" title="Select Motion Overlay" class="w-full bg-black border border-white/10 text-[11px] font-bold uppercase p-2 focus:border-accent outline-none">
+                    <option value="none" selected>Static (Default)</option>
+                    <option value="pulse">Breathing Pulse</option>
+                    <option value="spin">Continuous Spin</option>
+                    <option value="bounce">Bounce Load</option>
+                    <option value="shake">Warning Shake</option>
+                </select>
+            </div>
+
+            <div class="bg-white/5 p-4 border border-white/5 rounded-sm">
+                <label class="text-[10px] font-bold uppercase block mb-3 leading-none" for="themeColor">Global Accent Color</label>
+                <div class="flex items-center gap-3">
+                    <input type="color" id="themeColor" value="#E5FF00" title="Choose Accent Color"
+                        class="w-10 h-10 bg-transparent border-none cursor-pointer">
+                    <input type="text" id="themeHex" value="#E5FF00" title="Accent Hex Code" placeholder="#E5FF00"
+                        class="flex-grow bg-black border border-white/10 text-[11px] font-mono px-2 py-2 text-center uppercase focus:border-accent outline-none">
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-auto pt-6 border-t border-white/10 flex flex-col gap-3">
+            <button onclick="resetSettings()" class="w-full h-12 bg-white/5 hover:bg-white text-white hover:text-black font-bold uppercase text-xs transition-colors border border-white/10">
+                Reset Defaults
+            </button>
+            <p class="text-[8px] text-muted text-center italic opacity-50">OPTIMIZED FOR LOW-SPEC // VERSION 3.1.0</p>
+        </div>
+    </div>
+
+    <!-- SVG Filter Library -->
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true" focusable="false">
+        <defs>
+            <filter id="fx-glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="1.5" result="blur" />
+                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+            
+            <filter id="fx-grain" x="0%" y="0%" width="100%" height="100%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.80" numOctaves="4" stitchTiles="stitch" />
+                <feColorMatrix type="saturate" values="0" />
+                <feComponentTransfer>
+                    <feFuncA type="linear" slope="0.05" />
+                </feComponentTransfer>
+                <feComposite operator="in" in2="SourceGraphic" />
+            </filter>
+
+            <filter id="fx-glass" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+                <feSpecularLighting surfaceScale="5" specularConstant="1.2" specularExponent="20" lighting-color="#ffffff" in="blur" result="specular">
+                    <fePointLight x="-5000" y="-10000" z="20000" />
+                </feSpecularLighting>
+                <feComposite in="specular" in2="SourceGraphic" operator="in" result="composite" />
+                <feMerge>
+                    <feMergeNode in="SourceGraphic" />
+                    <feMergeNode in="composite" />
+                </feMerge>
+            </filter>
+
+            <filter id="fx-duotone">
+                <feColorMatrix type="matrix" values="0.2 0 0 0 0.1  0.2 0 0 0 0.8  0.2 0 0 0 0.8  0 0 0 1 0" />
+            </filter>
+
+            <filter id="fx-glitch">
+                <feOffset in="SourceGraphic" dx="2" dy="2" result="offset1" />
+                <feColorMatrix in="offset1" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="red" />
+                <feOffset in="SourceGraphic" dx="-2" dy="-2" result="offset2" />
+                <feColorMatrix in="offset2" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="cyan" />
+                <feMerge>
+                    <feMergeNode in="red" />
+                    <feMergeNode in="cyan" />
+                    <feMergeNode in="SourceGraphic" />
+                </feMerge>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] toast">
+        <div class="bg-accent text-black px-6 py-2 flex items-center gap-3 shadow-2xl">
+            <span class="font-bold text-[10px] uppercase tracking-tighter">SUCCESS</span>
+            <div class="h-4 w-px bg-black/20"></div>
+            <span id="toastIconName" class="font-mono text-[10px] opacity-70"></span>
+            <button onclick="document.getElementById('toast').classList.remove('show')" class="ml-4 hover:opacity-50 transition-opacity" title="Close Notification">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="icons_data.js"></script>
+    <script>
+        const ICONS_DATA = window.ICONS_DATA;
+
+        let PREVIEW_DUR = 2.0;
+        let COPY_DUR = 4.0;
+        let FORCE_LOOP = false;
+        let LOW_SPEC = false;
+        let ACTIVE_FX = 'none';
+        let ACTIVE_MOTION = 'none';
+        const THEME_COLOR = '#E5FF00';
+        const COLLECTIONS = JSON.parse(localStorage.getItem('ICON_COLLECTIONS') || '[]');
+        
+        // --- COMMUNICATION CHANNEL ---
+        const studioBridge = new BroadcastChannel('svg_studio_bridge');
+        
+        let selectionMode = false;
+        let selectedIcons = new Set();
+        
+        const typeSelect = document.getElementById('typeSelect');
+        const fxSelect = document.getElementById('fxSelect');
+        const lowSpecToggle = document.getElementById('lowSpecToggle');
+        
+        let filteredIcons = [];
+        let displayLimit = 100;
+
+        // Virtualization Observer (Defined early to avoid hoisting issues)
+        const iconObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const card = entry.target;
+                    const svgContainer = card.querySelector('[id^="svg-"]');
+                    if (svgContainer && !svgContainer.innerHTML) {
+                        const icon = JSON.parse(card.dataset.iconData);
+                        const body = card.dataset.body;
+                        const fillAttr = card.dataset.fill;
+                        const strokeAttr = card.dataset.stroke;
+                        const filterAttr = (ACTIVE_FX !== 'none' && !LOW_SPEC) ? `filter="url(#fx-${ACTIVE_FX})"` : '';
+                        
+                        svgContainer.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${icon.w} ${icon.h}" ${fillAttr} ${strokeAttr} stroke-linecap="round" stroke-linejoin="round" ${filterAttr} class="pointer-events-none">${body}</svg>`;
+                    }
+                } else if (LOW_SPEC) {
+                    // Unload icons in Low-Spec mode to save memory
+                    const svgContainer = entry.target.querySelector('[id^="svg-"]');
+                    if (svgContainer) svgContainer.innerHTML = '';
+                }
+            });
+        }, { rootMargin: '400px' });
+
+        let toastTimeout;
+        function showToast(name) {
+            clearTimeout(toastTimeout);
+            toastIconName.textContent = name;
+            toast.classList.add('show');
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        let iconCounter = 0;
+
+        function getLibraryStyle(name) {
+            const lib = name.split(':')[0].toLowerCase();
+            const fillLibs = ['ri', 'carbon', 'bi', 'logos', 'skill-icons', 'fxemoji', 'solar'];
+            const strokeLibs = ['ph', 'fluent', 'tabler', 'lucide', 'line-md', 'eos-icons'];
+            
+            if (fillLibs.includes(lib)) return 'fill';
+            if (strokeLibs.includes(lib)) return 'stroke';
+            return 'fill'; // Default to fill
+        }
+
+        function getSvgString(body, w, h, iconType, name, duration = COPY_DUR + "s") {
+            const isLogo = iconType === 2;
+            const isAnimated = iconType === 3;
+            const style = getLibraryStyle(name);
+            
+            let stroke = '';
+            let fill = '';
+            
+            if (isLogo) {
+                fill = 'fill="currentColor"';
+                stroke = '';
+            } else if (style === 'stroke') {
+                fill = 'fill="none"';
+                stroke = 'stroke="currentColor" stroke-width="2"';
+            } else {
+                fill = 'fill="currentColor"';
+                stroke = 'stroke="none"';
+            }
+            
+            let finalBody = body;
+            if (isAnimated) {
+                // Determine if it should loop: user toggle OR library hint OR name hint
+                const isSpinner = name.includes('spinner') || name.includes('loading') || name.includes('processing');
+                const isLoopHint = name.includes('-loop') || name.includes('_loop');
+                const shouldLoop = FORCE_LOOP || isSpinner || isLoopHint;
+
+                if (shouldLoop) {
+                    finalBody = finalBody.replace(/repeatCount="[^"]*"/g, 'repeatCount="indefinite"');
+                    if (!finalBody.includes('repeatCount=')) {
+                        finalBody = finalBody.replace(/<(animate|animateTransform|animateMotion)/g, '<$1 repeatCount="indefinite"');
+                    }
+                } else {
+                    // One-shot animations: Ensure they stay in completed state
+                    finalBody = finalBody.replace(/repeatCount="indefinite"/g, 'repeatCount="1"');
+                    finalBody = finalBody.replace(/fill="remove"/g, 'fill="freeze"');
+                }
+                
+                finalBody = finalBody.replace(/dur="[^"]*"/g, `dur="${duration}"`);
+            }
+
+            return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" ${fill} ${stroke} stroke-linecap="round" stroke-linejoin="round">${finalBody}</svg>`;
+        }
+
+        function copyIcon(body, name, w, h, type) {
+            const svg = getSvgString(body, w, h, type, name, COPY_DUR + "s");
+            navigator.clipboard.writeText(svg).then(() => showToast(`COPIED: ${name}`));
+        }
+
+        function downloadIcon(body, name, w, h, type) {
+            const svg = getSvgString(body, w, h, type, name, COPY_DUR + "s");
+            const blob = new Blob([svg], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${name.replace(':', '_')}.svg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast(`DOWNLOADED: ${name}`);
+        }
+
+        function createIconCard(icon) {
+            const card = document.createElement('div');
+            card.className = 'icon-card flex flex-col items-center justify-center p-4 relative group cursor-pointer aspect-square';
+            
+            const isLogo = icon.t === 2;
+            const isAnimated = icon.t === 3;
+            const cardId = `icon-${iconCounter++}`;
+            const isSelected = selectedIcons.has(icon);
+            
+            if (isSelected) card.classList.add('ring-2', 'ring-accent', 'border-accent');
+            if (selectionMode) card.classList.add('selection-active');
+
+            const colorClass = isLogo ? '' : 'text-white group-hover:text-accent';
+            const style = getLibraryStyle(icon.n);
+            
+            let strokeAttr = '';
+            let fillAttr = '';
+            
+            if (isLogo) {
+                fillAttr = 'fill="currentColor"';
+                strokeAttr = '';
+            } else if (isAnimated) {
+                fillAttr = 'fill="none"';
+                strokeAttr = 'stroke="currentColor" stroke-width="2"';
+            } else if (style === 'stroke') {
+                fillAttr = 'fill="none"';
+                strokeAttr = 'stroke="currentColor" stroke-width="2"';
+            } else {
+                fillAttr = 'fill="currentColor"';
+                strokeAttr = 'stroke="none"';
+            }
+
+            const svgContainer = document.createElement('div');
+            svgContainer.className = `w-10 h-10 flex items-center justify-center pointer-events-none ${colorClass}`;
+            
+            // Motion Overlay Engine
+            const motionWrapper = document.createElement('div');
+            motionWrapper.className = `w-full h-full flex items-center justify-center transition-all ${ACTIVE_MOTION !== 'none' ? `motion-${ACTIVE_MOTION}` : ''}`;
+            svgContainer.appendChild(motionWrapper);
+
+            let body = icon.b;
+
+            // Preview Optimization: Inject SVG only when visible using Intersection Observer
+            if (isAnimated) {
+                const isSpinner = icon.n.includes('spinner') || icon.n.includes('loading') || icon.n.includes('processing');
+                const isLoopHint = icon.n.includes('-loop') || icon.n.includes('_loop');
+                const shouldLoop = FORCE_LOOP || isSpinner || isLoopHint;
+
+                if (shouldLoop) {
+                    body = body.replace(/repeatCount="[^"]*"/g, 'repeatCount="indefinite"');
+                    if (!body.includes('repeatCount=')) {
+                        body = body.replace(/<(animate|animateTransform|animateMotion)/g, '<$1 repeatCount="indefinite"');
+                    }
+                } else {
+                    body = body.replace(/repeatCount="indefinite"/g, 'repeatCount="1"');
+                    body = body.replace(/fill="remove"/g, 'fill="freeze"');
+                }
+                body = body.replace(/dur="[^"]*"/g, `dur="${PREVIEW_DUR}s"`);
+            }
+            
+            // Optimized ID scoping
+            if (body.includes('id="') || body.includes('url(#')) {
+                const idRegex = /id="([^"]+)"/g;
+                const replacements = [];
+                let match;
+                while ((match = idRegex.exec(body)) !== null) {
+                    replacements.push([match[1], `${cardId}-${match[1]}`]);
+                }
+                replacements.forEach(([oldId, newId]) => {
+                    body = body.split(`id="${oldId}"`).join(`id="${newId}"`);
+                    body = body.split(`url(#${oldId})`).join(`url(#${newId})`);
+                    body = body.split(`xlink:href="#${oldId}"`).join(`xlink:href="#${newId}"`);
+                });
+            }
+
+            motionWrapper.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 ${icon.w} ${icon.h}" ${fillAttr} ${strokeAttr} stroke-linecap="round" stroke-linejoin="round" ${(ACTIVE_FX !== 'none' && !LOW_SPEC) ? `filter="url(#fx-${ACTIVE_FX})"` : ''} class="pointer-events-none">${body}</svg>`;
+            
+            const nameLabel = document.createElement('span');
+            nameLabel.className = 'mt-3 text-[9px] font-mono text-muted group-hover:text-white truncate w-full text-center px-2';
+            nameLabel.textContent = icon.n.split(':')[1];
+
+            const libLabel = document.createElement('span');
+            libLabel.className = 'absolute top-1 right-1 text-[7px] font-mono opacity-30 text-white';
+            libLabel.textContent = icon.n.split(':')[0].toUpperCase();
+
+            if (isAnimated) {
+                const animBadge = document.createElement('span');
+                animBadge.className = 'absolute top-1 left-1 text-[6px] font-bold bg-accent text-black px-1 leading-tight';
+                animBadge.textContent = 'ANIM';
+                card.appendChild(animBadge);
+            }
+
+            // Actions Overlay
+            const actions = document.createElement('div');
+            actions.className = 'absolute inset-0 bg-black/80 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity';
+            
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'btn-action bg-accent text-black p-1 hover:brightness-110';
+            copyBtn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>';
+            copyBtn.title = 'Copy SVG';
+
+            const downBtn = document.createElement('button');
+            downBtn.className = 'btn-action bg-white text-black p-1 hover:brightness-110';
+            downBtn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>';
+            downBtn.title = 'Download SVG';
+
+
+
+            actions.appendChild(copyBtn);
+            actions.appendChild(downBtn);
+
+
+            const copySuccess = document.createElement('div');
+            copySuccess.className = 'copy-overlay';
+            copySuccess.innerHTML = '<span class="text-black font-bold text-[10px] tracking-tighter">COPIED</span>';
+
+            // Set placeholder for virtualization
+            card.dataset.iconData = JSON.stringify(icon);
+            card.dataset.body = body;
+            card.dataset.fill = fillAttr;
+            card.dataset.stroke = strokeAttr;
+            
+            svgContainer.id = `svg-${cardId}`;
+            card.appendChild(svgContainer);
+            card.appendChild(nameLabel);
+            card.appendChild(libLabel);
+            card.appendChild(actions);
+            card.appendChild(copySuccess);
+
+            iconObserver.observe(card);
+
+            const performCopy = (e) => {
+                if (e) e.stopPropagation();
+                if (selectionMode) {
+                    toggleSelect(icon, card);
+                    return;
+                }
+                copyIcon(icon.b, icon.n, icon.w, icon.h, icon.t);
+                copySuccess.classList.add('active');
+                setTimeout(() => copySuccess.classList.remove('active'), 800);
+            };
+
+            card.onclick = performCopy;
+            copyBtn.onclick = performCopy;
+            downBtn.onclick = (e) => { 
+                e.stopPropagation(); 
+                downloadIcon(icon.b, icon.n, icon.w, icon.h, icon.t); 
+            };
+
+
+
+            // Restart animation on hover
+            card.onmouseenter = () => {
+                const svg = card.querySelector('svg');
+                if (svg && typeof svg.setCurrentTime === 'function') {
+                    try {
+                        svg.setCurrentTime(0);
+                    } catch(e) {}
+                }
+            };
+
+            return card;
+        }
+
+
+        function renderIcons(append = false) {
+            if (!append) iconGrid.innerHTML = '';
+            
+            const start = append ? iconGrid.children.length : 0;
+            const end = Math.min(start + displayLimit, filteredIcons.length);
+            
+            for (let i = start; i < end; i++) {
+                const card = createIconCard(filteredIcons[i]);
+                if (append) card.classList.add('card-enter');
+                iconGrid.appendChild(card);
+            }
+
+            loadingState.style.display = 'none';
+            emptyState.style.display = filteredIcons.length === 0 ? 'flex' : 'none';
+            resultCount.textContent = `${filteredIcons.length} FOUND`;
+        }
+
+        function handleFilter() {
+            const query = searchInput.value.toLowerCase();
+            const category = categorySelect.value;
+            const type = typeSelect.value;
+
+            filteredIcons = ICONS_DATA.filter(icon => {
+                const matchesSearch = icon.n.toLowerCase().includes(query);
+                const matchesLib = category === 'all' || icon.n.startsWith(category + ':');
+                
+                let matchesType = type === 'all' || icon.t.toString() === type;
+                if (type === 'interactive') {
+                    // Custom Logic for Interactive Category
+                    const interactiveLibs = ['line-md', 'svg-spinners', 'eos-icons'];
+                    matchesType = interactiveLibs.some(lib => icon.n.startsWith(lib + ':')) || icon.t === 3;
+                }
+                
+                return matchesSearch && matchesLib && matchesType;
+            });
+
+            renderIcons();
+        }
+
+        // --- NEW FEATURES LOGIC ---
+
+        function initProjects() {
+            renderProjectSidebar();
+            
+            addProjectBtn.onclick = () => {
+                const name = prompt("Enter Project Name:");
+                if (name) {
+                    COLLECTIONS.push({ id: Date.now(), name, icons: [] });
+                    saveCollections();
+                    renderProjectSidebar();
+                }
+            };
+        }
+
+        function saveCollections() {
+            localStorage.setItem('ICON_COLLECTIONS', JSON.stringify(COLLECTIONS));
+        }
+
+        function renderProjectSidebar() {
+            projectList.innerHTML = '';
+            COLLECTIONS.forEach(proj => {
+                const item = document.createElement('div');
+                item.className = 'group/proj flex flex-col p-2 hover:bg-white/5 cursor-default transition-colors relative';
+                
+                const header = document.createElement('div');
+                header.className = 'flex items-center justify-between mb-1';
+                header.innerHTML = `
+                    <span class="text-[10px] font-bold text-white truncate group-hover:block hidden">${proj.name.toUpperCase()}</span>
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="deleteProject(${proj.id})" class="text-muted hover:text-red-500" title="Delete Project">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+                
+                const iconBtn = document.createElement('div');
+                iconBtn.className = 'w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-sm self-center group-hover:self-start group-hover:w-full group-hover:h-8 group-hover:px-2 group-hover:justify-start gap-2';
+                iconBtn.innerHTML = `
+                    <svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+                    <span class="text-[9px] font-mono text-muted hidden group-hover:inline">${proj.icons.length} ICONS</span>
+                `;
+                iconBtn.onclick = () => {
+                    filteredIcons = proj.icons;
+                    renderIcons();
+                    showToast(`VIEWING: ${proj.name}`);
+                };
+
+                // Drop support for sidebar
+                item.ondragover = (e) => { e.preventDefault(); item.classList.add('bg-accent/10'); };
+                item.ondragleave = () => item.classList.remove('bg-accent/10');
+                item.ondrop = (e) => {
+                    e.preventDefault();
+                    item.classList.remove('bg-accent/10');
+                    if (selectedIcons.size > 0) {
+                        proj.icons.push(...Array.from(selectedIcons));
+                        saveCollections();
+                        renderProjectSidebar();
+                        clearSelection();
+                        showToast(`ADDED ${selectedIcons.size} TO ${proj.name}`);
+                    }
+                };
+
+                item.appendChild(header);
+                item.appendChild(iconBtn);
+                projectList.appendChild(item);
+            });
+        }
+
+        function deleteProject(id) {
+            if (confirm("Delete this project?")) {
+                COLLECTIONS = COLLECTIONS.filter(p => p.id !== id);
+                saveCollections();
+                renderProjectSidebar();
+            }
+        }
+
+        // --- THEME & MOTION ---
+
+        function initTheme() {
+            themeColor.oninput = () => {
+                THEME_COLOR = themeColor.value;
+                themeHex.value = THEME_COLOR.toUpperCase();
+                document.documentElement.style.setProperty('--accent-color', THEME_COLOR);
+            };
+            themeHex.onchange = () => {
+                let val = themeHex.value;
+                if (!val.startsWith('#')) val = '#' + val;
+                if (/^#[0-9A-F]{6}$/i.test(val)) {
+                    THEME_COLOR = val;
+                    themeColor.value = THEME_COLOR;
+                    document.documentElement.style.setProperty('--accent-color', THEME_COLOR);
+                }
+            };
+
+            motionSelect.onchange = () => {
+                ACTIVE_MOTION = motionSelect.value;
+                renderIcons();
+            };
+        }
+
+        // --- IMPORTER ---
+
+        function initImporter() {
+            window.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                if (e.dataTransfer.types.includes('Files')) dropZone.classList.add('active');
+            });
+
+            dropZone.addEventListener('dragleave', (e) => {
+                if (e.relatedTarget === null || e.relatedTarget === document.body) {
+                    dropZone.classList.remove('active');
+                }
+            });
+
+            window.addEventListener('dragover', (e) => e.preventDefault());
+
+            window.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('active');
+                const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.svg'));
+                if (files.length > 0) importSVGs(files);
+            });
+        }
+
+        function importSVGs(files) {
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const content = e.target.result;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(content, 'image/svg+xml');
+                    const svg = doc.querySelector('svg');
+                    
+                    if (svg) {
+                        const newIcon = {
+                            n: `user:${file.name.replace('.svg', '')}`,
+                            b: svg.innerHTML,
+                            w: svg.getAttribute('width') || 24,
+                            h: svg.getAttribute('height') || 24,
+                            t: 1
+                        };
+                        ICONS_DATA.unshift(newIcon);
+                        categorySelect.value = 'all';
+                        handleFilter();
+                        showToast(`IMPORTED: ${file.name}`);
+                    }
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        function toggleSettings() {
+            settingsPanel.classList.toggle('translate-x-full');
+        }
+
+        function toggleSelectionMode() {
+            selectionMode = !selectionMode;
+            selectionToggle.textContent = `SELECT: ${selectionMode ? 'ON' : 'OFF'}`;
+            selectionToggle.classList.toggle('bg-accent', selectionMode);
+            selectionToggle.classList.toggle('text-black', selectionMode);
+            
+            document.querySelectorAll('.icon-card').forEach(card => {
+                card.classList.toggle('selection-active', selectionMode);
+            });
+
+            if (!selectionMode) clearSelection();
+        }
+
+        function toggleSelect(icon, card) {
+            if (selectedIcons.has(icon)) {
+                selectedIcons.delete(icon);
+                card.classList.remove('ring-2', 'ring-accent', 'border-accent');
+            } else {
+                selectedIcons.add(icon);
+                card.classList.add('ring-2', 'ring-accent', 'border-accent');
+            }
+            updateSelectionUI();
+        }
+
+        function updateSelectionUI() {
+            selectionCount.textContent = `${selectedIcons.size} SELECTED`;
+            if (selectedIcons.size > 0) {
+                batchToolbar.classList.remove('opacity-0', 'pointer-events-none', 'scale-90');
+            } else {
+                batchToolbar.classList.add('opacity-0', 'pointer-events-none', 'scale-90');
+            }
+        }
+
+        function clearSelection() {
+            selectedIcons.clear();
+            document.querySelectorAll('.icon-card').forEach(card => {
+                card.classList.remove('ring-2', 'ring-accent', 'border-accent');
+            });
+            updateSelectionUI();
+        }
+
+        async function downloadBatch() {
+            const list = Array.from(selectedIcons);
+            showToast(`STARTING BATCH: ${list.length} ICONS`);
+            
+            for (const icon of list) {
+                downloadIcon(icon.b, icon.n, icon.w, icon.h, icon.t);
+                // Smal delay to prevent browser overload and grouped download prompts
+                await new Promise(r => setTimeout(r, 200));
+            }
+            
+            clearSelection();
+            toggleSelectionMode();
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        searchInput.oninput = debounce(handleFilter, 300);
+        categorySelect.onchange = handleFilter;
+        typeSelect.onchange = handleFilter;
+
+        settingsBtn.onclick = toggleSettings;
+        selectionToggle.onclick = toggleSelectionMode;
+        previewDurInput.oninput = () => {
+            PREVIEW_DUR = parseFloat(previewDurInput.value);
+            previewDurVal.textContent = PREVIEW_DUR.toFixed(1) + 's';
+            // Surgical live update for all visible animated icons
+            document.querySelectorAll('.icon-card').forEach(card => {
+                const data = JSON.parse(card.dataset.iconData);
+                if (data.t === 3) {
+                    const animations = card.querySelectorAll('animate, animateTransform, animateMotion');
+                    animations.forEach(anim => anim.setAttribute('dur', PREVIEW_DUR + 's'));
+                }
+            });
+        };
+
+        copyDurInput.oninput = () => {
+            COPY_DUR = parseFloat(copyDurInput.value);
+            copyDurVal.textContent = COPY_DUR.toFixed(1) + 's';
+        };
+
+        fxSelect.onchange = () => {
+            ACTIVE_FX = fxSelect.value;
+            renderIcons(); // Re-render to apply filters
+        };
+
+        lowSpecToggle.onclick = () => {
+            LOW_SPEC = !LOW_SPEC;
+            lowSpecToggle.classList.toggle('bg-accent', LOW_SPEC);
+            lowSpecToggle.querySelector('.dot').classList.toggle('bg-black', LOW_SPEC);
+            lowSpecToggle.querySelector('.dot').classList.toggle('translate-x-5', LOW_SPEC);
+            
+            // If turning on low-spec, immediately clear out-of-view icons
+            if (LOW_SPEC) {
+                renderIcons();
+            } else {
+                renderIcons();
+            }
+        };
+
+        forceLoopToggle.onclick = () => {
+            FORCE_LOOP = !FORCE_LOOP;
+            forceLoopToggle.classList.toggle('bg-accent', FORCE_LOOP);
+            forceLoopToggle.querySelector('.dot').classList.toggle('bg-black', FORCE_LOOP);
+            forceLoopToggle.querySelector('.dot').classList.toggle('translate-x-5', FORCE_LOOP);
+            renderIcons(); // Re-render required for logic changes
+        };
+
+        function resetSettings() {
+            previewDurInput.value = 2.0;
+            copyDurInput.value = 4.0;
+            FORCE_LOOP = false;
+            LOW_SPEC = false;
+            ACTIVE_FX = 'none';
+            fxSelect.value = 'none';
+            
+            lowSpecToggle.classList.remove('bg-accent');
+            lowSpecToggle.querySelector('.dot').classList.remove('bg-black', 'translate-x-5');
+            
+            forceLoopToggle.classList.remove('bg-accent');
+            forceLoopToggle.querySelector('.dot').classList.add('bg-muted');
+            forceLoopToggle.querySelector('.dot').classList.remove('bg-black', 'translate-x-5');
+            PREVIEW_DUR = 2.0;
+            COPY_DUR = 4.0;
+            previewDurVal.textContent = '2.0s';
+            copyDurVal.textContent = '4.0s';
+            renderIcons();
+        }
+
+        // Infinite scroll
+        window.onscroll = () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                if (iconGrid.children.length < filteredIcons.length) {
+                    renderIcons(true);
+                }
+            }
+        };
+
+        // Initialize
+        setTimeout(() => {
+            initProjects();
+            initTheme();
+            initImporter();
+            filteredIcons = [...ICONS_DATA];
+            renderIcons();
+        }, 100);
+
+    </script>
+</body>
+</html>

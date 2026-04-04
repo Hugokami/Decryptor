@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="holo-link">
+  <defs>
+    <linearGradient id="grad-link" x1="0%" y1="0%" x2="200%" y2="200%">
+      <stop offset="0%" stop-color="#FF0080" />
+      <stop offset="33%" stop-color="#7928CA" />
+      <stop offset="66%" stop-color="#4facfe" />
+      <stop offset="100%" stop-color="#00f2fe" />
+      <animate attributeName="x1" values="0%;-100%;0%" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="y1" values="0%;-100%;0%" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="x2" values="200%;100%;200%" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="200%;100%;200%" dur="4s" repeatCount="indefinite" />
+    </linearGradient>
+  </defs>
+  <style>
+    #holo-link * {
+      stroke: url(#grad-link);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+  </style><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>

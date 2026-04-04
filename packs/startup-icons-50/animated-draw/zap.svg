@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-zap">
+<style>
+  @keyframes draw-zap {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-zap path, #draw-zap line, #draw-zap polyline, #draw-zap polygon, 
+  #draw-zap rect, #draw-zap circle, #draw-zap ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-zap 2s ease-out forwards;
+  }
+</style><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-zap 2s ease-out forwards"></svg>

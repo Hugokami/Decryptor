@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="holo-hexagon">
+  <defs>
+    <linearGradient id="grad-hexagon" x1="0%" y1="0%" x2="200%" y2="200%">
+      <stop offset="0%" stop-color="#FF0080" />
+      <stop offset="33%" stop-color="#7928CA" />
+      <stop offset="66%" stop-color="#4facfe" />
+      <stop offset="100%" stop-color="#00f2fe" />
+      <animate attributeName="x1" values="0%;-100%;0%" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="y1" values="0%;-100%;0%" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="x2" values="200%;100%;200%" dur="4s" repeatCount="indefinite" />
+      <animate attributeName="y2" values="200%;100%;200%" dur="4s" repeatCount="indefinite" />
+    </linearGradient>
+  </defs>
+  <style>
+    #holo-hexagon * {
+      stroke: url(#grad-hexagon);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+  </style><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>

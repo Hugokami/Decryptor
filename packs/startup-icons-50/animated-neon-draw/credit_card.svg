@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-credit_card">
+  <defs>
+    <filter id="glow-credit_card" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-credit_card {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-credit_card); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-credit_card); opacity: 1; }
+    }
+    #neon-credit_card path, #neon-credit_card line, #neon-credit_card polyline, #neon-credit_card polygon, 
+    #neon-credit_card rect, #neon-credit_card circle, #neon-credit_card ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-credit_card 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><line x1="1" y1="10" x2="23" y2="10"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

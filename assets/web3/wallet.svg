@@ -1,0 +1,19 @@
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" data-ag-state="idle">
+  <!-- Styles are expected to be loaded from ag-web3-states.css -->
+  
+  <g class="ag-main-part" fill="none" stroke="currentColor" stroke-width="2">
+    <!-- Wallet Body -->
+    <rect x="10" y="30" width="80" height="50" rx="4" />
+    <path d="M10 40 L90 40" />
+    <!-- Clasp -->
+    <rect x="75" y="48" width="10" height="15" rx="2" />
+  </g>
+
+  <!-- Interaction Part (Dynamic) -->
+  <g class="ag-dynamic-part" stroke="#ff00ff" stroke-width="3" stroke-linecap="round">
+    <!-- Star/Sparkle for Signing/Success -->
+    <path d="M50 10 L50 25 M40 17 L60 17" opacity="0" class="ag-status-mark" />
+    <!-- Progress Ring for Pending -->
+    <circle cx="50" cy="50" r="40" stroke-dasharray="10 20" />
+  </g>
+</svg>

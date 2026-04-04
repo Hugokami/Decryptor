@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-video">
+  <defs>
+    <filter id="glow-video" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-video {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-video); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-video); opacity: 1; }
+    }
+    #neon-video path, #neon-video line, #neon-video polyline, #neon-video polygon, 
+    #neon-video rect, #neon-video circle, #neon-video ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-video 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><polygon points="23 7 16 12 23 17 23 7"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

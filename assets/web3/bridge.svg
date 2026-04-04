@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" data-ag-state="idle">
+  <!-- Main Nodes -->
+  <g class="ag-main-part" fill="none" stroke="currentColor" stroke-width="2">
+    <circle cx="20" cy="50" r="10" />
+    <circle cx="80" cy="50" r="10" />
+    <path d="M30 50 L70 50" stroke-dasharray="4 4" />
+  </g>
+
+  <!-- Transferring Particle (Dynamic) -->
+  <circle class="ag-dynamic-part" cx="30" cy="50" r="3" fill="#ff00ff">
+    <animate attributeName="cx" from="30" to="70" dur="2s" repeatCount="indefinite" />
+  </circle>
+  
+  <style>
+    [data-ag-state="idle"] .ag-dynamic-part { display: none; }
+    [data-ag-state="signing"] .ag-dynamic-part { display: block; filter: blur(2px); }
+    [data-ag-state="pending"] .ag-dynamic-part { r: 5; fill: var(--ag-web3-pending); }
+    [data-ag-state="success"] .ag-dynamic-part { fill: var(--ag-web3-success); opacity: 0; }
+  </style>
+</svg>

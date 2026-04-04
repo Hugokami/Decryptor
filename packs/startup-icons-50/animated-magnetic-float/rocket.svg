@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="float-rocket">
+  <style>
+    @keyframes float-rocket {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      33% { transform: translateY(-4px) rotate(3deg) scale(1.05); }
+      66% { transform: translateY(2px) rotate(-2deg) scale(0.98); }
+    }
+    #float-rocket {
+      animation: float-rocket 4s cubic-bezier(0.45, 0, 0.15, 1) infinite;
+      transform-origin: center;
+      overflow: visible;
+    }
+    #float-rocket * {
+      stroke: currentColor;
+      stroke-width: 2;
+      transition: stroke 0.3s ease;
+    }
+  </style><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2l.5-.5a5.4 5.4 0 0 0 5.4 0l.5.5c1.26 1.5 5 2 5 2s-.5-3.74-2-5l-.5-.5a5.4 5.4 0 0 0 0-5.4l-.5-.5C14.74 3.5 11 3 11 3s-3.74.5-5 2l-.5.5a5.4 5.4 0 0 0 0 5.4l-.5.5Z"/><path d="m12 15 3.5-3.5"/><path d="M2 22v-3l4-4 3 3-4 4H2Z"/><path d="M22 2h-3l-4 4 3 3 4-4V2Z"/></svg>

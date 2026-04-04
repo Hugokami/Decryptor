@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-share_2">
+<style>
+  @keyframes draw-share_2 {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-share_2 path, #draw-share_2 line, #draw-share_2 polyline, #draw-share_2 polygon, 
+  #draw-share_2 rect, #draw-share_2 circle, #draw-share_2 ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-share_2 2s ease-out forwards;
+  }
+</style><circle cx="18" cy="5" r="3"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-share_2 2s ease-out forwards"><circle cx="6" cy="12" r="3"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-share_2 2s ease-out forwards"><circle cx="18" cy="19" r="3"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-share_2 2s ease-out forwards"><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-share_2 2s ease-out forwards"><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-share_2 2s ease-out forwards"></svg>

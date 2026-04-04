@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280">
+    <title>Cover</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            width: 1280px;
+            height: 720px;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background: #09090b;
+            color: #fafafa;
+            display: flex;
+            position: relative;
+        }
+
+        /* Ambient glow blobs */
+        .glow-1 {
+            position: absolute;
+            top: -120px;
+            left: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(229,255,0,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .glow-2 {
+            position: absolute;
+            bottom: -150px;
+            right: -80px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(66,133,244,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .glow-3 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(229,255,0,0.04) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* Left side — text content */
+        .left {
+            flex: 0 0 520px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 56px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(229,255,0,0.12);
+            border: 1px solid rgba(229,255,0,0.25);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #E5FF00;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            width: fit-content;
+            margin-bottom: 28px;
+        }
+
+        h1 {
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1.05;
+            letter-spacing: -2px;
+            margin-bottom: 20px;
+        }
+        h1 .accent {
+            background: linear-gradient(135deg, #4285F4, #EA4335, #FBBC05, #34A853);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #a1a1aa;
+            line-height: 1.6;
+            margin-bottom: 32px;
+            max-width: 400px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 32px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: #E5FF00;
+        }
+        .stat-label {
+            font-size: 10px;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 2px;
+        }
+
+        /* Right side — icon grid */
+        .right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            padding: 40px 40px 40px 20px;
+        }
+
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            gap: 14px;
+            width: 100%;
+            max-width: 640px;
+        }
+
+        .icon-cell {
+            aspect-ratio: 1;
+            background: rgba(24,24,27,0.8);
+            border: 1px solid rgba(63,63,70,0.6);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+        .icon-cell::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+            pointer-events: none;
+        }
+        .icon-cell svg {
+            width: 40px;
+            height: 40px;
+            color: #e4e4e7;
+        }
+
+        /* Highlight a few icons with accent glow */
+        .icon-cell.glow-accent {
+            border-color: rgba(229,255,0,0.35);
+            box-shadow: 0 0 24px rgba(229,255,0,0.08), inset 0 0 20px rgba(229,255,0,0.03);
+        }
+        .icon-cell.glow-accent svg {
+            color: #E5FF00;
+            filter: drop-shadow(0 0 8px rgba(229,255,0,0.3));
+        }
+
+        .icon-cell.glow-blue {
+            border-color: rgba(66,133,244,0.35);
+            box-shadow: 0 0 24px rgba(66,133,244,0.08), inset 0 0 20px rgba(66,133,244,0.03);
+        }
+        .icon-cell.glow-blue svg {
+            color: #4285F4;
+            filter: drop-shadow(0 0 8px rgba(66,133,244,0.3));
+        }
+
+        .icon-cell.glow-red {
+            border-color: rgba(234,67,53,0.3);
+            box-shadow: 0 0 24px rgba(234,67,53,0.06);
+        }
+        .icon-cell.glow-red svg {
+            color: #EA4335;
+            filter: drop-shadow(0 0 8px rgba(234,67,53,0.3));
+        }
+
+        .icon-cell.glow-green {
+            border-color: rgba(52,168,83,0.3);
+            box-shadow: 0 0 24px rgba(52,168,83,0.06);
+        }
+        .icon-cell.glow-green svg {
+            color: #34A853;
+            filter: drop-shadow(0 0 8px rgba(52,168,83,0.3));
+        }
+
+        /* Animated stroke-draw on a few */
+        @keyframes draw-in {
+            0% { stroke-dashoffset: 200; opacity: 0.3; }
+            100% { stroke-dashoffset: 0; opacity: 1; }
+        }
+        .anim-draw svg path, .anim-draw svg polyline, .anim-draw svg line,
+        .anim-draw svg circle, .anim-draw svg rect {
+            stroke-dasharray: 200;
+            animation: draw-in 2.5s ease-out forwards;
+        }
+
+        @keyframes pulse-in {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+        .anim-pulse svg {
+            animation: pulse-in 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+    <div class="glow-3"></div>
+
+    <div class="left">
+        <div class="badge">✦ SVG Icon Pack</div>
+        <h1>Animated<br>SVG Icons.<br><span class="accent">Startup Kit.</span></h1>
+        <p class="subtitle">50 lightweight icons × 3 animation styles. Pure SVG + CSS — no dependencies, under 2KB each.</p>
+        <div class="stats">
+            <div>
+                <div class="stat-value">150</div>
+                <div class="stat-label">Animated SVGs</div>
+            </div>
+            <div>
+                <div class="stat-value">~2KB</div>
+                <div class="stat-label">Per Icon</div>
+            </div>
+            <div>
+                <div class="stat-value">0</div>
+                <div class="stat-label">Dependencies</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="right">
+        <div class="icon-grid">
+            <!-- Row 1 -->
+            <div class="icon-cell anim-draw">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            </div>
+            <div class="icon-cell glow-accent">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div class="icon-cell">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <div class="icon-cell glow-blue anim-pulse">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div class="icon-cell">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="icon-cell glow-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="icon-cell anim-draw">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <div class="icon-cell glow-accent anim-pulse">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="icon-cell">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div class="icon-cell glow-green anim-draw">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="icon-cell">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div class="icon-cell glow-blue">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <div class="icon-cell glow-accent">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="icon-cell anim-draw">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="icon-cell glow-red anim-pulse">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+
+            <!-- Row 4 -->
+            <div class="icon-cell glow-green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="icon-cell">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+            </div>
+            <div class="icon-cell glow-blue anim-draw">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div class="icon-cell glow-accent">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            </div>
+            <div class="icon-cell anim-pulse">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

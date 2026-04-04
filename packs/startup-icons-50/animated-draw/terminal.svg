@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-terminal">
+<style>
+  @keyframes draw-terminal {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-terminal path, #draw-terminal line, #draw-terminal polyline, #draw-terminal polygon, 
+  #draw-terminal rect, #draw-terminal circle, #draw-terminal ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-terminal 2s ease-out forwards;
+  }
+</style><polyline points="4 17 10 11 4 5"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-terminal 2s ease-out forwards"><line x1="12" y1="19" x2="20" y2="19"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-terminal 2s ease-out forwards"></svg>

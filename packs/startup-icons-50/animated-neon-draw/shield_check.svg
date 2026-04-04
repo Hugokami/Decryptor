@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-shield_check">
+  <defs>
+    <filter id="glow-shield_check" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-shield_check {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-shield_check); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-shield_check); opacity: 1; }
+    }
+    #neon-shield_check path, #neon-shield_check line, #neon-shield_check polyline, #neon-shield_check polygon, 
+    #neon-shield_check rect, #neon-shield_check circle, #neon-shield_check ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-shield_check 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><path d="m9 12 2 2 4-4"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>

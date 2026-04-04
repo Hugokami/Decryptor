@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-layers">
+<style>
+  @keyframes draw-layers {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-layers path, #draw-layers line, #draw-layers polyline, #draw-layers polygon, 
+  #draw-layers rect, #draw-layers circle, #draw-layers ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-layers 2s ease-out forwards;
+  }
+</style><polygon points="12 2 2 7 12 12 22 7 12 2"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-layers 2s ease-out forwards"><polyline points="2 12 12 17 22 12"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-layers 2s ease-out forwards"><polyline points="2 17 12 22 22 17"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-layers 2s ease-out forwards"></svg>

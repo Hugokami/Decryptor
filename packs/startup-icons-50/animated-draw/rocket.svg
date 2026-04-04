@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="draw-rocket">
+<style>
+  @keyframes draw-rocket {
+    0% { stroke-dashoffset: var(--path-length); opacity: 0.3; }
+    10% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 1; }
+  }
+  #draw-rocket path, #draw-rocket line, #draw-rocket polyline, #draw-rocket polygon, 
+  #draw-rocket rect, #draw-rocket circle, #draw-rocket ellipse {
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    animation: draw-rocket 2s ease-out forwards;
+  }
+</style><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2l.5-.5a5.4 5.4 0 0 0 5.4 0l.5.5c1.26 1.5 5 2 5 2s-.5-3.74-2-5l-.5-.5a5.4 5.4 0 0 0 0-5.4l-.5-.5C14.74 3.5 11 3 11 3s-3.74.5-5 2l-.5.5a5.4 5.4 0 0 0 0 5.4l-.5.5Z"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-rocket 2s ease-out forwards"><path d="m12 15 3.5-3.5"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-rocket 2s ease-out forwards"><path d="M2 22v-3l4-4 3 3-4 4H2Z"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-rocket 2s ease-out forwards"><path d="M22 2h-3l-4 4 3 3 4-4V2Z"/ fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="500" stroke-dashoffset="500" style="animation: draw-rocket 2s ease-out forwards"></svg>

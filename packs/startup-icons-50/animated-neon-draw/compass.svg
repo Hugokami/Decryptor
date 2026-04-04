@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="neon-compass">
+  <defs>
+    <filter id="glow-compass" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+    @keyframes neon-compass {
+      0% { stroke-dashoffset: var(--pl, 100); opacity: 0; filter: none; }
+      30% { opacity: 1; }
+      80% { filter: url(#glow-compass); }
+      100% { stroke-dashoffset: 0; filter: url(#glow-compass); opacity: 1; }
+    }
+    #neon-compass path, #neon-compass line, #neon-compass polyline, #neon-compass polygon, 
+    #neon-compass rect, #neon-compass circle, #neon-compass ellipse {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      animation: neon-compass 1.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+  </style><circle cx="12" cy="12" r="10"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/ style="--pl: 150; stroke-dasharray: 150; stroke-dashoffset: 150;"></svg>
