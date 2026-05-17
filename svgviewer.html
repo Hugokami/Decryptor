@@ -1447,6 +1447,8 @@
                                             <option value="loop" selected>LOOP / INFINITE</option>
                                             <option value="hover">HOVER PLAY</option>
                                             <option value="once">PLAY ONCE</option>
+                                            <option value="click">CLICK PLAY</option>
+                                            <option value="scroll">SCROLL INTO VIEW</option>
                                         </select>
                                     </div>
                                     <div class="flex items-center gap-1.5 pb-1.5 ml-auto">
@@ -1477,6 +1479,14 @@
                                         <input type="checkbox" id="animManualPivot" class="accent-accent">
                                         <span id="pivotCoords" class="text-[9px] text-accent font-tech hidden">50% 50%</span>
                                     </div>
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-[10px] text-muted mb-1.5 uppercase tracking-wider font-tech">Axis Lock</label>
+                                    <select id="animAxisLock" class="w-full bg-bg border border-border hover:border-accent/50 p-1.5 text-[10px] text-gray-200 outline-none transition-colors font-tech">
+                                        <option value="none" selected>NONE</option>
+                                        <option value="x">X ONLY</option>
+                                        <option value="y">Y ONLY</option>
+                                    </select>
                                 </div>
                                 <div class="flex-[2]">
                                     <label class="flex justify-between text-[10px] text-muted mb-1.5 uppercase tracking-wider font-tech">
@@ -1531,19 +1541,34 @@
                                     <input type="number" id="animStagger" value="0" min="0" step="0.05"
                                         class="w-full bg-bg border border-border hover:border-accent/50 p-1.5 text-xs text-gray-200 outline-none transition-colors font-tech">
                                 </div>
-                                <div class="flex-1">
-                                    <label
-                                        class="block text-[10px] text-muted mb-1.5 uppercase tracking-wider font-tech">Stagger From</label>
-                                    <select id="animStaggerFrom"
-                                        class="w-full bg-bg border border-border hover:border-accent/50 p-1.5 text-xs text-gray-200 outline-none transition-colors font-tech">
-                                        <option value="start" selected>START</option>
-                                        <option value="end">END</option>
-                                        <option value="center">CENTER</option>
-                                        <option value="edges">EDGES</option>
-                                    </select>
+                                <div class="flex-[1.5] flex gap-2">
+                                    <div class="flex-1">
+                                        <label
+                                            class="block text-[10px] text-muted mb-1.5 uppercase tracking-wider font-tech">Stagger From</label>
+                                        <select id="animStaggerFrom"
+                                            class="w-full bg-bg border border-border hover:border-accent/50 p-1.5 text-xs text-gray-200 outline-none transition-colors font-tech">
+                                            <option value="start" selected>START</option>
+                                            <option value="end">END</option>
+                                            <option value="center">CENTER</option>
+                                            <option value="edges">EDGES</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex-1">
+                                        <label class="block text-[10px] text-muted mb-1.5 uppercase tracking-wider font-tech">Randomize</label>
+                                        <div class="flex items-center gap-1.5 h-8">
+                                            <input type="checkbox" id="animRandomize" class="accent-accent">
+                                            <span class="text-[9px] text-gray-400 font-tech">JITTER</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <button id="applyCustomAnimBtn" class="bg-panel border border-border hover:border-accent/50 text-gray-300 hover:text-accent mt-1 w-full py-2 text-xs font-tech tracking-widest uppercase transition-all">↻ REPLAY ANIMATION</button>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
+                                <label class="text-[10px] text-muted uppercase tracking-wider font-tech flex items-center gap-2">
+                                    Time Scale <span id="animTimeScaleVal" class="text-accent">1.0x</span>
+                                </label>
+                                <input type="range" id="animTimeScale" min="0.1" max="3" step="0.1" value="1" class="w-24 accent-accent bg-bg h-2 opacity-70 hover:opacity-100 transition-opacity">
+                            </div>
+                            <button id="applyCustomAnimBtn" class="bg-panel border border-border hover:border-accent/50 text-gray-300 hover:text-accent mt-2 w-full py-2 text-xs font-tech tracking-widest uppercase transition-all">↻ REPLAY ANIMATION</button>
                         </div>
                     
                 <div class="flex justify-between items-center pb-2 border-b border-border mb-2 shrink-0">
@@ -1904,25 +1929,7 @@
                     </svg></button>
             </div>
             <div class="p-6 flex flex-col gap-6">
-                <div class="flex flex-col gap-2">
-                    <label class="text-[10px] text-muted font-tech uppercase tracking-widest">Gemini API Key</label>
-                    <div class="relative">
-                        <input type="password" id="geminiApiKey"
-                            class="w-full bg-bg border border-border p-2 text-xs text-white focus:outline-none focus:border-accent/50 transition-colors font-tech"
-                            placeholder="Enter your API key...">
-                        <button id="toggleApiKeyVisible"
-                            class="absolute right-2 top-1.5 text-muted hover:text-accent p-0.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-                    <p class="text-[10px] text-muted leading-relaxed font-tech">Your key is stored locally in your
-                        browser and never sent to our servers. Leave blank to use the default/demo mode.</p>
+                    <p class="text-[10px] text-muted leading-relaxed font-tech mt-2">All settings are applied globally to your workspace.</p>
                 </div>
                 <!-- Editor Effects -->
                 <div class="flex flex-col gap-3 pt-2 border-t border-border">
@@ -2198,9 +2205,7 @@
         const settingsModal = document.getElementById('settingsModal');
         const settingsModalContent = document.getElementById('settingsModalContent');
         const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-        const geminiApiKeyInp = document.getElementById('geminiApiKey');
         const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-        const toggleApiKeyVisible = document.getElementById('toggleApiKeyVisible');
 
         // Walkthrough Elements
         const walkthroughBtn = document.getElementById('walkthroughBtn');
@@ -2612,7 +2617,6 @@
 
         // Settings Logic
         settingsBtn.addEventListener('click', () => {
-            geminiApiKeyInp.value = localStorage.getItem('userGeminiApiKey') || '';
             settingsModal.classList.remove('hidden');
             setTimeout(() => {
                 settingsModal.classList.add('opacity-100');
@@ -2634,14 +2638,8 @@
         settingsModal.addEventListener('click', (e) => { if (e.target === settingsModal) closeSettings(); });
 
         saveSettingsBtn.addEventListener('click', () => {
-            localStorage.setItem('userGeminiApiKey', geminiApiKeyInp.value.trim());
-            showToast('API Key saved successfully');
+            showToast('Settings saved successfully');
             closeSettings();
-        });
-
-        toggleApiKeyVisible.addEventListener('click', () => {
-            const type = geminiApiKeyInp.getAttribute('type') === 'password' ? 'text' : 'password';
-            geminiApiKeyInp.setAttribute('type', type);
         });
 
         // Walkthrough Logic
@@ -2702,13 +2700,18 @@
             const strokeWidth = document.getElementById('animStrokeWidth').value || '2';
             const strokeOpacity = document.getElementById('animStrokeOpacity').value || '1';
             
+            // New Advanced Controls
+            const randomize = document.getElementById('animRandomize')?.checked || false;
+            const axisLock = document.getElementById('animAxisLock')?.value || 'none';
+            const timeScale = document.getElementById('animTimeScale')?.value || '1';
+            
             // Pass isLive=true to avoid double-history pushes during drag
-            applyCustomAnimation(type, duration, easing, direction, delay, iteration, origin, intensity, stagger, staggerFrom, strokeColor, strokeWidth, strokeOpacity, true, triggerMode, holdDuration);
+            applyCustomAnimation(type, duration, easing, direction, delay, iteration, origin, intensity, stagger, staggerFrom, strokeColor, strokeWidth, strokeOpacity, true, triggerMode, holdDuration, randomize, axisLock, timeScale);
         }
 
         // Save snapshot on pointerdown for ALL animation sliders/inputs,
         // clear it on pointerup so undo only requires one step.
-        const _animSliderIds = ['animIntensity', 'animScale', 'animFreq', 'animStrokeOpacity', 'animStrokeWidth', 'animDuration', 'animDelay', 'animStagger', 'animHoldDuration'];
+        const _animSliderIds = ['animIntensity', 'animScale', 'animFreq', 'animStrokeOpacity', 'animStrokeWidth', 'animDuration', 'animDelay', 'animStagger', 'animHoldDuration', 'animTimeScale'];
         let _animHistoryBefore = null; // editor history saved pre-drag
 
         _animSliderIds.forEach(id => {
@@ -2782,6 +2785,12 @@
         const intensityVal = document.getElementById('animIntensityVal');
         intensityInput.addEventListener('input', () => {
             intensityVal.textContent = `[ ${parseFloat(intensityInput.value).toFixed(1)}x ]`;
+        });
+        
+        const timeScaleInput = document.getElementById('animTimeScale');
+        const timeScaleVal = document.getElementById('animTimeScaleVal');
+        timeScaleInput.addEventListener('input', () => {
+            timeScaleVal.textContent = `${parseFloat(timeScaleInput.value).toFixed(1)}x`;
         });
 
         const opacityInput = document.getElementById('animStrokeOpacity');
@@ -2871,6 +2880,8 @@
                         css = css.replace(/@keyframes\s+[\w-]+\s*\{(?:[^{}]*|\{[^{}]*\})*\}/g, (match) => {
                             return animationKeywords.test(match) ? '' : match;
                         });
+                        // Remove trigger-specific CSS blocks
+                        css = css.replace(/svg\[data-trigger=[^\]]*\][^{]*\{[^}]*\}\s*/g, '');
                     }
                     if (css.length !== originalLen) {
                         styleEl.textContent = css.trim();
@@ -2884,14 +2895,80 @@
                     defsSelectors.forEach(sel => {
                         svg.querySelectorAll(`defs ${sel}`).forEach(defEl => { defEl.remove(); count++; });
                     });
+
+                    // Reset SVG Root State
+                    svg.removeAttribute('data-trigger');
+                    svg.classList.remove('is-playing', 'is-visible');
+                    
+                    // Remove trigger scripts
+                    svg.querySelectorAll('script[class*="-smil-script"]').forEach(s => { s.remove(); count++; });
                 }
             }
             return count;
         }
 
 
-        function applyCustomAnimation(type, duration, easing, direction, delay, iteration, origin, intensity, stagger, staggerFrom, strokeColor = '#E5FF00', strokeWidth = '2', strokeOpacity = '1', isLive = false, triggerMode = 'loop', holdDuration = 0) {
+        function applyCustomAnimation(type, _duration, easing, direction, _delay, iteration, origin, intensity, _stagger, staggerFrom, strokeColor = '#E5FF00', strokeWidth = '2', strokeOpacity = '1', isLive = false, triggerMode = 'loop', holdDuration = 0, randomize = false, axisLock = 'none', timeScale = 1) {
             
+            // Adjust parameters globally by timeScale
+            const duration = parseFloat(_duration) / parseFloat(timeScale);
+            const delay = parseFloat(_delay) / parseFloat(timeScale);
+            const stagger = parseFloat(_stagger) / parseFloat(timeScale);
+            
+            // Helper to normalize basic shapes into SVG paths to ensure 100% pathLength CSS compatibility
+            function normalizeShapeToPath(shape) {
+                const tag = shape.tagName.toLowerCase();
+                if (['path', 'text', 'tspan', 'textpath', 'use', 'g'].includes(tag)) return shape;
+                
+                let d = '';
+                if (tag === 'line') {
+                    const x1 = shape.getAttribute('x1') || 0, y1 = shape.getAttribute('y1') || 0;
+                    const x2 = shape.getAttribute('x2') || 0, y2 = shape.getAttribute('y2') || 0;
+                    d = `M ${x1} ${y1} L ${x2} ${y2}`;
+                } else if (tag === 'polyline' || tag === 'polygon') {
+                    const points = shape.getAttribute('points');
+                    if (!points) return shape;
+                    const pts = points.trim().split(/[\s,]+/).filter(p => p !== '');
+                    if (pts.length < 2) return shape;
+                    d = `M ${pts[0]} ${pts[1]}`;
+                    for (let i = 2; i < pts.length; i += 2) {
+                        if (pts[i] !== undefined && pts[i+1] !== undefined) d += ` L ${pts[i]} ${pts[i+1]}`;
+                    }
+                    if (tag === 'polygon') d += ' Z';
+                } else if (tag === 'rect') {
+                    const x = parseFloat(shape.getAttribute('x') || 0), y = parseFloat(shape.getAttribute('y') || 0);
+                    const w = parseFloat(shape.getAttribute('width') || 0), h = parseFloat(shape.getAttribute('height') || 0);
+                    let rx = parseFloat(shape.getAttribute('rx') || 0), ry = parseFloat(shape.getAttribute('ry') || 0);
+                    if (!rx && ry) rx = ry; else if (!ry && rx) ry = rx;
+                    if (rx > w/2) rx = w/2; if (ry > h/2) ry = h/2;
+                    if (rx === 0 && ry === 0) {
+                        d = `M ${x} ${y} L ${x+w} ${y} L ${x+w} ${y+h} L ${x} ${y+h} Z`;
+                    } else {
+                        d = `M ${x+rx} ${y} H ${x+w-rx} A ${rx} ${ry} 0 0 1 ${x+w} ${y+ry} V ${y+h-ry} A ${rx} ${ry} 0 0 1 ${x+w-rx} ${y+h} H ${x+rx} A ${rx} ${ry} 0 0 1 ${x} ${y+h-ry} V ${y+ry} A ${rx} ${ry} 0 0 1 ${x+rx} ${y} Z`;
+                    }
+                } else if (tag === 'circle') {
+                    const cx = parseFloat(shape.getAttribute('cx') || 0), cy = parseFloat(shape.getAttribute('cy') || 0);
+                    const r = parseFloat(shape.getAttribute('r') || 0);
+                    d = `M ${cx-r} ${cy} a ${r} ${r} 0 1 0 ${2*r} 0 a ${r} ${r} 0 1 0 ${-2*r} 0`;
+                } else if (tag === 'ellipse') {
+                    const cx = parseFloat(shape.getAttribute('cx') || 0), cy = parseFloat(shape.getAttribute('cy') || 0);
+                    const rx = parseFloat(shape.getAttribute('rx') || 0), ry = parseFloat(shape.getAttribute('ry') || 0);
+                    d = `M ${cx-rx} ${cy} a ${rx} ${ry} 0 1 0 ${2*rx} 0 a ${rx} ${ry} 0 1 0 ${-2*rx} 0`;
+                } else {
+                    return shape;
+                }
+
+                const path = doc.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute('d', d);
+                Array.from(shape.attributes).forEach(attr => {
+                    if (!['x1','y1','x2','y2','points','x','y','width','height','rx','ry','cx','cy','r'].includes(attr.name)) {
+                        path.setAttribute(attr.name, attr.value);
+                    }
+                });
+                if (shape.parentNode) shape.parentNode.replaceChild(path, shape);
+                return path;
+            }
+
             // Fix missing optimizations variables
             let batchedStyles = '';
             const isFidel = type.includes('fidel');
@@ -2990,6 +3067,12 @@
                         const centerIdx = (total - 1) / 2;
                         staggerDelay += (centerIdx - Math.abs(idx - centerIdx)) * staggerAmount;
                     }
+                    if (randomize) {
+                         // Apply a random jitter between -staggerAmount/2 and +staggerAmount/2
+                         const jitter = (Math.random() - 0.5) * staggerAmount;
+                         staggerDelay += jitter;
+                    }
+                    if (staggerDelay < 0) staggerDelay = 0;
                     // Apply inline style for specific delay
                     el.style.animationDelay = `${staggerDelay}s`;
                 }
@@ -3059,11 +3142,10 @@
 
             if (triggerMode === 'hover') {
                 svg.setAttribute('data-trigger', 'hover');
-                if (!batchedStyles.includes('animation-play-state: paused')) {
-                    // Global play state override for ANY element inside a hover-triggered SVG
-                    batchedStyles += `\nsvg[data-trigger="hover"] * { animation-play-state: paused !important; }\nsvg[data-trigger="hover"]:hover * { animation-play-state: running !important; }\n`;
-                    
-                    // SMIL Animation Handling (for <animate>, <animateTransform>, etc.)
+                svg.classList.remove('is-playing', 'is-visible');
+                if (!batchedStyles.includes('svg[data-trigger="hover"]')) {
+                    // Global play-state override for ANY element inside a hover-triggered SVG
+                    batchedStyles += `\nsvg[data-trigger="hover"] { pointer-events: all; }\nsvg[data-trigger="hover"], svg[data-trigger="hover"] * { animation-play-state: paused !important; }\nsvg[data-trigger="hover"]:hover, svg[data-trigger="hover"]:hover * { animation-play-state: running !important; }\n`;
                     let hoverScript = svg.querySelector('script.hover-smil-script');
                     if (!hoverScript) {
                         hoverScript = doc.createElementNS("http://www.w3.org/2000/svg", "script");
@@ -3072,22 +3154,89 @@
                             (function(){
                                 const svg = document.querySelector('svg');
                                 if (!svg) return;
+                                svg.pauseAnimations();
+                                svg.addEventListener('mouseenter', () => svg.unpauseAnimations());
+                                svg.addEventListener('mouseleave', () => svg.pauseAnimations());
+                            })();
+                        `;
+                        svg.appendChild(hoverScript);
+                    }
+                }
+            } else if (triggerMode === 'click') {
+                svg.setAttribute('data-trigger', 'click');
+                svg.classList.remove('is-visible');
+                if (!batchedStyles.includes('svg[data-trigger="click"]')) {
+                    batchedStyles += `\nsvg[data-trigger="click"], svg[data-trigger="click"] * { animation-play-state: paused !important; cursor: pointer; }\nsvg[data-trigger="click"].is-playing, svg[data-trigger="click"].is-playing * { animation-play-state: running !important; }\n`;
+                    let clickScript = svg.querySelector('script.click-smil-script');
+                    if (!clickScript) {
+                        clickScript = doc.createElementNS("http://www.w3.org/2000/svg", "script");
+                        clickScript.setAttribute('class', 'click-smil-script');
+                        clickScript.textContent = `
+                            (function(){
+                                const svg = document.querySelector('svg');
+                                if (!svg) return;
                                 const handle = () => {
-                                    if (svg.getAttribute('data-trigger') === 'hover') {
+                                    if (svg.getAttribute('data-trigger') === 'click') {
                                         svg.pauseAnimations();
-                                        svg.addEventListener('mouseenter', () => svg.unpauseAnimations());
-                                        svg.addEventListener('mouseleave', () => svg.pauseAnimations());
+                                        svg.addEventListener('click', () => {
+                                            if (svg.classList.contains('is-playing')) {
+                                                svg.classList.remove('is-playing');
+                                                svg.pauseAnimations();
+                                            } else {
+                                                svg.classList.add('is-playing');
+                                                svg.unpauseAnimations();
+                                            }
+                                        });
                                     }
                                 };
                                 if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', handle); }
                                 else { handle(); }
                             })();
                         `;
-                        svg.appendChild(hoverScript);
+                        svg.appendChild(clickScript);
+                    }
+                }
+            } else if (triggerMode === 'scroll') {
+                svg.setAttribute('data-trigger', 'scroll');
+                svg.classList.remove('is-playing');
+                if (!batchedStyles.includes('svg[data-trigger="scroll"]')) {
+                    batchedStyles += `\nsvg[data-trigger="scroll"], svg[data-trigger="scroll"] * { animation-play-state: paused !important; }\nsvg[data-trigger="scroll"].is-visible, svg[data-trigger="scroll"].is-visible * { animation-play-state: running !important; }\n`;
+                    let scrollScript = svg.querySelector('script.scroll-smil-script');
+                    if (!scrollScript) {
+                        scrollScript = doc.createElementNS("http://www.w3.org/2000/svg", "script");
+                        scrollScript.setAttribute('class', 'scroll-smil-script');
+                        scrollScript.textContent = `
+                            (function(){
+                                const svg = document.querySelector('svg');
+                                if (!svg) return;
+                                const handle = () => {
+                                    if (svg.getAttribute('data-trigger') === 'scroll') {
+                                        svg.pauseAnimations();
+                                        const observer = new IntersectionObserver((entries) => {
+                                            entries.forEach(entry => {
+                                                if (entry.isIntersecting) {
+                                                    svg.classList.add('is-visible');
+                                                    svg.unpauseAnimations();
+                                                } else {
+                                                    svg.classList.remove('is-visible');
+                                                    svg.pauseAnimations();
+                                                }
+                                            });
+                                        }, { threshold: 0.1 });
+                                        observer.observe(svg);
+                                    }
+                                };
+                                if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', handle); }
+                                else { handle(); }
+                            })();
+                        `;
+                        svg.appendChild(scrollScript);
                     }
                 }
             } else {
                 svg.removeAttribute('data-trigger');
+                svg.classList.add('is-playing'); // Ensure starts playing immediately on loop
+                svg.classList.remove('is-visible');
             }
 
             if (type === 'cyber-glitch') {
@@ -3108,14 +3257,14 @@
             } else if (type === 'rgb-split') {
                 const rOff = 3 * intensity;
                 const bOff = -3 * intensity;
-                batchedStyles += `\n@keyframes rgbSplit { 
+                batchedStyles += `\n@keyframes anim-rgbSplit { 
                     0% { filter: drop-shadow(${rOff}px 0 rgba(255,0,0,0.8)) drop-shadow(${bOff}px 0 rgba(0,255,255,0.8)); transform: translate(0,0); }
                     25% { filter: drop-shadow(${-rOff/2}px 0 rgba(255,0,0,0.8)) drop-shadow(${bOff*2}px 0 rgba(0,255,255,0.8)); transform: translate(-1px, 1px); }
                     50% { filter: drop-shadow(${rOff*2}px 0 rgba(255,0,255,0.8)) drop-shadow(${bOff/2}px 0 rgba(0,255,0,0.8)); transform: translate(1px, -1px); }
                     75% { filter: drop-shadow(${-rOff}px 0 rgba(255,255,0,0.8)) drop-shadow(${bOff}px 0 rgba(0,0,255,0.8)); transform: translate(0, 1px); }
                     100% { filter: drop-shadow(${rOff}px 1px rgba(255,0,0,0.8)) drop-shadow(${bOff}px 0 rgba(0,255,255,0.8)); transform: translate(0,0); }
                 }`;
-                batchedStyles += `\n.anim-rgb-split { animation: rgbSplit ${animProps}; }\n`;
+                batchedStyles += `\n.anim-rgb-split { animation: anim-rgbSplit ${animProps}; }\n`;
                 applyClassToTargets('anim-rgb-split');
             } else if (type === 'holo-wipe') {
                 const clipId = `holo-wipe-clip-${Date.now()}`;
@@ -3128,8 +3277,8 @@
                     </rect>
                 </clipPath>`;
                 applyClassToTargets('anim-holo-wipe', el => el.setAttribute('clip-path', `url(#${clipId})`));
-                batchedStyles += `\n@keyframes holoGlow { 0% { filter: drop-shadow(0 -5px 5px ${strokeColor}); opacity:1; } 100% { filter: drop-shadow(0 -5px 5px ${strokeColor}); opacity:1; } }`;
-                batchedStyles += `\n.anim-holo-wipe { animation: holoGlow ${animProps}; }\n`;
+                batchedStyles += `\n@keyframes anim-holoGlow { 0% { filter: drop-shadow(0 -5px 5px ${strokeColor}); opacity:1; } 100% { filter: drop-shadow(0 -5px 5px ${strokeColor}); opacity:1; } }`;
+                batchedStyles += `\n.anim-holo-wipe { animation: anim-holoGlow ${animProps}; }\n`;
             } else if (type === 'hex-cascade') {
                 let textElements = [];
                 if (selectedElements.length > 0) {
@@ -3206,8 +3355,8 @@
                     targetShapes = Array.from(svg.querySelectorAll('path, circle, rect, polygon, polyline, ellipse, line, text, tspan, textPath, use'));
                 }
                 
-                if (!batchedStyles.includes('@keyframes laserWeld')) {
-                    batchedStyles += `\n@keyframes laserWeld { 
+                if (!batchedStyles.includes('@keyframes anim-laserWeld')) {
+                    batchedStyles += `\n@keyframes anim-laserWeld { 
                         0% { stroke-dashoffset: 1; fill: transparent; filter: drop-shadow(0 0 2px ${strokeColor}); } 
                         80% { stroke-dashoffset: 0; fill: transparent; filter: drop-shadow(0 0 5px ${strokeColor}); } 
                         85% { fill: ${strokeColor}; filter: drop-shadow(0 0 20px ${strokeColor}); }
@@ -3216,6 +3365,7 @@
                 }
                 
                 targetShapes.forEach((shape, idx) => {
+                    shape = normalizeShapeToPath(shape);
                     shape.setAttribute('pathLength', '1');
                     shape.style.strokeDasharray = '1';
                     shape.style.strokeDashoffset = '1';
@@ -3224,42 +3374,42 @@
                     const fill = shape.getAttribute('fill') || 'none';
                     if(fill !== 'none') shape.style.setProperty('--orig-fill', fill);
                     
-                    batchedStyles += `\n.anim-laser-welder-${idx} { animation: laserWeld ${animProps}; }\n`;
+                    batchedStyles += `\n.anim-laser-welder-${idx} { animation: anim-laserWeld ${animProps}; }\n`;
                     applyAnimationToElement(shape, `anim-laser-welder-${idx}`, idx, targetShapes.length);
                 });
             } else if (type === 'spin') {
-                batchedStyles += `\n@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
-                batchedStyles += `\n.anim-spin { animation: spin ${animProps}; ${originStyle} }\n`;
+                batchedStyles += `\n@keyframes anim-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+                batchedStyles += `\n.anim-spin { animation: anim-spin ${animProps}; ${originStyle} }\n`;
                 applyClassToTargets('anim-spin');
             } else if (type === 'pulse') {
                 const pScale = 1 + (0.05 * intensity);
-                batchedStyles += `\n@keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(${pScale}); } }`;
-                batchedStyles += `\n.anim-pulse { animation: pulse ${animProps}; ${originStyle} }\n`;
+                batchedStyles += `\n@keyframes anim-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(${pScale}); } }`;
+                batchedStyles += `\n.anim-pulse { animation: anim-pulse ${animProps}; ${originStyle} }\n`;
                 applyClassToTargets('anim-pulse');
             } else if (type === 'float') {
                 const fDist = 15 * intensity;
-                batchedStyles += `\n@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-${fDist}px); } }`;
-                batchedStyles += `\n.anim-float { animation: float ${animProps}; ${originStyle} }\n`;
+                batchedStyles += `\n@keyframes anim-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-${fDist}px); } }`;
+                batchedStyles += `\n.anim-float { animation: anim-float ${animProps}; ${originStyle} }\n`;
                 applyClassToTargets('anim-float');
             } else if (type === 'shake') {
                 const sDist = 5 * intensity;
                 const sRot = 2 * intensity;
-                batchedStyles += `\n@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-${sDist}px) rotate(-${sRot}deg); } 75% { transform: translateX(${sDist}px) rotate(${sRot}deg); } }`;
-                batchedStyles += `\n.anim-shake { animation: shake ${animProps}; ${originStyle} }\n`;
+                batchedStyles += `\n@keyframes anim-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-${sDist}px) rotate(-${sRot}deg); } 75% { transform: translateX(${sDist}px) rotate(${sRot}deg); } }`;
+                batchedStyles += `\n.anim-shake { animation: anim-shake ${animProps}; ${originStyle} }\n`;
                 applyClassToTargets('anim-shake');
             } else if (type === 'fade') {
-                batchedStyles += `\n@keyframes fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }`;
-                batchedStyles += `\n.anim-fade { animation: fade ${animProps}; }\n`;
+                batchedStyles += `\n@keyframes anim-fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }`;
+                batchedStyles += `\n.anim-fade { animation: anim-fade ${animProps}; }\n`;
                 applyClassToTargets('anim-fade');
             } else if (type === 'bounce') {
                 const bDist = 15 * intensity;
-                batchedStyles += `\n@keyframes bounce { 0%, 100% { transform: translateY(0); animation-timing-function: cubic-bezier(0.8,0,1,1); } 50% { transform: translateY(-${bDist}%); animation-timing-function: cubic-bezier(0,0,0.2,1); } }`;
-                batchedStyles += `\n.anim-bounce { animation: bounce ${animProps}; transform-origin: bottom center; transform-box: fill-box; }\n`;
+                batchedStyles += `\n@keyframes anim-bounce { 0%, 100% { transform: translateY(0); animation-timing-function: cubic-bezier(0.8,0,1,1); } 50% { transform: translateY(-${bDist}%); animation-timing-function: cubic-bezier(0,0,0.2,1); } }`;
+                batchedStyles += `\n.anim-bounce { animation: anim-bounce ${animProps}; transform-origin: bottom center; transform-box: fill-box; }\n`;
                 applyClassToTargets('anim-bounce');
             } else if (type === 'orbit') {
                 const oDist = 20 * intensity;
-                batchedStyles += `\n@keyframes orbitAnim { 0% { transform: rotate(0deg) translateX(${oDist}px) rotate(0deg); } 100% { transform: rotate(360deg) translateX(${oDist}px) rotate(-360deg); } }`;
-                batchedStyles += `\n.anim-orbit { animation: orbitAnim ${animProps}; ${originStyle} }\n`;
+                batchedStyles += `\n@keyframes anim-orbitAnim { 0% { transform: rotate(0deg) translateX(${oDist}px) rotate(0deg); } 100% { transform: rotate(360deg) translateX(${oDist}px) rotate(-360deg); } }`;
+                batchedStyles += `\n.anim-orbit { animation: anim-orbitAnim ${animProps}; ${originStyle} }\n`;
                 applyClassToTargets('anim-orbit');
             } else if (type.startsWith('draw') || type.startsWith('dash') || type.startsWith('adv-stroke')) {
                 let targetShapes = [];
@@ -3294,6 +3444,7 @@
                 }
 
                 targetShapes.forEach((shape, idx) => {
+                    shape = normalizeShapeToPath(shape);
                     shape.setAttribute('pathLength', '1');
                     
                     // Optimization: Skip getComputedStyle for non-fidel/standard types
@@ -3303,21 +3454,42 @@
                     }
 
                     if (isFidel) {
-                        // styleSniff: Check attributes/inline styles since getComputedStyle is null on detached docs
-                        const attrStroke = shape.getAttribute('stroke');
-                        const styleStroke = shape.style.stroke;
-                        const hasNoStroke = !attrStroke || attrStroke === 'none' || styleStroke === 'none';
+                        // Inherited style sniff for detached elements without getComputedStyle
+                        let current = shape;
+                        let resolvedStroke = null;
+                        let resolvedFill = null;
+                        let resolvedStrokeWidth = null;
+
+                        while (current && current.tagName && current.tagName.toLowerCase() !== 'svg') {
+                            if (!resolvedStroke) {
+                                const s = current.style.stroke || current.getAttribute('stroke');
+                                if (s && s !== 'none') resolvedStroke = s;
+                                else if (s === 'none') resolvedStroke = 'none'; // explicitly none
+                            }
+                            if (!resolvedFill) {
+                                const f = current.style.fill || current.getAttribute('fill');
+                                if (f && f !== 'none') resolvedFill = f;
+                                else if (f === 'none') resolvedFill = 'none'; // explicitly none
+                            }
+                            if (!resolvedStrokeWidth) {
+                                const sw = current.style.strokeWidth || current.getAttribute('stroke-width');
+                                if (sw) resolvedStrokeWidth = parseFloat(sw);
+                            }
+                            current = current.parentNode;
+                        }
+
+                        const hasNoStroke = !resolvedStroke || resolvedStroke === 'none';
                         
                         if (hasNoStroke) {
-                            const fill = shape.getAttribute('fill') || shape.style.fill;
-                            const fallbackColor = (fill && fill !== 'none' && fill !== 'transparent') ? fill : strokeColor;
+                            const fallbackColor = (resolvedFill && resolvedFill !== 'none' && resolvedFill !== 'transparent') ? resolvedFill : strokeColor;
                             shape.style.stroke = fallbackColor;
                         }
                         
-                        const attrWidth = parseFloat(shape.getAttribute('stroke-width'));
-                        const styleWidth = parseFloat(shape.style.strokeWidth);
-                        const sWidth = attrWidth || styleWidth || 0;
+                        const sWidth = resolvedStrokeWidth || 0;
                         if (sWidth < 0.5) shape.style.strokeWidth = strokeWidth + 'px';
+                        
+                        // Set original fill for fidel draw
+                        shape.setAttribute('data-original-fill', resolvedFill || 'none');
                     }
 
                     if (!isTrace && type !== 'electric-pulse') {
@@ -3341,7 +3513,7 @@
                         shape.style.strokeDashoffset = '1';
 
                         if (type === 'draw-fidel') {
-                            const originalFill = shape.getAttribute('fill') || (computed ? computed.fill : 'none') || 'none';
+                            const originalFill = shape.getAttribute('data-original-fill') || 'none';
                             // Sync draw and fill in ONE keyframe set to ensure perfect loop timing
                             if (!batchedStyles.includes(`@keyframes drawFidelKey_${idx}`)) {
                                 batchedStyles += `\n@keyframes drawFidelKey_${idx} { 
@@ -3375,7 +3547,7 @@
                         shape.style.strokeDasharray = '1';
                         shape.style.strokeDashoffset = '1';
                         if (type === 'draw-erase-fidel') {
-                            const originalFill = shape.getAttribute('fill') || (computed ? computed.fill : 'none') || 'none';
+                            const originalFill = shape.getAttribute('data-original-fill') || 'none';
                             const p1 = Math.min(49.9, ((duration - holdDur) / 2) / duration * 100);
                             const p2 = Math.min(99.9, p1 + (holdDur / duration * 100));
                             // Buffer for fill transition
@@ -3933,6 +4105,20 @@
                     svg.insertBefore(filter, svg.firstChild);
                 }
                 applyClassToTargets('', el => el.setAttribute('filter', 'url(#textGlitchFilter)'));
+            }
+            // Apply axis lock constraints to CSS transforms by parsing batched @keyframes
+            if (axisLock && axisLock !== 'none') {
+                if (axisLock === 'x') {
+                    // Lock to X Axis (Zero out Y)
+                    batchedStyles = batchedStyles.replace(/translate\(([^,)]+)(?:,\s*([^)]+))?\)/g, (m, x, y) => `translate(${x}, 0px)`);
+                    batchedStyles = batchedStyles.replace(/translateY\([^)]+\)/g, 'translateY(0px)');
+                    batchedStyles = batchedStyles.replace(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/g, (m, sx, sy) => `scale(${sx}, 1)`);
+                } else if (axisLock === 'y') {
+                    // Lock to Y Axis (Zero out X)
+                    batchedStyles = batchedStyles.replace(/translate\(([^,)]+)(?:,\s*([^)]+))?\)/g, (m, x, y) => `translate(0px, ${y || '0px'})`);
+                    batchedStyles = batchedStyles.replace(/translateX\([^)]+\)/g, 'translateX(0px)');
+                    batchedStyles = batchedStyles.replace(/scale\(([^,)]+)(?:,\s*([^)]+))?\)/g, (m, sx, sy) => `scale(1, ${sy || sx})`);
+                }
             }
 
             // Flush batched styles to the DOM
@@ -4824,7 +5010,11 @@
             { name: 'CIRCULAR BADGE', icon: '*', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><defs><path id="badgePath" d="M 150, 150 m -100, 0 a 100,100 0 1,1 200,0 a 100,100 0 1,1 -200,0"/></defs><text font-family="Impact, sans-serif" font-size="24" font-weight="bold" fill="#E5FF00" letter-spacing="6px" class="anim-text-3d"><textPath href="#badgePath" startOffset="50%" text-anchor="middle">* OPTIMAL PERFORMANCE * MAXIMUM OVERDRIVE *</textPath></text></svg>' },
             { name: 'MATRIX TERMINAL', icon: '>', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect x="10" y="10" width="380" height="180" fill="#050505" stroke="#00FF41" stroke-width="2"/><text x="40" y="60" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="20" fill="#00FF41" class="anim-typewriter" style="animation-duration:3s;">> INITIATING PROTOCOL...</text><text x="40" y="100" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="20" fill="#00FF41" class="anim-typewriter" style="animation-duration:4s; animation-delay:1s; opacity:0; animation-fill-mode:forwards;">> BYPASSING SECURITY...</text><text x="40" y="140" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="20" fill="#E5FF00" class="anim-typewriter" style="animation-duration:2s; animation-delay:3s; opacity:0; animation-fill-mode:forwards; font-weight:bold;">> ACCESS GRANTED_</text></svg>' },
             { name: 'WAVY BANNER', icon: '~', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200"><defs><path id="bannerWave" d="M 50, 100 Q 150, 50 250, 100 T 450, 100"/></defs><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="36" font-style="italic" fill="#E5FF00" class="anim-text-wave"><textPath href="#bannerWave" startOffset="50%" text-anchor="middle">FUTURE BOUND // NO LIMITS</textPath></text></svg>' },
-            { name: '3D CYLINDER TEXT', icon: '◖', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><path id="cylinderPath" d="M 50,200 A 150,50 0 1,1 350,200 A 150,50 0 1,1 50,200"/></defs><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="32" font-weight="900" fill="none" stroke="#E5FF00" stroke-width="2" letter-spacing="8px" class="anim-text-3d" style="animation-duration:10s; transform-origin: 200px 200px;"><textPath href="#cylinderPath" startOffset="50%" text-anchor="middle">VIRTUAL REALITY • CYBERSPACE • METAVERSE •</textPath></text></svg>' }
+            { name: '3D CYLINDER TEXT', icon: '◖', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><path id="cylinderPath" d="M 50,200 A 150,50 0 1,1 350,200 A 150,50 0 1,1 50,200"/></defs><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="32" font-weight="900" fill="none" stroke="#E5FF00" stroke-width="2" letter-spacing="8px" class="anim-text-3d" style="animation-duration:10s; transform-origin: 200px 200px;"><textPath href="#cylinderPath" startOffset="50%" text-anchor="middle">VIRTUAL REALITY • CYBERSPACE • METAVERSE •</textPath></text></svg>' },
+            { name: 'SYSTEM BREACH', icon: '⌨', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect x="5" y="5" width="390" height="190" fill="#050505" stroke="#E5FF00" stroke-width="2"/><rect x="5" y="5" width="390" height="25" fill="#1A1A1A"/><text x="15" y="22" font-family="monospace" font-size="12" fill="#E5FF00" font-weight="bold">TERMINAL // SECURITY_BYPASS</text><text x="20" y="65" font-family="monospace" font-size="14" fill="#E5FF00" class="anim-typewriter" style="animation-duration:4s;">> INITIATING BRUTE FORCE...</text><text x="20" y="95" font-family="monospace" font-size="14" fill="#E5FF00" class="anim-typewriter" style="animation-duration:5s; animation-delay:1.5s; opacity:0; animation-fill-mode:forwards;">> PACKET INJECTION SUCCESSFUL</text><text x="20" y="125" font-family="monospace" font-size="14" fill="#FF6600" class="anim-typewriter" style="animation-duration:2s; animation-delay:4s; opacity:0; animation-fill-mode:forwards; font-weight:bold;">> [CRITICAL] SYSTEM OVERRIDE</text></svg>' },
+            { name: 'ARCHIVE BADGE', icon: '❂', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><defs><path id="badgePathInternal" d="M 150, 150 m -80, 0 a 80,80 0 1,1 160,0 a 80,80 0 1,1 -160,0"/></defs><circle cx="150" cy="150" r="140" fill="none" stroke="#E5FF00" stroke-width="1" stroke-dasharray="4 4" opacity="0.3"/><circle cx="150" cy="150" r="120" fill="none" stroke="#E5FF00" stroke-width="4" stroke-dasharray="60 20" class="motion-spin" style="animation-duration:20s"/><circle cx="150" cy="150" r="100" fill="none" stroke="#E5FF00" stroke-width="2" stroke-dasharray="10 10" class="motion-spin" style="animation-duration:15s; animation-direction:reverse"/><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="14" fill="#E5FF00" letter-spacing="4px"><textPath href="#badgePathInternal" startOffset="50%" text-anchor="middle">RESTRICTED DATA // ARCHIVE ACCESS</textPath></text><polygon points="150,110 170,140 150,170 130,140" fill="#E5FF00" class="motion-pulse"/></svg>' },
+            { name: 'GRID SCANNER', icon: '⌗', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="scanGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#E5FF00" stop-opacity="0"/><stop offset="50%" stop-color="#E5FF00" stop-opacity="0.2"/><stop offset="100%" stop-color="#E5FF00" stop-opacity="0"/></linearGradient></defs><rect width="400" height="300" fill="#050505"/><path d="M0 0 H400 M0 50 H400 M0 100 H400 M0 150 H400 M0 200 H400 M0 250 H400 M0 300 H400 M0 0 V300 M50 0 V300 M100 0 V300 M150 0 V300 M200 0 V300 M250 0 V300 M300 0 V300 M350 0 V300 M400 0 V300" stroke="#E5FF00" stroke-width="0.5" opacity="0.1"/><rect width="400" height="60" fill="url(#scanGrad)" class="motion-bounce" style="animation-duration:4s; transform-origin: center"/><text x="10" y="290" font-family="monospace" font-size="10" fill="#E5FF00" opacity="0.5">X: 102.44 // Y: 559.12 // SEQ: 00192</text></svg>' }
+
         ];
 
         const templatesBtn = document.getElementById('templatesBtn');
@@ -9294,6 +9484,38 @@
                   console.log("System: Initialization final pass...");
                   updatePreview(editor.getValue());
                   updatePivotHandle();
+                  
+                  // Check for sketcher import
+                  const urlParams = new URLSearchParams(window.location.search);
+                  if (urlParams.get('import') === 'sketcher') {
+                      const sketcherData = localStorage.getItem('sketcher_vector_export');
+                      if (sketcherData) {
+                          editor.setValue(sketcherData);
+                          updatePreview(sketcherData);
+                          localStorage.removeItem('sketcher_vector_export');
+                          showToast("Imported from Sketcher");
+                          
+                          // Remove the query param from URL without refreshing
+                          window.history.replaceState({}, document.title, window.location.pathname);
+                          
+                          // Trigger animation automatically
+                          setTimeout(() => {
+                              const animStrokeBtn = document.getElementById('ecpAnimStrokeBtn');
+                              if (animStrokeBtn) {
+                                  // Find and select all paths to animate them
+                                  const svg = svgTransformWrapper.querySelector('svg');
+                                  if (svg) {
+                                      const paths = svg.querySelectorAll('path.anim-stroke');
+                                      if (paths.length > 0) {
+                                          selectedElements = Array.from(paths);
+                                          updateSelectionBox();
+                                          animStrokeBtn.click();
+                                      }
+                                  }
+                              }
+                          }, 500);
+                      }
+                  }
               });
         });
     </script>

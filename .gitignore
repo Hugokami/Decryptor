@@ -33,7 +33,11 @@ archive/
 exports/
 my-video/
 tmp/
-C:/Users/lyan1/.gemini/antigravity/
 
-# Large data (optional choice, but user might want it)
-# icons_data.js
+# Dev / cache artifacts
+__pycache__/
+*.pyc
+.genkit/
+.orchids/
+temp_search.txt
+bun.lock

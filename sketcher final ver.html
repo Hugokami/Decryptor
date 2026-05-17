@@ -1,0 +1,3095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>SSSS Lv Sketcher v2.1 - Enhanced by Hugo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        :root {
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            
+            /* Dark Theme (Default) */
+            --bg-color-dark: #1A1B1E; 
+            --panel-bg-dark: #25262B; 
+            --panel-bg-alt-dark: #2C2D32;
+            --canvas-bg-dark: #FFFFFF;
+            --text-color-dark: #F0F0F0; 
+            --text-secondary-dark: #A0A3BD; 
+            --accent-color-dark: #7071E8;
+            --accent-hover-dark: #8A8AFF;
+            --active-color-dark: #5051D8; 
+            --border-color-dark: #383A40; 
+            --loader-step-color-dark: #4A4C50;
+            --input-bg-dark: #202124; 
+            --input-border-dark: #4A4C50;
+            --danger-color-dark: #F44336;
+            --danger-hover-dark: #E57373;
+            --success-color-dark: #4CAF50;
+            --success-hover-dark: #66BB6A;
+            --shadow-sm-dark: rgba(0, 0, 0, 0.3);
+            --shadow-md-dark: rgba(0, 0, 0, 0.4);
+
+            /* Light Theme */
+            --bg-color-light: #F4F6F8;
+            --panel-bg-light: #FFFFFF;
+            --panel-bg-alt-light: #F9FAFB;
+            --canvas-bg-light: #FFFFFF;
+            --text-color-light: #212529;
+            --text-secondary-light: #6C757D;
+            --accent-color-light: #007AFF;
+            --accent-hover-light: #3390FF;
+            --active-color-light: #0056CC;
+            --border-color-light: #DEE2E6;
+            --loader-step-color-light: #CED4DA;
+            --input-bg-light: #F1F3F5;
+            --input-border-light: #CED4DA;
+            --danger-color-light: #DC3545;
+            --danger-hover-light: #E4606D;
+            --success-color-light: #28A745;
+            --success-hover-light: #2EBF4F;
+            --shadow-sm-light: rgba(0, 0, 0, 0.08);
+            --shadow-md-light: rgba(0, 0, 0, 0.12);
+
+            /* Applied variables */
+            --bg-color: var(--bg-color-dark);
+            --panel-bg: var(--panel-bg-dark);
+            --panel-bg-alt: var(--panel-bg-alt-dark);
+            --canvas-bg: var(--canvas-bg-dark);
+            --text-color: var(--text-color-dark);
+            --text-secondary: var(--text-secondary-dark);
+            --accent-color: var(--accent-color-dark);
+            --accent-hover: var(--accent-hover-dark);
+            --active-color: var(--active-color-dark);
+            --border-color: var(--border-color-dark);
+            --loader-step-color: var(--loader-step-color-dark);
+            --input-bg: var(--input-bg-dark);
+            --input-border: var(--input-border-dark);
+            --danger-color: var(--danger-color-dark);
+            --danger-hover: var(--danger-hover-dark);
+            --success-color: var(--success-color-dark);
+            --success-hover: var(--success-hover-dark);
+            --shadow-sm: var(--shadow-sm-dark);
+            --shadow-md: var(--shadow-md-dark);
+
+            --icon-size: 1.25em; 
+            --sidebar-width: 320px; /* Slightly wider */
+            --sidebar-width-collapsed: 55px;
+            --border-radius-sm: 4px;
+            --border-radius-md: 6px;
+            --border-radius-lg: 8px;
+        }
+
+        body.light-theme {
+            --bg-color: var(--bg-color-light);
+            --panel-bg: var(--panel-bg-light);
+            --panel-bg-alt: var(--panel-bg-alt-light);
+            --text-color: var(--text-color-light);
+            --text-secondary: var(--text-secondary-light);
+            --accent-color: var(--accent-color-light);
+            --accent-hover: var(--accent-hover-light);
+            --active-color: var(--active-color-light);
+            --border-color: var(--border-color-light);
+            --loader-step-color: var(--loader-step-color-light);
+            --input-bg: var(--input-bg-light);
+            --input-border: var(--input-border-light);
+            --danger-color: var(--danger-color-light);
+            --danger-hover: var(--danger-hover-light);
+            --success-color: var(--success-color-light);
+            --success-hover: var(--success-hover-light);
+            --shadow-sm: var(--shadow-sm-light);
+            --shadow-md: var(--shadow-md-light);
+        }
+
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            overflow: hidden; 
+            -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none;
+            -moz-user-select: none; -ms-user-select: none; user-select: none;
+        }
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color); display: flex; flex-direction: row;
+            color: var(--text-color);
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .sidebar {
+             width: var(--sidebar-width); 
+             background-color: var(--panel-bg);
+             border-right: 1px solid var(--border-color); 
+             display: flex; flex-direction: column; height: 100%; 
+             box-shadow: 4px 0 15px var(--shadow-md);
+             transition: background-color 0.2s ease, border-color 0.2s ease, width 0.3s ease-in-out, padding 0.3s ease-in-out;
+             flex-shrink: 0; 
+             overflow: hidden; 
+             position: relative;
+        }
+        .sidebar.collapsed {
+            width: var(--sidebar-width-collapsed);
+        }
+        .sidebar.collapsed .sidebar-header h1,
+        .sidebar.collapsed .sidebar-header .subtitle-span,
+        .sidebar.collapsed .sidebar-content,
+        .sidebar.collapsed #status .status-text { /* Hide status text, not icons */
+            display: none;
+        }
+         .sidebar.collapsed #status {
+            text-align: center; /* Center icons if any */
+        }
+        .sidebar.collapsed .sidebar-header {
+            padding: 10px 0;
+            height: 40px; 
+             border-bottom: none;
+        }
+        
+        .sidebar.collapsed #themeToggleBtn {
+             top: 50%; transform: translateY(-50%); right: -200px;
+             opacity:0;
+        }
+
+
+        .sidebar-header {
+            padding: 16px 20px 16px 55px; text-align: center; 
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0; position: relative;
+            display: flex; 
+            align-items: center;
+            justify-content: space-between; 
+        }
+         #toggleSidebarBtn {
+            position: fixed; top: 10px; left: 10px; z-index: 5001;
+            font-size: 1.6em; padding: 5px 9px;
+            background-color: var(--panel-bg); border: 1px solid var(--input-border);
+            color: var(--text-secondary); border-radius: var(--border-radius-md); line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--shadow-sm);
+            transition: background-color 0.15s, border-color 0.15s;
+        }
+        #toggleSidebarBtn:hover { background-color: var(--input-bg); color: var(--text-color); border-color: var(--accent-color); }
+
+        .sidebar-header .title-block { flex-grow: 1; text-align: center; }
+        .sidebar-header h1 { 
+            margin: 0; font-size: 1.25em; color: var(--text-color); font-weight: 600; word-break: break-all; 
+        }
+        .sidebar-header h1 span { font-size: 0.75em; color: var(--text-secondary); font-weight: 400; margin-left: 6px; }
+        .sidebar-header .subtitle-span { display: block; font-size: 0.75em; color: var(--text-secondary); margin-top: 3px; }
+
+        #themeToggleBtn {
+            position: static; 
+            margin-left: 12px; 
+            font-size: 1.1em; padding: 7px 9px;
+            background-color: transparent; border: 1px solid var(--input-border);
+            color: var(--text-secondary); border-radius: var(--border-radius-md);
+             transition: opacity 0.2s, right 0.3s ease-in-out;
+        }
+        #themeToggleBtn:hover { background-color: var(--input-bg); color: var(--text-color); border-color: var(--accent-color); }
+
+        .sidebar-content { flex-grow: 1; overflow-y: auto; padding: 10px; } 
+        .sidebar-content::-webkit-scrollbar { width: 8px; }
+        .sidebar-content::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-content::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: var(--border-radius-sm); }
+        .sidebar-content::-webkit-scrollbar-thumb:hover { background-color: var(--text-secondary); }
+
+        .tool-section { 
+            margin-bottom: 16px; 
+            padding: 12px; 
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            background-color: var(--panel-bg-alt);
+        }
+        .tool-section:last-child { margin-bottom: 0;}
+        .tool-section h3 {
+            font-size: 0.8em; margin: 0 0 12px 0; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 1.2px; font-weight: 500; 
+            padding-bottom: 6px; border-bottom: 1px solid var(--border-color);
+        }
+        .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; margin-bottom: 12px; } 
+        .actions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .zoom-actions-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+
+
+        .sidebar button, .layer-actions button, #palette-add-btn {
+            padding: 9px; border: 1px solid var(--input-border); 
+            background-color: var(--input-bg); color: var(--text-secondary);
+            cursor: pointer; border-radius: var(--border-radius-md); font-size: var(--icon-size);
+            transition: all 0.15s ease-in-out;
+            text-align: center; line-height: 1;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 1px 3px var(--shadow-sm); word-break: keep-all; 
+        }
+         .actions-grid button, .zoom-actions-grid button { font-size: 0.75em; padding: 8px 10px; }
+        #palette-add-btn { font-size: 0.8em; padding: 8px 12px; width: 100%; margin-top: 10px; }
+
+        
+        .sidebar button.active {
+            background-color: var(--active-color); border-color: var(--accent-color);
+            color: #fff; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 40%, transparent), 0 2px 6px var(--shadow-md);
+            transform: translateY(0px); /* Keep consistent Y for active */
+        }
+         .sidebar button:hover:not(.active):not(:disabled), #palette-add-btn:hover:not(:disabled) {
+            background-color: color-mix(in srgb, var(--input-bg) 80%, var(--text-color) 20%);
+            border-color: var(--accent-hover);
+            color: var(--text-color); transform: translateY(-1px); box-shadow: 0 2px 5px var(--shadow-md);
+        }
+
+        .sidebar button:disabled { background-color: var(--input-bg); color: var(--text-secondary); opacity: 0.5; cursor: not-allowed; box-shadow: none; transform: translateY(0); }
+        
+        .tool-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+        .tool-row label { font-size: 0.8em; color: var(--text-secondary); min-width: 75px; flex-shrink: 0;}
+        .tool-row input[type="color"] {
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            border: 1px solid var(--input-border); padding: 0; width: 38px; height: 28px; 
+            cursor: pointer; border-radius: var(--border-radius-sm); background-color: transparent;
+        }
+        .tool-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+        .tool-row input[type="color"]::-webkit-color-swatch { border: none; border-radius: var(--border-radius-sm); }
+        .tool-row input[type="color"]::-moz-color-swatch { border: none; border-radius: var(--border-radius-sm); }
+
+        .tool-row input[type="range"] {
+            flex-grow: 1; cursor: pointer; accent-color: var(--accent-color);
+            height: 6px; background: var(--input-border); border-radius: 3px;
+            -webkit-appearance: none; appearance: none; border: none; min-width: 60px; 
+        }
+        .tool-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: var(--accent-color);
+            border-radius: 50%; cursor: pointer; border: 3px solid var(--panel-bg); box-shadow: 0 1px 3px var(--shadow-sm);
+        }
+        .tool-row input[type="range"]::-moz-range-thumb {
+            width: 14px; height: 14px; background: var(--accent-color);
+            border-radius: 50%; cursor: pointer; border: 3px solid var(--panel-bg); box-shadow: 0 1px 3px var(--shadow-sm);
+        }
+
+        .tool-row input[type="number"], .tool-row select, .layer-controls select {
+            width: auto; flex-grow: 1; max-width: 150px; padding: 8px 10px; border-radius: var(--border-radius-md); 
+            border: 1px solid var(--input-border); font-size: 0.8em; 
+            background-color: var(--input-bg); color: var(--text-color);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .tool-row input[type="number"]:focus, .tool-row select:focus, .layer-controls select:focus {
+            border-color: var(--accent-color); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 30%, transparent); outline:none;
+        }
+        .layer-controls { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+
+        .tool-row .value-display { font-size: 0.8em; min-width: 30px; text-align: right; color: var(--text-secondary);}
+        .tool-row input[type="checkbox"] { cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-color); margin-right: 5px; vertical-align: middle; }
+        
+        #layer-panel { list-style:none;padding:0;margin:0 0 10px 0;max-height:150px;overflow-y:auto;border:1px solid var(--border-color);border-radius:var(--border-radius-md);background-color:color-mix(in srgb, var(--panel-bg) 92%, black);}
+        body.light-theme #layer-panel { background-color: color-mix(in srgb, var(--panel-bg) 96%, black); }
+        #layer-panel li { background-color:var(--input-bg);padding:10px 12px;border-bottom:1px solid var(--border-color);display:flex;flex-direction:column;gap:8px;cursor:pointer;transition:background-color 0.15s, border-left-color 0.15s;font-size:0.85em;}
+        #layer-panel li:first-child { border-top-left-radius: var(--border-radius-sm); border-top-right-radius: var(--border-radius-sm); }
+        #layer-panel li:last-child { border-bottom: none; border-bottom-left-radius: var(--border-radius-sm); border-bottom-right-radius: var(--border-radius-sm);}
+        .layer-info { display: flex; align-items: center; gap: 8px; width: 100%;}
+        .layer-info-controls { display: flex; align-items: center; gap: 4px; margin-left: auto;}
+        .layer-opacity-display { font-size: 0.7em; color: var(--text-secondary); min-width: 70px; text-align: right; }
+
+        #layer-panel li.active-layer { background-color:var(--panel-bg);border-left:4px solid var(--accent-color);font-weight:600;box-shadow:inset 3px 0 6px var(--shadow-sm);}
+        #layer-panel li:hover:not(.active-layer) { background-color: var(--border-color); }
+        #layer-panel li input[type="checkbox"].layer-visible-toggle { cursor:pointer;accent-color:var(--accent-hover);width:16px;height:16px;}
+        #layer-panel li input[type="range"].layer-opacity-slider { width:70px;height:6px;cursor:pointer;accent-color:var(--accent-hover);margin:0 5px;background:transparent;border:none;}
+        #layer-panel li span.layer-name { flex-grow:1;color:var(--text-color);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-left:5px;}
+        #layer-panel li button.delete-layer { background:none;border:none;cursor:pointer;font-size:1.2em;color:var(--danger-color);padding:0 3px;margin-left:auto;transition:color 0.15s ease;}
+        #layer-panel li button.delete-layer:hover { color: var(--danger-hover); transform: scale(1.08); }
+        .layer-actions { display:flex;justify-content:space-around;gap:10px;margin-top:12px;}
+        .layer-actions button { font-size:1.3em;padding:8px 12px;}
+
+        .templates-container, #palette-container { display:grid;grid-template-columns:repeat(auto-fill,minmax(30px,1fr));gap:6px;padding:6px;border:1px solid var(--input-border);border-radius:var(--border-radius-md);background-color:color-mix(in srgb, var(--panel-bg) 88%, black);min-height:35px;margin-top:6px;max-height:75px;overflow-y:auto;}
+        .templates-container::-webkit-scrollbar, #palette-container::-webkit-scrollbar { width: 6px; }
+        .templates-container::-webkit-scrollbar-thumb, #palette-container::-webkit-scrollbar-thumb { background-color: var(--text-secondary); border-radius: 3px;}
+
+        .swatch { width:100%;padding-bottom:100%;border-radius:var(--border-radius-sm);cursor:pointer;border:1px solid var(--border-color);box-shadow:inset 0 0 2px var(--shadow-sm);transition:transform 0.1s ease,box-shadow 0.1s ease;}
+        .swatch:hover { transform:scale(1.1);box-shadow:0 0 6px var(--accent-hover);}
+
+        #canvas-container { 
+            flex-grow:1; width: 0; min-width: 0;
+            display:flex;justify-content:center;align-items:center;
+            padding:20px;box-sizing:border-box;overflow:hidden; 
+            background-color:var(--bg-color);transition:background-color 0.3s ease, margin-left 0.3s ease-in-out;
+            position: relative; 
+        }
+        #drawingCanvas { 
+            border:1px solid var(--border-color);cursor:crosshair;
+            background-color:var(--canvas-bg);
+            box-shadow:0 0 30px var(--shadow-md);
+            transition:background-color 0.3s ease,border-color 0.3s ease;
+            image-rendering:pixelated; 
+            display: block; 
+            touch-action: none;
+        }
+        body.light-theme #drawingCanvas { box-shadow:0 0 20px var(--shadow-md-light);}
+        #imageLoader { display:none;}
+        
+        #status { 
+            padding:12px 18px;border-top:1px solid var(--border-color);
+            color:var(--text-secondary);font-size:0.85em;text-align:left;
+            background-color:var(--panel-bg);flex-shrink:0;
+            transition:background-color 0.3s ease,color 0.3s ease,border-color 0.3s ease;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .status-text { flex-grow: 1; }
+        .status-info span { margin-left: 15px; }
+
+        .property-row { display:none;} .property-row.visible { display:flex;}
+
+        /* Intro Overlay */
+        #introOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            z-index: 9999;
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center;
+            opacity: 1; transition: opacity 0.7s ease-out .2s, visibility 0s linear 0s;
+            visibility: visible;
+        }
+        #introOverlay.hidden {
+            opacity: 0; visibility: hidden; transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
+            pointer-events: none;
+        }
+        .intro-content { padding: 25px; display: flex; flex-direction: column; align-items: center; }
+        .intro-content .intro-title { 
+            font-size: 2.8em; 
+            color: var(--accent-color); 
+            margin-bottom: 12px; 
+            opacity: 0;  /* GSAP controlled */
+            transform: translateY(-25px) scale(0.9); /* GSAP controlled */
+        }
+        .intro-content .intro-subtitle { 
+            font-size: 1.15em; 
+            color: var(--text-secondary); 
+            margin-bottom: 35px; 
+            opacity: 0; /* GSAP controlled */
+            transform: translateY(-20px); /* GSAP controlled */
+        }
+        
+        #startSketchingBtn {
+            padding: 14px 28px; font-size: 1.05em; font-weight: 500;
+            background-color: var(--accent-color); color: white;
+            border: none; border-radius: var(--border-radius-lg); cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 35px; 
+            opacity: 0; /* GSAP controlled */
+            transform: translateY(25px); /* GSAP controlled */
+        }
+        #startSketchingBtn:hover { background-color: var(--accent-hover); }
+
+        .loader {
+            position: relative;
+            width: 120px;
+            height: 90px; 
+            margin: 0 auto 25px auto;
+            opacity: 0;  /* GSAP controlled */
+        }
+        .loader:before { content: ""; position: absolute; bottom: 30px; left: 50px; height: 30px; width: 30px; border-radius: 50%; background: var(--accent-color); animation: loading-bounce 0.5s ease-in-out infinite alternate;}
+        .loader:after { content: ""; position: absolute; right: 0; top: 0; height: 7px; width: 45px; border-radius: 4px; box-shadow: 0 5px 0 var(--loader-step-color), -35px 50px 0 var(--loader-step-color), -70px 95px 0 var(--loader-step-color); animation: loading-step 1s ease-in-out infinite;}
+        @keyframes loading-bounce { 0% {transform: scale(1, 0.7);} 40% {transform: scale(0.8, 1.2);} 60% {transform: scale(1, 1);} 100% {bottom: 120px;}}
+        @keyframes loading-step { 0% {box-shadow: 0 10px 0 rgba(0,0,0,0), 0 10px 0 var(--loader-step-color), -35px 50px 0 var(--loader-step-color), -70px 90px 0 var(--loader-step-color);} 100% {box-shadow: 0 10px 0 var(--loader-step-color), -35px 50px 0 var(--loader-step-color), -70px 90px 0 var(--loader-step-color), -70px 90px 0 rgba(0,0,0,0);}}
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: 100vh; height: 100dvh; }
+            
+            /* Sidebar becomes slide-over drawer */
+            .sidebar {
+                position: fixed; top: 0; left: 0;
+                width: 85vw; max-width: 340px;
+                height: 100vh; height: 100dvh;
+                z-index: 5000;
+                border-right: 1px solid var(--border-color);
+                box-shadow: 6px 0 25px var(--shadow-md);
+                transform: translateX(0);
+                transition: transform 0.3s ease-in-out, background-color 0.2s ease;
+            }
+            .sidebar.collapsed {
+                transform: translateX(-100%);
+                width: 85vw; max-width: 340px;
+                height: 100vh; height: 100dvh;
+            }
+            .sidebar.collapsed .sidebar-header h1,
+            .sidebar.collapsed .sidebar-header .subtitle-span,
+            .sidebar.collapsed .sidebar-content,
+            .sidebar.collapsed #status .status-text { display: block; } /* Show content in drawer */
+            .sidebar.collapsed .sidebar-header { height: auto; border-bottom: 1px solid var(--border-color); }
+            .sidebar.collapsed #themeToggleBtn { opacity: 1; right: auto; }
+
+            /* Canvas fills entire screen */
+            #canvas-container {
+                position: fixed; top: 0; left: 0;
+                width: 100vw; height: 100vh; height: 100dvh;
+                padding: 0; min-height: unset;
+            }
+
+            /* Mobile adjustments for toggle button */
+            #toggleSidebarBtn {
+                padding: 8px 10px;
+            }
+
+            /* Overlay backdrop when sidebar is open */
+            .sidebar-backdrop {
+                position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                background: rgba(0,0,0,0.4); z-index: 4999;
+                opacity: 1; pointer-events: auto;
+                transition: opacity 0.3s ease;
+            }
+            .sidebar-backdrop.hidden {
+                opacity: 0; pointer-events: none;
+            }
+
+            .sidebar-content { padding: 8px; }
+            .tool-grid { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 6px; }
+            .sidebar button { min-height: 40px; min-width: 40px; }
+            .actions-grid { grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 6px; }
+            .templates-container, #palette-container { max-height: 65px; }
+            #layer-panel { max-height: 100px; }
+            .intro-content .intro-title { font-size: 2.2em; }
+            .loader { transform: scale(0.85); }
+
+            /* Floating status bar */
+            .sidebar #status {
+                position: fixed; bottom: 0; left: 0; width: 100vw; z-index: 4998;
+                font-size: 0.75em; padding: 6px 12px;
+                background-color: var(--panel-bg); border-top: 1px solid var(--border-color);
+                box-shadow: 0 -2px 8px var(--shadow-sm);
+            }
+        }
+        @media (max-width: 480px) {
+            .sidebar { max-width: 90vw; }
+            .sidebar-header h1 { font-size: 1.1em; }
+            .sidebar-header h1 span, .sidebar-header .subtitle-span { font-size: 0.7em; }
+            .tool-section h3 { font-size: 0.78em; margin-bottom: 10px; }
+            .tool-grid { grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 5px; }
+            .sidebar button, .layer-actions button, #palette-add-btn { font-size: 1.15em; padding: 7px; }
+            .actions-grid button { font-size: 0.72em; padding: 7px 9px; }
+            .tool-row label { font-size: 0.78em; min-width: 60px; }
+            .tool-row input[type="number"], .tool-row select, .layer-controls select { font-size: 0.75em; padding: 7px 9px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="introOverlay">
+        <div class="intro-content">
+            <h1 class="intro-title">SSSS Lv Sketcher</h1>
+            <p class="intro-subtitle">Initializing your creative space...</p>
+            <div class="loader"></div>
+            <button id="startSketchingBtn">Start Sketching</button>
+        </div>
+    </div>
+
+    <button id="toggleSidebarBtn" title="Toggle Controls (Tab)">☰</button>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="title-block">
+                <h1>SSSS Lv Sketcher <span>by Hugo</span></h1>
+                <span class="subtitle-span">Enhanced Edition 2.1</span>
+            </div>
+            <button id="themeToggleBtn" title="Toggle Theme">🌙</button>
+        </div>
+        <div class="sidebar-content">
+            <div class="tool-section"><h3>Tools</h3><div class="tool-grid">
+                <button id="penTool" class="active" title="Pen (P)">✏️</button>
+                <button id="pixelTool" title="Pixel Art (X)">🔲</button>
+                <button id="eraserTool" title="Eraser (E)">🧼</button>
+                <button id="fillTool" title="Fill Bucket (F)">🪣</button>
+                <button id="lineTool" title="Line (L)">📏</button>
+                <button id="shapeTool" title="Shape Tool (H)">💠</button> 
+                <button id="textTool" title="Text Tool (T)">Aa</button>
+                <button id="eyedropperTool" title="Eyedropper (I, Alt+Click)">💧</button>
+                <button id="sprayTool" title="Spray Paint (S)">💨</button>
+                <button id="selectTool" title="Selection Tool (M)">⬚</button> 
+                <button id="moveTool" title="Move Tool (V)">✥</button> 
+            </div></div>
+            <div class="tool-section"><h3>Properties</h3>
+                <div class="tool-row" id="colorTypeRow"><label for="colorTypeSelect">Color Type</label><select id="colorTypeSelect"><option value="solid">Solid</option><option value="linear">Linear Gradient</option></select></div>
+                <div class="tool-row property-row" id="solidColorPropsRow"><label for="lineColor">Color</label><input type="color" id="lineColor" value="#000000"></div>
+                <div class="tool-row property-row" id="gradientPropsRow1"><label for="gradientStartColor">Start 🎨</label><input type="color" id="gradientStartColor" value="#000000"></div>
+                <div class="tool-row property-row" id="gradientPropsRow2"><label for="gradientEndColor">End 🎨</label><input type="color" id="gradientEndColor" value="#FF8A8A"></div>
+                
+                <div class="tool-row property-row" id="shapeTypeRow"> <label for="shapeTypeSelect">Shape</label> <select id="shapeTypeSelect"> <option value="rectangle">Rectangle</option> <option value="roundedRect">Rounded Rect</option> <option value="circle">Circle</option> <option value="ellipse">Ellipse</option> <option value="triangle">Triangle</option> <option value="star">Star</option> <option value="polygon">Polygon</option> <option value="rhombus">Rhombus</option> </select> </div>
+                <div class="tool-row property-row" id="cornerRadiusRow"><label for="cornerRadius">Radius</label><input type="range" id="cornerRadius" min="0" max="100" value="10"><span id="cornerRadiusValue" class="value-display">10</span>px</div>
+                <div class="tool-row"><label for="lineWidth">Width</label><input type="range" id="lineWidth" min="1" max="100" value="5"><span id="lineWidthValue" class="value-display">5</span>px</div>
+                <div class="tool-row"><label for="strokeStyle">Stroke Style</label><select id="strokeStyle"><option value="solid">Solid</option><option value="dashed">Dashed</option><option value="dotted">Dotted</option></select></div>
+                <div class="tool-row property-row" id="shapeCommonPropsRow"><label for="fillShapeCheckbox" title="Fill Shape?">Fill Shape</label><input type="checkbox" id="fillShapeCheckbox" title="Fill Shape?"></div>
+                <div class="tool-row property-row" id="polygonSidesRow"><label for="polygonSides">Sides</label><input type="number" id="polygonSides" min="3" max="20" value="5"></div>
+                <div class="tool-row property-row" id="textPropsRow1"><label for="textSize">Text Size</label><input type="number" id="textSize" min="8" max="150" value="24"><span class="value-display">px</span></div>
+                <div class="tool-row property-row" id="textPropsRow2"><label for="fontFamily">Font</label><select id="fontFamily"><option>Inter</option><option>Arial</option><option>Verdana</option><option>Georgia</option><option>Times New Roman</option><option>Courier New</option></select></div>
+                <div class="tool-row property-row" id="textPropsRow3"><label for="textAlign">Align</label><select id="textAlign"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+                
+                <div class="tool-row" id="gridPropsRow1">
+                    <label for="showGridCheckbox">Show Grid</label><input type="checkbox" id="showGridCheckbox" title="Toggle Grid (Ctrl+G)">
+                    <label for="snapToGridCheckbox" style="min-width:auto; margin-left:5px;">Snap</label><input type="checkbox" id="snapToGridCheckbox">
+                </div>
+                <div class="tool-row property-row" id="gridPropsRow2">
+                    <label for="gridSizeInput">Grid Size</label><input type="number" id="gridSizeInput" value="20" min="5" max="200" step="1"><span class="value-display">px</span>
+                    <label for="gridColorPicker" style="min-width:auto; margin-left:5px;">Color</label><input type="color" id="gridColorPicker" value="#cccccc">
+                </div>
+            </div>
+            <div class="tool-section"><h3>Actions & Effects</h3>
+                <div class="tool-grid"> 
+                    <button id="undoBtn" title="Undo (Ctrl+Z)">↩️</button> 
+                    <button id="redoBtn" title="Redo (Ctrl+Y or Ctrl+Shift+Z)">↪️</button>
+                    <button id="uploadImageBtn" title="Upload Image">🖼️</button> 
+                    <button id="clearBtn" title="Clear ALL Layers">🗑️</button> 
+                    <button id="saveBtn" title="Save Image">💾</button> 
+                    <button id="saveProjectBtn" title="Save Project (.sketch)">📁</button>
+                    <button id="loadProjectBtn" title="Load Project (.sketch)">📂</button>
+                    <input type="file" id="projectLoader" accept=".sketch" style="display:none;">
+                    <button id="replayBtn" title="Replay Animation">▶️</button>
+                    <button id="exportSvgBtn" title="Export to SVG Studio">📤</button>
+                    <button id="clearSelectionContentBtn" title="Clear Selected Area (Del/Backspace)">✂️</button>
+                    <button id="flipHorizontalBtn" title="Flip Layer Horizontally">⇄</button>
+                    <button id="flipVerticalBtn" title="Flip Layer Vertically">⇅</button>
+                </div>
+                <div class="actions-grid"> 
+                    <button id="grayscaleBtn" title="Grayscale Layer">Grayscale</button> 
+                    <button id="invertBtn" title="Invert Layer Colors">Invert</button> 
+                    <button id="symmetryToggleBtn" title="Toggle Symmetry (X)">OFF</button> 
+                </div>
+                <div class="tool-row" style="margin-top: 10px;">
+                    <label for="canvasSizeSelect" style="min-width: 80px;">Canvas</label>
+                    <select id="canvasSizeSelect" style="flex-grow:1; padding: 7px 9px; border-radius: var(--border-radius-md); border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--text-color); font-size: 0.85em;">
+                        <option value="3000x2250">3000×2250 (4:3 HD)</option>
+                        <option value="1920x1080">1920×1080 (16:9 FHD)</option>
+                        <option value="2560x1440">2560×1440 (16:9 QHD)</option>
+                        <option value="4096x4096">4096×4096 (Square)</option>
+                        <option value="2048x2048">2048×2048 (Square)</option>
+                        <option value="1080x1920">1080×1920 (Portrait)</option>
+                        <option value="1080x1080">1080×1080 (Instagram)</option>
+                        <option value="custom">Custom...</option>
+                    </select>
+                </div>
+                <div class="tool-row" id="customCanvasSizeRow" style="display: none; margin-top: 6px;">
+                    <input type="number" id="customCanvasW" value="3000" min="100" max="8192" style="width: 70px; padding: 6px; border-radius: var(--border-radius-md); border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--text-color); font-size: 0.85em;">
+                    <span style="margin: 0 4px; color: var(--text-secondary);">×</span>
+                    <input type="number" id="customCanvasH" value="2250" min="100" max="8192" style="width: 70px; padding: 6px; border-radius: var(--border-radius-md); border: 1px solid var(--input-border); background-color: var(--input-bg); color: var(--text-color); font-size: 0.85em;">
+                    <button id="applyCanvasSizeBtn" style="padding: 6px 10px; font-size: 0.8em; margin-left: 6px;">Apply</button>
+                </div>
+                <div class="zoom-actions-grid">
+                    <button id="zoomInBtn" title="Zoom In (+)">➕</button>
+                    <button id="zoomOutBtn" title="Zoom Out (-)">➖</button>
+                    <button id="resetZoomBtn" title="Reset Zoom (0)">⟲</button>
+                    <button id="rotateScreenBtn" title="Toggle Orientation Lock">🔄</button>
+                </div>
+                <div class="tool-row" id="replayControls" style="display:none; flex-direction:column; margin-top: 12px;">
+                    <div style="display:flex; justify-content:space-between; width:100%;">
+                        <label style="min-width:auto;">Replay</label>
+                        <div>
+                            <button id="replayRecordBtn" style="padding: 2px 5px; font-size: 10px; background: #e74c3c;">Record</button>
+                            <button id="replayCloseBtn" style="padding: 2px 5px; font-size: 10px;">Close</button>
+                        </div>
+                    </div>
+                    <input type="range" id="replayScrubber" min="0" max="100" value="0" step="0.1" style="width: 100%;">
+                </div>
+                <div class="tool-row" style="margin-top:12px;"><label for="saveFormat">Format</label><select id="saveFormat"><option value="png">PNG</option><option value="png-transparent">PNG (Transparent)</option><option value="jpeg">JPEG</option><option value="svg-animated">Animated SVG</option><option value="svg-static">Static SVG</option></select></div>
+                <input type="file" id="imageLoader" accept="image/*"/>
+            </div>
+            <div class="tool-section"><h3>Layers</h3><ul id="layer-panel"></ul><div class="layer-actions"><button id="addLayerBtn" title="Add Layer">➕</button> <button id="mergeLayerBtn" title="Merge Layer Down">Merge ↓</button> <button id="deleteLayerBtn" title="Delete Layer">➖</button></div></div>
+            <div class="tool-section"><h3>Color Palette</h3> <div id="palette-container" class="templates-container"></div> <button id="paletteAddBtn" title="Add Current to Palette">➕ Add</button> </div>
+            <div class="tool-section"><h3>Solid Templates</h3> <div id="solid-templates-container" class="templates-container"></div> </div>
+            <div class="tool-section"><h3>Gradient Templates</h3> <div id="gradient-templates-container" class="templates-container"></div> </div>
+        </div>
+        <div id="status">
+            <span class="status-text">Loading SSSS Lv Sketcher...</span>
+            <div class="status-info">
+                <span id="zoomLevelDisplay">Zoom: 100%</span>
+                <span id="cursorCoordsDisplay">X: 0, Y: 0</span>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar-backdrop hidden" id="sidebarBackdrop"></div>
+    <div id="canvas-container">
+        <canvas id="drawingCanvas"></canvas>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Canvas Dimensions (adjustable) ---
+            let DEFAULT_LOGICAL_WIDTH = 3000;
+            let DEFAULT_LOGICAL_HEIGHT = 2250;
+            const PIXEL_GRID_ZOOM_THRESHOLD = 8; // Zoom level above which pixel grid appears
+
+            // --- DOM Elements ---
+            const mainCanvas = document.getElementById('drawingCanvas');
+            const mainCtx = mainCanvas.getContext('2d', { willReadFrequently: true });
+            const colorTypeSelect = document.getElementById('colorTypeSelect');
+            const solidColorPropsRow = document.getElementById('solidColorPropsRow');
+            const lineColorPicker = document.getElementById('lineColor');
+            const gradientPropsRow1 = document.getElementById('gradientPropsRow1');
+            const gradientPropsRow2 = document.getElementById('gradientPropsRow2');
+            const gradientStartColorPicker = document.getElementById('gradientStartColor');
+            const gradientEndColorPicker = document.getElementById('gradientEndColor');
+            const shapeTypeRow = document.getElementById('shapeTypeRow'); 
+            const shapeTypeSelect = document.getElementById('shapeTypeSelect'); 
+            const cornerRadiusRow = document.getElementById('cornerRadiusRow');
+            const cornerRadiusSlider = document.getElementById('cornerRadius');
+            const cornerRadiusValue = document.getElementById('cornerRadiusValue');
+            const lineWidthSlider = document.getElementById('lineWidth');
+            const lineWidthValue = document.getElementById('lineWidthValue');
+            const strokeStyleSelect = document.getElementById('strokeStyle');
+            const shapeCommonPropsRow = document.getElementById('shapeCommonPropsRow'); 
+            const fillShapeCheckbox = document.getElementById('fillShapeCheckbox');
+            const polygonSidesRow = document.getElementById('polygonSidesRow'); 
+            const polygonSidesInput = document.getElementById('polygonSides');
+            const textPropsRow1 = document.getElementById('textPropsRow1');
+            const textPropsRow2 = document.getElementById('textPropsRow2');
+            const textPropsRow3 = document.getElementById('textPropsRow3');
+            const textSizeInput = document.getElementById('textSize');
+            const fontFamilySelect = document.getElementById('fontFamily');
+            const textAlignSelect = document.getElementById('textAlign');
+            const showGridCheckbox = document.getElementById('showGridCheckbox');
+            const snapToGridCheckbox = document.getElementById('snapToGridCheckbox');
+            const gridSizeInput = document.getElementById('gridSizeInput');
+            const gridColorPicker = document.getElementById('gridColorPicker');
+            
+            const undoBtn = document.getElementById('undoBtn');
+            const redoBtn = document.getElementById('redoBtn'); // New
+            const uploadImageBtn = document.getElementById('uploadImageBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const saveProjectBtn = document.getElementById('saveProjectBtn');
+            const loadProjectBtn = document.getElementById('loadProjectBtn');
+            const projectLoader = document.getElementById('projectLoader');
+            const replayBtn = document.getElementById('replayBtn');
+            const exportSvgBtn = document.getElementById('exportSvgBtn');
+            const replayControls = document.getElementById('replayControls');
+            const replayScrubber = document.getElementById('replayScrubber');
+            const replayCloseBtn = document.getElementById('replayCloseBtn');
+            const replayRecordBtn = document.getElementById('replayRecordBtn');
+            let mediaRecorder = null;
+            let recordedChunks = [];
+            const saveFormatSelect = document.getElementById('saveFormat');
+            const imageLoader = document.getElementById('imageLoader');
+            const grayscaleBtn = document.getElementById('grayscaleBtn');
+            const invertBtn = document.getElementById('invertBtn');
+            const symmetryToggleBtn = document.getElementById('symmetryToggleBtn');
+            const layerPanel = document.getElementById('layer-panel');
+            const addLayerBtn = document.getElementById('addLayerBtn');
+            const mergeLayerBtn = document.getElementById('mergeLayerBtn');
+            const deleteLayerBtn = document.getElementById('deleteLayerBtn');
+            const paletteContainer = document.getElementById('palette-container');
+            const paletteAddBtn = document.getElementById('paletteAddBtn');
+            const solidTemplatesContainer = document.getElementById('solid-templates-container');
+            const gradientTemplatesContainer = document.getElementById('gradient-templates-container');
+            
+            const statusDiv = document.getElementById('status');
+            const statusText = statusDiv.querySelector('.status-text'); // For main status messages
+            const zoomLevelDisplay = document.getElementById('zoomLevelDisplay');
+            const cursorCoordsDisplay = document.getElementById('cursorCoordsDisplay');
+
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const sidebar = document.querySelector('.sidebar');
+            const zoomInBtn = document.getElementById('zoomInBtn');
+            const zoomOutBtn = document.getElementById('zoomOutBtn');
+            const resetZoomBtn = document.getElementById('resetZoomBtn');
+            const rotateScreenBtn = document.getElementById('rotateScreenBtn');
+            const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+            
+            const introOverlay = document.getElementById('introOverlay');
+            const introTitle = introOverlay.querySelector('.intro-title');
+            const introSubtitle = introOverlay.querySelector('.intro-subtitle');
+            const introLoader = introOverlay.querySelector('.loader');
+            const startSketchingBtn = document.getElementById('startSketchingBtn');
+
+            const clearSelectionContentBtn = document.getElementById('clearSelectionContentBtn');
+            const flipHorizontalBtn = document.getElementById('flipHorizontalBtn');
+            const flipVerticalBtn = document.getElementById('flipVerticalBtn');
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+            const canvasSizeSelect = document.getElementById('canvasSizeSelect');
+            const customCanvasSizeRow = document.getElementById('customCanvasSizeRow');
+            const customCanvasW = document.getElementById('customCanvasW');
+            const customCanvasH = document.getElementById('customCanvasH');
+            const applyCanvasSizeBtn = document.getElementById('applyCanvasSizeBtn');
+
+            function isMobileLayout() { return window.innerWidth <= 768; }
+
+
+            // --- State Variables ---
+            let currentTool = 'pen';
+            let currentShapeType = 'rectangle'; 
+            let previousToolBeforeEyedropper = 'pen'; 
+            let isAltEyedropperActive = false;
+
+            let isDrawing = false; 
+            let isSelecting = false; 
+            let isMovingSelection = false; 
+            let lastX = 0, lastY = 0; // World coordinates
+            let startX = 0, startY = 0; // World coordinates
+            let selectionRect = null; // { x, y, width, height } in world coordinates
+            let movingSelectionData = null; // { imageData, x, y, offsetX, offsetY } x,y in world for top-left of imageData
+
+            let currentColorMode = 'solid'; 
+            let currentSolidColor = '#000000'; 
+            let currentGradient = { start: '#000000', end: '#FF8A8A' };
+            let currentWidth = 5; 
+            let currentCornerRadius = 10; // New for rounded rect
+            let currentPolygonSides = 5;
+            let currentFontSize = 24; 
+            let currentFontFamily = 'Arial';
+            let currentTextAlign = 'left';
+            let currentStrokeStyle = 'solid';
+            
+            let showGrid = false;
+            let snapToGrid = false;
+            let gridSize = 20; 
+            let gridColor = '#cccccc';
+            
+            let deviceScale = window.devicePixelRatio || 1; 
+            let zoomLevel = 1.0;
+            let panX = 0; // Screen pixels for panning offset
+            let panY = 0; 
+            let isPanning = false; 
+            let lastPanX_mouse, lastPanY_mouse; // For mouse panning
+            let pinchStartDistance = 0;
+            let lastPinchMidX, lastPinchMidY; // For pinch zoom/pan
+
+            let symmetryMode = 'OFF'; 
+            const symmetryModes = ['OFF', 'Y', 'X', 'XY'];
+            let currentSymmetryIndex = 0;
+            let paletteColors = [];
+            const MAX_PALETTE_COLORS = 24;
+            let layers = [];
+            let activeLayerIndex = -1;
+            let layerCounter = 1;
+            
+            let history = {}; // { layerIndex: [dataURL1, dataURL2, ...] }
+            let historyStep = {}; // { layerIndex: currentStepIndex }
+            const MAX_HISTORY_STEPS = 25; // Increased slightly
+
+            let vectorStrokes = [];
+            let currentVectorStroke = null;
+            let isReplaying = false;
+            let pixelFilledCells = new Set(); // tracks filled cells during a single pixel stroke
+
+            const blendModes = [ 'source-over', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity', 'destination-over', 'lighter', 'xor' ];
+            const solidColorTemplates = [ "#E74C3C", "#F1C40F", "#2ECC71", "#3498DB", "#9B59B6", "#34495E", "#1ABC9C", "#E67E22", "#BDC3C7", "#7F8C8D", "#F39C12", "#D35400", "#C0392B", "#16A085", "#27AE60", "#2980B9" ];
+            const gradientTemplates = [ { name: "Sunset", start: "#FFC371", end: "#FF5F6D" }, { name: "Ocean", start: "#34E89E", end: "#034AD8" }, { name: "Forest", start: "#138808", end: "#228B22" }, { name: "Plum", start: "#4A00E0", end: "#8E2DE2" }, { name: "Rose", start: "#FFDDD2", end: "#FF8DC7" }, { name: "Sky", start: "#0072ff", end: "#00c6ff" }, { name: "Fire", start: "#f12711", end: "#f5af19" }, { name: "Mint", start: "#A1FFCE", end: "#FAFFD1" }, { name: "Rainbow", start: "#ff0000", end: "#0000ff"} ];
+            
+            let selectionMarchOffset = 0; 
+
+            // --- Initialization & Setup ---
+            function animateIntroElements() {
+                const tl = gsap.timeline({
+                    onComplete: () => {
+                         // Auto-hide intro after animations plus some viewing time
+                        setTimeout(hideIntro, 1800); // Viewing time after animation
+                    }
+                });
+                tl.to(introTitle, { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: "power2.out" }, 0.3)
+                  .to(introSubtitle, { opacity: 1, y: 0, duration: 0.6, ease: "power1.out" }, "-=0.4")
+                  .to(introLoader, { opacity: 1, duration: 0.5, ease: "sine.inOut" }, "-=0.5")
+                  .to(startSketchingBtn, { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.7)" }, "+=0.3");
+            }
+
+            function initializeApp() {
+                gsap.set(introTitle, { opacity: 0, y: -25, scale: 0.9 });
+                gsap.set(introSubtitle, { opacity: 0, y: -20 });
+                gsap.set(introLoader, { opacity: 0 });
+                gsap.set(startSketchingBtn, { opacity: 0, y: 25 });
+                animateIntroElements();
+                
+                attemptLockOrientation('landscape-primary'); 
+
+                const savedTheme = localStorage.getItem('sketcherTheme');
+                if (savedTheme === 'light') { document.body.classList.add('light-theme'); themeToggleBtn.textContent = '🌙'; } else { themeToggleBtn.textContent = '☀️'; }
+                
+                const sidebarCollapsed = isMobileLayout() ? true : (localStorage.getItem('sidebarCollapsed') === 'true');
+                if (sidebarCollapsed) {
+                    sidebar.classList.add('collapsed');
+                    toggleSidebarBtn.textContent = '☰'; 
+                } else {
+                    toggleSidebarBtn.textContent = '❮'; 
+                }
+                // Ensure backdrop is hidden initially
+                sidebarBackdrop.classList.add('hidden');
+
+                lineColorPicker.value = currentSolidColor; 
+                gradientStartColorPicker.value = currentGradient.start; gradientEndColorPicker.value = currentGradient.end;
+                lineWidthSlider.value = currentWidth; lineWidthValue.textContent = currentWidth;
+                cornerRadiusSlider.value = currentCornerRadius; cornerRadiusValue.textContent = currentCornerRadius;
+                polygonSidesInput.value = currentPolygonSides; shapeTypeSelect.value = currentShapeType;
+                textSizeInput.value = currentFontSize; fontFamilySelect.value = currentFontFamily; textAlignSelect.value = currentTextAlign;
+                strokeStyleSelect.value = currentStrokeStyle; colorTypeSelect.value = currentColorMode;
+                showGridCheckbox.checked = showGrid; snapToGridCheckbox.checked = snapToGrid;
+                gridSizeInput.value = gridSize; gridColorPicker.value = gridColor;
+
+                loadPalette(); renderSolidColorTemplates(); renderGradientTemplates();
+                initializeCanvasAndLayers(); 
+                setupEventListeners(); updateColorPropertiesUI(); updateActiveToolPropertiesUI(); updateCursor();
+                updateStatus("Select a tool to begin or load an image.");
+                updateZoomPanDisplay();
+                requestAnimationFrame(animateSelectionMarch); 
+            }
+            
+            function hideIntro() {
+                if (introOverlay && !introOverlay.classList.contains('hidden')) {
+                    gsap.to(introOverlay, { 
+                        opacity: 0, 
+                        duration: 0.4, 
+                        ease: "power1.in",
+                        onComplete: () => {
+                            introOverlay.classList.add('hidden');
+                        } 
+                    });
+                }
+            }
+
+            function initializeCanvasAndLayers() {
+                const container = document.getElementById('canvas-container'); 
+                const cs = getComputedStyle(container);
+                const pX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+                const pY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+                
+                let displayWidth = Math.max(100, container.clientWidth - pX);
+                let displayHeight = Math.max(100, container.clientHeight - pY);
+
+                if (container.clientWidth === 0 || displayWidth <=0 ) {
+                     const sidebarCurrentWidth = sidebar.classList.contains('collapsed') ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-collapsed')) : parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width'));
+                     displayWidth = Math.max(300, window.innerWidth - sidebarCurrentWidth - pX - 30); 
+                }
+                if (container.clientHeight === 0 || displayHeight <=0) {
+                    displayHeight = Math.max(300, window.innerHeight - pY - 30); 
+                }
+
+                // mainCanvas is the viewport
+                mainCanvas.style.width = displayWidth + 'px';
+                mainCanvas.style.height = displayHeight + 'px';
+                mainCanvas.width = Math.round(displayWidth * deviceScale); 
+                mainCanvas.height = Math.round(displayHeight * deviceScale);
+                // IMPORTANT: This initial scale on mainCtx means all its operations expect logical coordinates
+                mainCtx.scale(deviceScale, deviceScale); 
+                
+                if (layers.length > 0) { // Resizing existing layers - concept changed. Layers are fixed large size.
+                    layers.forEach(layer => {
+                        // If layer canvases were to resize (e.g. if NOT using fixed DEFAULT_LOGICAL_WIDTH)
+                        // this is where you'd copy old content to new sized canvas.
+                        // For now, they keep their fixed DEFAULT_LOGICAL_WIDTH/HEIGHT.
+                        // Ensure they exist if they were somehow lost
+                        if (!layer.canvas) { 
+                            const c = document.createElement('canvas');
+                            layer.canvas = c;
+                            layer.context = c.getContext('2d', {willReadFrequently: true});
+                            // This case might need to re-establish old content or history might be tricky
+                        }
+                         // Update layer canvas dimensions if they ever changed from default
+                        layer.canvas.width = Math.round(DEFAULT_LOGICAL_WIDTH * deviceScale); 
+                        layer.canvas.height = Math.round(DEFAULT_LOGICAL_HEIGHT * deviceScale);
+                        // Existing content on layers will persist as they are not being resized here,
+                        // only viewport (mainCanvas) changes.
+                    });
+                } else { // Initial setup
+                    layers=[]; history={}; historyStep={}; layerCounter=1; activeLayerIndex=-1; 
+                    addLayer(); // addLayer will now use DEFAULT_LOGICAL sizes
+                }
+                resetView(); // Resets zoom/pan and calls renderComposite for the new larger world
+            }
+
+            function resizeCanvasLogical(newW, newH) {
+                if (newW === DEFAULT_LOGICAL_WIDTH && newH === DEFAULT_LOGICAL_HEIGHT) return;
+                const confirm = window.confirm(`Resize canvas to ${newW}×${newH}? Existing content will be preserved but may be cropped.`);
+                if (!confirm) {
+                    // Reset dropdown to current size
+                    const currentVal = `${DEFAULT_LOGICAL_WIDTH}x${DEFAULT_LOGICAL_HEIGHT}`;
+                    canvasSizeSelect.value = [...canvasSizeSelect.options].some(o => o.value === currentVal) ? currentVal : 'custom';
+                    return;
+                }
+                DEFAULT_LOGICAL_WIDTH = newW;
+                DEFAULT_LOGICAL_HEIGHT = newH;
+                // Resize all layer canvases, preserving content
+                layers.forEach(layer => {
+                    const oldCanvas = layer.canvas;
+                    const newCanvas = document.createElement('canvas');
+                    newCanvas.width = Math.round(newW * deviceScale);
+                    newCanvas.height = Math.round(newH * deviceScale);
+                    const newCtx = newCanvas.getContext('2d', { willReadFrequently: true });
+                    // Copy old content
+                    newCtx.drawImage(oldCanvas, 0, 0);
+                    layer.canvas = newCanvas;
+                    layer.context = newCtx;
+                });
+                // Clear history for all layers since canvas size changed
+                history = {}; historyStep = {};
+                layers.forEach((l, i) => { saveHistory(i); });
+                // Re-init viewport
+                initializeCanvasAndLayers();
+                updateStatus(`Canvas resized to ${newW}×${newH}.`);
+            }
+
+            // Auto-close sidebar on mobile after tool selection
+            function closeSidebarOnMobile() {
+                if (isMobileLayout() && !sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.add('collapsed');
+                    toggleSidebarBtn.textContent = '☰';
+                    sidebarBackdrop.classList.add('hidden');
+                }
+            }
+            
+            function setupEventListeners() {
+                startSketchingBtn.addEventListener('click', hideIntro);
+                toggleSidebarBtn.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed');
+                    const isCollapsed = sidebar.classList.contains('collapsed');
+                    toggleSidebarBtn.textContent = isCollapsed ? '☰' : '❮';
+                    try { localStorage.setItem('sidebarCollapsed', isCollapsed); } catch (e) { console.warn("Could not save sidebar state:", e); }
+                    if (isMobileLayout()) {
+                        sidebarBackdrop.classList.toggle('hidden', isCollapsed);
+                    }
+                    setTimeout(handleResize, 310); 
+                });
+                sidebarBackdrop.addEventListener('click', () => {
+                    sidebar.classList.add('collapsed');
+                    toggleSidebarBtn.textContent = '☰';
+                    sidebarBackdrop.classList.add('hidden');
+                    setTimeout(handleResize, 310);
+                });
+
+                sidebar.addEventListener('click', handleToolbarClick);
+                colorTypeSelect.addEventListener('change', handlePropertyChange);
+                lineColorPicker.addEventListener('input', handlePropertyChange);
+                gradientStartColorPicker.addEventListener('input', handlePropertyChange);
+                gradientEndColorPicker.addEventListener('input', handlePropertyChange);
+                shapeTypeSelect.addEventListener('change', handlePropertyChange); 
+                cornerRadiusSlider.addEventListener('input', handlePropertyChange);
+                lineWidthSlider.addEventListener('input', handlePropertyChange);
+                strokeStyleSelect.addEventListener('input', handlePropertyChange);
+                fillShapeCheckbox.addEventListener('change', handlePropertyChange);
+                polygonSidesInput.addEventListener('input', handlePropertyChange);
+                textSizeInput.addEventListener('input', handlePropertyChange);
+                fontFamilySelect.addEventListener('change', handlePropertyChange);
+                textAlignSelect.addEventListener('change', handlePropertyChange);
+                showGridCheckbox.addEventListener('change', handlePropertyChange);
+                snapToGridCheckbox.addEventListener('change', handlePropertyChange);
+                gridSizeInput.addEventListener('input', handlePropertyChange);
+                gridColorPicker.addEventListener('input', handlePropertyChange);
+
+                mainCanvas.addEventListener('mousedown',startAction); 
+                mainCanvas.addEventListener('mousemove',performAction);
+                mainCanvas.addEventListener('mouseup',endAction); 
+                mainCanvas.addEventListener('mouseleave',endAction); 
+                mainCanvas.addEventListener('wheel', handleWheelZoom, { passive: false }); 
+                mainCanvas.addEventListener('mousemove', updateCursorCoordinatesDisplay); // For coordinate display
+                mainCanvas.addEventListener('contextmenu', (e) => { e.preventDefault(); }); // Prevent right-click menu for right-click pan
+
+                mainCanvas.addEventListener('touchstart',handleTouchStart,{passive:false}); 
+                mainCanvas.addEventListener('touchmove',handleTouchMove,{passive:false});
+                mainCanvas.addEventListener('touchend',handleTouchEnd,{passive:false}); 
+                mainCanvas.addEventListener('touchcancel',endAction,{passive:false}); 
+
+                imageLoader.addEventListener('change',handleImageUpload); 
+                window.addEventListener('resize',handleResize);
+                
+                if (screen.orientation) {
+                    screen.orientation.addEventListener('change', () => {
+                        console.log('Screen orientation changed to: ' + screen.orientation.type);
+                        updateStatus(`Orientation: ${screen.orientation.type.split('-')[0]}.`);
+                        handleResize(); 
+                    });
+                }
+
+                document.addEventListener('keydown',handleKeyboardShortcuts); 
+                document.addEventListener('keyup', handleKeyUp); 
+                themeToggleBtn.addEventListener('click',toggleTheme);
+                undoBtn.addEventListener('click', undoLast);
+                redoBtn.addEventListener('click', redoLast); // New
+                saveProjectBtn.addEventListener('click', saveProject);
+                loadProjectBtn.addEventListener('click', () => projectLoader.click());
+                projectLoader.addEventListener('change', loadProject);
+                replayBtn.addEventListener('click', startReplayAnimation);
+                replayCloseBtn.addEventListener('click', stopReplayAnimation);
+                replayScrubber.addEventListener('input', scrubReplay);
+                exportSvgBtn.addEventListener('click', exportToSVG);
+                grayscaleBtn.addEventListener('click',applyGrayscaleEffect); 
+                invertBtn.addEventListener('click',applyInvertEffect);
+                symmetryToggleBtn.addEventListener('click',cycleSymmetryMode); 
+                paletteAddBtn.addEventListener('click',addCurrentColorToPalette);
+                mergeLayerBtn.addEventListener('click', mergeActiveLayerDown);
+                zoomInBtn.addEventListener('click', () => zoomAroundCenter(1.25));
+                zoomOutBtn.addEventListener('click', () => zoomAroundCenter(0.8));
+                resetZoomBtn.addEventListener('click', resetView);
+                rotateScreenBtn.addEventListener('click', toggleOrientationLock);
+                clearSelectionContentBtn.addEventListener('click', clearSelectedArea);
+                flipHorizontalBtn.addEventListener('click', () => flipLayer(true, false));
+                flipVerticalBtn.addEventListener('click', () => flipLayer(false, true));
+
+                // Canvas size selector
+                canvasSizeSelect.addEventListener('change', (e) => {
+                    if (e.target.value === 'custom') {
+                        customCanvasSizeRow.style.display = 'flex';
+                    } else {
+                        customCanvasSizeRow.style.display = 'none';
+                        const [w, h] = e.target.value.split('x').map(Number);
+                        resizeCanvasLogical(w, h);
+                    }
+                });
+                applyCanvasSizeBtn.addEventListener('click', () => {
+                    const w = Math.max(100, Math.min(8192, parseInt(customCanvasW.value) || 3000));
+                    const h = Math.max(100, Math.min(8192, parseInt(customCanvasH.value) || 2250));
+                    customCanvasW.value = w; customCanvasH.value = h;
+                    resizeCanvasLogical(w, h);
+                });
+            }
+            
+            function attemptLockOrientation(orientation = 'landscape-primary') {
+                try {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock(orientation)
+                            .then(() => {
+                                console.log(`Orientation locked to ${orientation}.`);
+                                updateStatus(`Orientation: ${screen.orientation.type.split('-')[0]}.`);
+                                setTimeout(handleResize, 100); 
+                            })
+                            .catch((error) => {
+                                console.warn(`Could not lock orientation to ${orientation}:`, error);
+                                updateStatus(`Orientation lock failed. Try manual rotation.`);
+                            });
+                    } else {
+                        console.warn('Screen Orientation API not fully supported for locking.');
+                        updateStatus('Orientation lock not fully supported.');
+                    }
+                } catch (e) {
+                    console.error("Error attempting to lock orientation:", e);
+                    updateStatus('Error trying to lock orientation.');
+                }
+            }
+            
+            function toggleOrientationLock() {
+                if (!screen.orientation || !screen.orientation.lock) {
+                    updateStatus("Screen Orientation API not supported for locking.");
+                    alert("Automatic screen rotation control is not supported by your browser or current security settings. Please rotate your device manually if needed.");
+                    return;
+                }
+                const currentOrientationType = screen.orientation.type;
+                let targetOrientation = currentOrientationType.startsWith('landscape') ? 'portrait-primary' : 'landscape-primary';
+                updateStatus(`Attempting to switch to ${targetOrientation.split('-')[0]}...`);
+                attemptLockOrientation(targetOrientation);
+            }
+
+            function updateColorPropertiesUI() {
+                solidColorPropsRow.classList.toggle('visible', currentColorMode === 'solid');
+                gradientPropsRow1.classList.toggle('visible', currentColorMode === 'linear');
+                gradientPropsRow2.classList.toggle('visible', currentColorMode === 'linear');
+                document.getElementById('gridPropsRow2').classList.toggle('visible', showGrid); 
+                updateCursor();
+            }
+            function updateActiveToolPropertiesUI() {
+                const allPropRows = sidebar.querySelectorAll('.property-row[id$="PropsRow"], .property-row[id$="Row"], .property-row[id$="Row1"], .property-row[id$="Row2"], .property-row[id$="Row3"]');
+                allPropRows.forEach(row => row.classList.remove('visible'));
+
+                if (currentTool === 'shape') {
+                    shapeTypeRow.classList.add('visible');
+                    shapeCommonPropsRow.classList.add('visible');
+                    if (currentShapeType === 'polygon') polygonSidesRow.classList.add('visible');
+                    if (currentShapeType === 'roundedRect') cornerRadiusRow.classList.add('visible');
+                } else if (currentTool === 'text') {
+                    textPropsRow1.classList.add('visible');
+                    textPropsRow2.classList.add('visible');
+                    textPropsRow3.classList.add('visible');
+                }
+                const showColorControls = !['select', 'move', 'eyedropper', 'fill'].includes(currentTool);
+                if (currentTool === 'pixel') {
+                    // Pixel tool: show only solid color picker, no gradient/type switcher
+                    colorTypeRow.style.display = 'none';
+                    solidColorPropsRow.classList.add('visible');
+                    gradientPropsRow1.classList.remove('visible');
+                    gradientPropsRow2.classList.remove('visible');
+                } else {
+                    colorTypeRow.style.display = showColorControls ? 'flex' : 'none';
+                    if (showColorControls) {
+                        solidColorPropsRow.classList.toggle('visible', currentColorMode === 'solid');
+                        gradientPropsRow1.classList.toggle('visible', currentColorMode === 'linear');
+                        gradientPropsRow2.classList.toggle('visible', currentColorMode === 'linear');
+                    }
+                }
+
+                document.getElementById('lineWidth').parentElement.style.display = ['pen', 'eraser', 'line', 'shape', 'spray'].includes(currentTool) ? 'flex' : 'none';
+                document.getElementById('strokeStyle').parentElement.style.display = ['pen', 'line', 'shape'].includes(currentTool) ? 'flex' : 'none';
+                // Auto-enable grid when pixel tool selected
+                if (currentTool === 'pixel' && !showGrid) {
+                    showGrid = true;
+                    showGridCheckbox.checked = true;
+                    updateColorPropertiesUI();
+                    updateStatus('Grid auto-enabled for Pixel tool.');
+                }
+                 
+                updateColorPropertiesUI(); 
+            }
+
+            function toggleTheme() { document.body.classList.toggle('light-theme'); const isLight=document.body.classList.contains('light-theme'); themeToggleBtn.textContent=isLight?'🌙':'☀️'; try { localStorage.setItem('sketcherTheme',isLight?'light':'dark'); } catch(e) {console.warn("Could not save theme:", e);} updateStatus(`${isLight?'Light':'Dark'} Theme activated.`); renderComposite(); }
+            function cycleSymmetryMode() { currentSymmetryIndex=(currentSymmetryIndex+1)%symmetryModes.length; symmetryMode=symmetryModes[currentSymmetryIndex]; symmetryToggleBtn.textContent=`${symmetryMode!=='OFF'?symmetryMode+'-':''}Symmetry: ${symmetryMode!=='OFF'?'ON':'OFF'}`; symmetryToggleBtn.classList.toggle('active',symmetryMode!=='OFF'); updateStatus(`${symmetryMode}-Axis Symmetry ${symmetryMode!=='OFF'?'Enabled':'Disabled'}.`); }
+
+            function handleToolbarClick(e) {
+                const button=e.target.closest('button'); if(!button||button.disabled)return;
+                const toolButtons=sidebar.querySelectorAll('.tool-grid button[id$="Tool"]');
+
+                if(Array.from(toolButtons).includes(button)){ 
+                    if(!button.classList.contains('active')){ 
+                        toolButtons.forEach(btn=>btn.classList.remove('active'));
+                        button.classList.add('active'); 
+                        currentTool=button.id.replace('Tool',''); 
+                        updateActiveToolPropertiesUI();
+                        updateCursor(); 
+                        updateStatus(`${currentTool.charAt(0).toUpperCase()+currentTool.slice(1)} tool selected.`);
+                        if (currentTool !== 'select' && currentTool !== 'move') deselect(); 
+                        closeSidebarOnMobile();
+                    }
+                }
+                else{switch(button.id){ case 'clearBtn':clearCanvas();break;case 'saveBtn':saveCanvas();break;/* undo handled by its own button */ /* redo handled by its own button */ case 'uploadImageBtn':imageLoader.click();break;case 'addLayerBtn':addLayer();break;case 'deleteLayerBtn':deleteLayer();break;}}
+            }
+            function handlePropertyChange(e) {
+                const target=e.target; 
+                switch(target.id){
+                    case 'colorTypeSelect':currentColorMode=target.value; updateColorPropertiesUI(); break;
+                    case 'lineColor':currentSolidColor=target.value;break;
+                    case 'gradientStartColor':currentGradient.start=target.value;updateCursor();break;
+                    case 'gradientEndColor':currentGradient.end=target.value;updateCursor();break;
+                    case 'shapeTypeSelect': currentShapeType = target.value; updateActiveToolPropertiesUI(); break; 
+                    case 'lineWidth':currentWidth=parseInt(target.value,10);lineWidthValue.textContent=currentWidth;updateCursor();break;
+                    case 'cornerRadius': currentCornerRadius = parseInt(target.value, 10); cornerRadiusValue.textContent = currentCornerRadius; break;
+                    case 'strokeStyle':currentStrokeStyle=target.value;break;
+                    case 'fillShapeCheckbox': break; // No action needed here, checked directly in drawing
+                    case 'polygonSides':currentPolygonSides=Math.max(3,Math.min(20,parseInt(target.value,10)||5)); target.value=currentPolygonSides; break;
+                    case 'textSize':currentFontSize=parseInt(target.value,10);break;
+                    case 'fontFamily':currentFontFamily=target.value;break;
+                    case 'textAlign':currentTextAlign=target.value;break;
+                    case 'showGridCheckbox': showGrid = target.checked; updateColorPropertiesUI(); renderComposite(); break;
+                    case 'snapToGridCheckbox': snapToGrid = target.checked; break;
+                    case 'gridSizeInput': gridSize = Math.max(5, parseInt(target.value, 10) || 20); target.value = gridSize; if(showGrid) renderComposite(); break;
+                    case 'gridColorPicker': gridColor = target.value; if(showGrid) renderComposite(); break;
+                }
+            }
+
+            function handleKeyUp(e) { 
+                 if (e.key === ' ') { 
+                     isPanning = false; 
+                     if (!isMovingSelection && !(currentTool === 'move' && selectionRect)) {
+                        updateCursor();
+                     }
+                }
+                if (e.key === 'Alt' && isAltEyedropperActive) {
+                    isAltEyedropperActive = false;
+                    document.getElementById(previousToolBeforeEyedropper + 'Tool')?.click(); // Revert to original tool
+                    updateStatus(`Switched back to ${previousToolBeforeEyedropper} tool.`);
+                    e.preventDefault();
+                }
+            }
+            function handleKeyboardShortcuts(e) { 
+                const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+                const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
+
+                if(ctrlKey && e.key.toLowerCase()==='z'){
+                    e.preventDefault();
+                    if (e.shiftKey) redoLast(); else undoLast();
+                } else if (ctrlKey && e.key.toLowerCase() === 'y') { // Standard Redo for non-Mac or alternative Mac
+                     e.preventDefault(); redoLast();
+                }
+
+                if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='SELECT'||document.activeElement.tagName==='TEXTAREA')return; 
+                
+                const toolMap={p:'penTool',e:'eraserTool',x:'pixelTool',l:'lineTool',h:'shapeTool',f:'fillTool',t:'textTool',i:'eyedropperTool',s:'sprayTool', m:'selectTool', v:'moveTool'}; 
+                if(!e.ctrlKey && !e.metaKey && !e.altKey) {
+                    if (toolMap[e.key.toLowerCase()]) {
+                        e.preventDefault();
+                        document.getElementById(toolMap[e.key.toLowerCase()])?.click();
+                    } else if (e.key === '[') {
+                        e.preventDefault();
+                        lineWidthSlider.value = Math.max(1, parseInt(lineWidthSlider.value) - 1);
+                        handlePropertyChange({target: lineWidthSlider});
+                    } else if (e.key === ']') {
+                        e.preventDefault();
+                        lineWidthSlider.value = Math.min(100, parseInt(lineWidthSlider.value) + 1);
+                        handlePropertyChange({target: lineWidthSlider});
+                    }
+                }
+                if(ctrlKey && e.key.toLowerCase()==='x') { e.preventDefault(); symmetryToggleBtn.click(); }
+                if(ctrlKey && e.key.toLowerCase()==='g') { e.preventDefault(); showGridCheckbox.checked = !showGridCheckbox.checked; handlePropertyChange({target: showGridCheckbox}); updateStatus(`Grid ${showGridCheckbox.checked ? 'shown' : 'hidden'}.`); }
+
+
+                if (e.key === 'Escape') { if (selectionRect) { deselect(); updateStatus("Selection cleared."); e.preventDefault(); } }
+                if (e.key === 'Delete' || e.key === 'Backspace') { if (selectionRect && (currentTool === 'select' || currentTool === 'move')) { clearSelectedArea(); e.preventDefault(); } }
+
+                if (e.key === ' ' && !isDrawing && !isSelecting && !isMovingSelection && !isPanning && (document.activeElement === document.body || document.activeElement === mainCanvas)) { 
+                    e.preventDefault(); 
+                    isPanning = true; 
+                    lastPanX_mouse = undefined; lastPanY_mouse = undefined; 
+                    mainCanvas.style.cursor = 'grab';
+                } 
+                if ((e.key === '+' || e.key === '=') && !e.shiftKey) { e.preventDefault(); zoomAroundCenter(1.1); } // Check for shift to avoid conflict with some +/= keys
+                if (e.key === '-') { e.preventDefault(); zoomAroundCenter(0.9); }
+                if (e.key === '0') { e.preventDefault(); resetView(); }
+
+                if (e.key === 'Alt' && !isAltEyedropperActive && currentTool !== 'eyedropper') {
+                    e.preventDefault();
+                    isAltEyedropperActive = true;
+                    previousToolBeforeEyedropper = currentTool;
+                    document.getElementById('eyedropperTool').click();
+                    updateStatus("Temporary Eyedropper active (release Alt to revert).");
+                }
+                 if (e.key.toLowerCase() === 'tab' && document.activeElement !== toggleSidebarBtn) { // Allow tabbing to sidebar toggle
+                    e.preventDefault();
+                    toggleSidebarBtn.click();
+                }
+            }
+
+            function addLayer(){ // canvasWidth & canvasHeight parameters are removed, uses defaults
+                const c=document.createElement('canvas');
+                c.width = Math.round(DEFAULT_LOGICAL_WIDTH * deviceScale); 
+                c.height = Math.round(DEFAULT_LOGICAL_HEIGHT * deviceScale);
+                const ctx=c.getContext('2d', {willReadFrequently: true});
+                if(!ctx)return;
+
+                const l={id:`layer-${layerCounter}`,canvas:c,context:ctx,name:`Layer ${layerCounter++}`,visible:true,opacity:1.0,blendMode:'source-over'};
+                layers.push(l);
+                const i=layers.length-1;
+                
+                const initialDataUrl = c.toDataURL();
+                history[i] = [initialDataUrl];
+                historyStep[i] = 0;
+
+                setActiveLayer(i);
+                renderLayerPanel();
+                renderComposite();
+                updateStatus(`Added ${l.name}. (${DEFAULT_LOGICAL_WIDTH}x${DEFAULT_LOGICAL_HEIGHT})`);
+            }
+
+            function deleteLayer(){if(layers.length<=1){alert("Cannot delete the last layer. Clear it instead if needed.");return;}if(activeLayerIndex<0||activeLayerIndex>=layers.length)return;const n=layers[activeLayerIndex].name;if(!confirm(`Are you sure you want to delete layer "${n}"? This cannot be undone.`))return;const d=activeLayerIndex;layers.splice(d,1);const oH=history,oHS=historyStep;history={};historyStep={};for(let i=0;i<layers.length;i++){const oi=(i<d)?i:i+1;history[i]=oH[oi]||[];historyStep[i]=oHS[oi]===undefined?0:oHS[oi];}setActiveLayer(Math.max(0,d-1));renderLayerPanel();renderComposite();updateStatus(`Deleted ${n}.`);}
+            function mergeActiveLayerDown(){if(activeLayerIndex<=0||activeLayerIndex>=layers.length){updateStatus("Cannot merge this layer.");updateMergeButtonState();return;}const srcL=layers[activeLayerIndex],tgtL=layers[activeLayerIndex-1];if(!confirm(`Merge "${srcL.name}" down onto "${tgtL.name}"? This action creates one history step for the target layer.`))return;saveHistory(activeLayerIndex-1); 
+                const tgtCtx=tgtL.context;tgtCtx.globalAlpha=srcL.opacity;tgtCtx.globalCompositeOperation=srcL.blendMode;tgtCtx.drawImage(srcL.canvas,0,0);tgtCtx.globalAlpha=1.0;tgtCtx.globalCompositeOperation='source-over';saveHistory(activeLayerIndex-1); 
+                layers.splice(activeLayerIndex,1);const oH=history,oHS=historyStep;history={};historyStep={};for(let i=0;i<layers.length;i++){const oIdx=(i<activeLayerIndex)?i:i+1;history[i]=oH[oIdx]||[];historyStep[i]=oHS[oIdx]===undefined?0:oHS[oIdx];}setActiveLayer(activeLayerIndex-1);renderLayerPanel();renderComposite();updateStatus(`Merged "${srcL.name}" down.`);}
+            function updateMergeButtonState(){mergeLayerBtn.disabled=!(activeLayerIndex>0&&activeLayerIndex<layers.length);}
+            
+            function setActiveLayer(i){if(i>=0&&i<layers.length){activeLayerIndex=i;renderLayerPanel();updateUndoRedoButtonStates();updateMergeButtonState();if(layers[i])updateStatus(`Active layer: ${layers[i].name}.`);}else{activeLayerIndex=-1;updateMergeButtonState();}}
+            function getActiveLayer(){return(activeLayerIndex>=0&&activeLayerIndex<layers.length)?layers[activeLayerIndex]:null;}
+            function getActiveContext(){const l=getActiveLayer();return l?l.context:null;}
+            
+            function renderLayerPanel(){
+                if(!layerPanel)return;layerPanel.innerHTML='';
+                layers.forEach((l,idx)=>{
+                    const li=document.createElement('li');li.dataset.index=idx;li.classList.toggle('active-layer',idx===activeLayerIndex);
+                    const idiv=document.createElement('div');idiv.className='layer-info';
+                    idiv.onclick=(e)=>{if(e.target===idiv||e.target.classList.contains('layer-name')||(e.target.tagName==='INPUT'&&e.target.type==='checkbox'))setActiveLayer(idx);};
+                    
+                    const vc=document.createElement('input');vc.type='checkbox';vc.checked=l.visible;vc.title="Toggle Layer Visibility";vc.className='layer-visible-toggle';
+                    vc.onchange=(e)=>{l.visible=e.target.checked;renderComposite(); saveHistory();};
+                    
+                    const ns=document.createElement('span');ns.className='layer-name';ns.textContent=l.name;
+                    ns.ondblclick=()=>{const n=prompt(`Rename layer "${l.name}":`,l.name);if(n&&n.trim()){l.name=n.trim();renderLayerPanel();updateStatus(`Layer renamed to "${l.name}".`);}};
+                    
+                    const controlsContainer = document.createElement('div');
+                    controlsContainer.className = 'layer-info-controls';
+
+                    const os=document.createElement('input');os.type='range';os.min=0;os.max=1;os.step=0.01;os.value=l.opacity;
+                    os.title=`Layer Opacity: ${Math.round(l.opacity*100)}%`;os.className='layer-opacity-slider';
+                    const opacityDisplay = document.createElement('span');
+                    opacityDisplay.className = 'layer-opacity-display';
+                    opacityDisplay.textContent = `Opacity: ${Math.round(l.opacity*100)}%`;
+
+                    os.oninput=(e)=>{
+                        l.opacity=parseFloat(e.target.value);
+                        os.title=`Layer Opacity: ${Math.round(l.opacity*100)}%`;
+                        opacityDisplay.textContent = `Opacity: ${Math.round(l.opacity*100)}%`;
+                        renderComposite();
+                    };
+                     os.onchange = () => { saveHistory(); };
+
+
+                    const db=document.createElement('button');db.className='delete-layer';db.innerHTML='🗑️';db.title="Delete Layer";
+                    db.onclick=(e)=>{e.stopPropagation();setActiveLayer(idx);deleteLayer();};
+                    
+                    idiv.appendChild(vc);idiv.appendChild(ns);
+                    controlsContainer.appendChild(opacityDisplay);
+                    controlsContainer.appendChild(os);
+                    controlsContainer.appendChild(db);
+                    idiv.appendChild(controlsContainer);
+
+                    li.appendChild(idiv);
+                    const cdiv=document.createElement('div');cdiv.className='layer-controls';
+                    const bl=document.createElement('label');bl.textContent='Blend:';bl.style.fontSize='0.8em';
+                    const bs=document.createElement('select');bs.title="Blend Mode";
+                    blendModes.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m.charAt(0).toUpperCase()+m.slice(1);if(m===l.blendMode)o.selected=true;bs.appendChild(o);});
+                    bs.onchange=(e)=>{l.blendMode=e.target.value;renderComposite();updateStatus(`${l.name} blend mode: ${l.blendMode}.`); saveHistory(); };
+                    cdiv.appendChild(bl);cdiv.appendChild(bs);li.appendChild(cdiv);
+                    layerPanel.appendChild(li);
+                });
+                deleteLayerBtn.disabled=layers.length<=1; updateMergeButtonState();
+            }
+
+
+            function deselect() {
+                selectionRect = null;
+                movingSelectionData = null; 
+                renderComposite(); 
+                updateCursor();
+            }
+
+            function drawSelectionOutline(targetCtx) { 
+                if (!selectionRect) return;
+                const x = selectionRect.x; const y = selectionRect.y;
+                const w = selectionRect.width; const h = selectionRect.height;
+
+                targetCtx.save();
+                targetCtx.lineWidth = 1 / zoomLevel; 
+                targetCtx.setLineDash([4 / zoomLevel, 4 / zoomLevel]);
+                
+                targetCtx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
+                targetCtx.lineDashOffset = -selectionMarchOffset / zoomLevel;
+                targetCtx.strokeRect(x, y, w, h);
+                
+                targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+                targetCtx.lineDashOffset = (4 - selectionMarchOffset) / zoomLevel;
+                targetCtx.strokeRect(x, y, w, h);
+                
+                targetCtx.restore();
+            }
+            
+            function animateSelectionMarch() {
+                selectionMarchOffset = (selectionMarchOffset + 0.5) % 8; 
+                if (selectionRect) {
+                    renderComposite(); 
+                }
+                requestAnimationFrame(animateSelectionMarch);
+            }
+
+            function getSelectionClipPath(forLayerContext) {
+                if (!selectionRect) return null;
+                const path = new Path2D();
+                let x = selectionRect.x; let y = selectionRect.y;
+                let w = selectionRect.width; let h = selectionRect.height;
+
+                if (w < 0) { x += w; w = -w; }
+                if (h < 0) { y += h; h = -h; }
+
+                if (forLayerContext) { 
+                    path.rect(x * deviceScale, y * deviceScale, w * deviceScale, h * deviceScale);
+                } else { 
+                    path.rect(x, y, w, h);
+                }
+                return path;
+            }
+
+            function clearSelectedArea() {
+                if (!selectionRect) {
+                    updateStatus("No selection to clear.");
+                    return;
+                }
+                const layerCtx = getActiveContext();
+                if (!layerCtx) return;
+                saveHistory();
+
+                const clipPath = getSelectionClipPath(true); 
+                layerCtx.save();
+                layerCtx.clip(clipPath);
+                layerCtx.clearRect(0, 0, layerCtx.canvas.width, layerCtx.canvas.height); 
+                layerCtx.restore();
+                
+                saveHistory();
+                renderComposite();
+                updateStatus("Selected area cleared.");
+                deselect(); 
+            }
+
+            function screenToWorld(screenX, screenY) { 
+                const rect = mainCanvas.getBoundingClientRect();
+                const canvasX = screenX - rect.left;
+                const canvasY = screenY - rect.top;
+                
+                // panX, panY are screen pixel offsets for mainCtx.translate
+                // zoomLevel is scale factor for mainCtx.scale
+                // mainCtx is ALREADY scaled by deviceScale initially. So canvasX/Y here are logical pixels
+                // IF mainCtx was NOT initially scaled, then we'd divide by deviceScale here.
+                // Since it IS, canvasX, canvasY can be considered logical screen coordinates.
+
+                return {
+                    x: (canvasX - panX) / zoomLevel, 
+                    y: (canvasY - panY) / zoomLevel  
+                };
+            }
+
+            function drawGrid(targetCtx) { // targetCtx is mainCtx, already deviceScale'd, pan/zoom applied in renderComposite
+                if(!showGrid || !targetCtx)return;
+                
+                const rect = mainCanvas.getBoundingClientRect();
+                const {x: worldLeft, y: worldTop} = screenToWorld(rect.left, rect.top); 
+                const {x: worldRight, y: worldBottom} = screenToWorld(rect.right, rect.bottom);
+
+                targetCtx.save();
+
+                // Pixel Grid at high zoom
+                if (zoomLevel > PIXEL_GRID_ZOOM_THRESHOLD) {
+                    targetCtx.strokeStyle = 'rgba(128,128,128,0.3)'; // Lighter color for pixel grid
+                    targetCtx.lineWidth = 0.35 / zoomLevel; // Very thin lines for pixel grid
+
+                    const startPixelX = Math.floor(worldLeft);
+                    const endPixelX = Math.ceil(worldRight);
+                    const startPixelY = Math.floor(worldTop);
+                    const endPixelY = Math.ceil(worldBottom);
+
+                    for (let x = startPixelX; x <= endPixelX; x += 1) { // Each logical pixel
+                        targetCtx.beginPath(); targetCtx.moveTo(x, worldTop); targetCtx.lineTo(x, worldBottom); targetCtx.stroke();
+                    }
+                    for (let y = startPixelY; y <= endPixelY; y += 1) {
+                        targetCtx.beginPath(); targetCtx.moveTo(worldLeft, y); targetCtx.lineTo(worldRight, y); targetCtx.stroke();
+                    }
+                } else { // Regular coarser grid
+                    targetCtx.strokeStyle = gridColor;
+                    targetCtx.lineWidth = 0.5 / zoomLevel; 
+                    targetCtx.globalAlpha = 0.3;
+                    targetCtx.setLineDash([]);
+
+                    const startGridX = Math.floor(worldLeft / gridSize) * gridSize;
+                    const endGridX = Math.ceil(worldRight / gridSize) * gridSize;
+                    const startGridY = Math.floor(worldTop / gridSize) * gridSize;
+                    const endGridY = Math.ceil(worldBottom / gridSize) * gridSize;
+                    
+                    for(let x = startGridX; x <= endGridX; x += gridSize) {
+                        targetCtx.beginPath(); targetCtx.moveTo(x, worldTop); targetCtx.lineTo(x, worldBottom); targetCtx.stroke();
+                    }
+                    for(let y = startGridY; y <= endGridY; y += gridSize) {
+                        targetCtx.beginPath(); targetCtx.moveTo(worldLeft, y); targetCtx.lineTo(worldRight, y); targetCtx.stroke();
+                    }
+                }
+                targetCtx.restore(); 
+            }
+            
+            function renderComposite(){
+                if(!mainCtx || !mainCanvas)return; 
+                
+                const bg=getComputedStyle(document.body).getPropertyValue('--canvas-bg').trim();
+                mainCtx.fillStyle=bg;
+                // mainCtx already scaled by deviceScale, so fillRect uses logical coords.
+                mainCtx.fillRect(0, 0, mainCanvas.width / deviceScale, mainCanvas.height / deviceScale); 
+
+                mainCtx.save();
+                mainCtx.translate(panX, panY); 
+                mainCtx.scale(zoomLevel, zoomLevel); 
+                
+                drawGrid(mainCtx); 
+                
+                layers.forEach(l=>{
+                    if(l.visible&&l.canvas && l.context){ 
+                        mainCtx.save();
+                        mainCtx.globalAlpha=l.opacity;
+                        mainCtx.globalCompositeOperation=l.blendMode||'source-over';
+                        // l.canvas is physical resolution. Draw it at world (0,0) with its logical size
+                        mainCtx.drawImage(
+                            l.canvas, 
+                            0, 0, l.canvas.width, l.canvas.height,  // Source: full layer canvas (physical)
+                            0, 0, l.canvas.width / deviceScale, l.canvas.height / deviceScale // Dest: at world (0,0) with layer's logical size
+                        );
+                        mainCtx.restore();
+                    }
+                });
+
+                drawSelectionOutline(mainCtx);
+                mainCtx.restore(); // Restore mainCtx from pan/zoom
+
+                if (currentTool === 'move' && isMovingSelection && movingSelectionData && movingSelectionData.imageData) {
+                    mainCtx.save();
+                    // Screen coordinates for drawing moving selection preview on mainCtx (which expects logical for drawing post initial scale)
+                    // movingSelectionData.x/y are world. Transform them to logical screen.
+                    const screenX = (movingSelectionData.x * zoomLevel) + panX;
+                    const screenY = (movingSelectionData.y * zoomLevel) + panY;
+                    // displayWidth/Height should be logical for drawing on mainCtx
+                    const displayWidth = (movingSelectionData.imageData.width / deviceScale) * zoomLevel;
+                    const displayHeight = (movingSelectionData.imageData.height / deviceScale) * zoomLevel;
+
+                    // Create a temporary canvas that has the original deviceScale resolution for the image data
+                    const tempPhysicalCanvas = document.createElement('canvas');
+                    tempPhysicalCanvas.width = movingSelectionData.imageData.width; // physical width
+                    tempPhysicalCanvas.height = movingSelectionData.imageData.height; // physical height
+                    tempPhysicalCanvas.getContext('2d').putImageData(movingSelectionData.imageData, 0, 0);
+
+                    mainCtx.globalAlpha = 0.7; 
+                    // Draw the physical tempCanvas onto the logical mainCtx, scaling it down appropriately
+                    mainCtx.drawImage(tempPhysicalCanvas, screenX, screenY, displayWidth, displayHeight);
+                    mainCtx.restore();
+                }
+                 updateZoomPanDisplay(); 
+            }
+            
+            function updateCursor(){
+                if(!getActiveLayer()){mainCanvas.style.cursor='not-allowed';return;} 
+                if(isPanning && mainCanvas.style.cursor !== 'grabbing') {mainCanvas.style.cursor = 'grabbing'; return;} 
+                if(isPanning) return; 
+
+                if(currentTool === 'move' && selectionRect && isDrawing) { 
+                    mainCanvas.style.cursor = 'grabbing'; return;
+                }
+                if(currentTool === 'move' && selectionRect) { 
+                    mainCanvas.style.cursor = 'grab'; return;
+                }
+
+                const s=Math.max(2,currentWidth); 
+                switch(currentTool){
+                    case 'pixel':{
+                        const cellScreenSize = Math.max(4, Math.round(gridSize * zoomLevel));
+                        const fillColor = encodeURIComponent(currentSolidColor);
+                        mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${cellScreenSize}" height="${cellScreenSize}"><rect x="0" y="0" width="${cellScreenSize}" height="${cellScreenSize}" fill="${fillColor}" opacity="0.5" stroke="white" stroke-width="1"/></svg>') ${Math.round(cellScreenSize/2)} ${Math.round(cellScreenSize/2)}, crosshair`;break;
+                    }
+                    case 'eraser':const sc=(currentSolidColor==='#ffffff'||currentSolidColor==='rgb(255,255,255)')?'black':'white';mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${s*2+2}" height="${s*2+2}" viewport="0 0 ${s*2+2} ${s*2+2}"><circle cx="${s+1}" cy="${s+1}" r="${s}" fill="rgba(255,255,255,0.3)" stroke="${sc}" stroke-width="1.5"/></svg>') ${s+1} ${s+1}, crosshair`;break;
+                    case 'fill':mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="${encodeURIComponent(currentColorMode==='solid'?currentSolidColor:currentGradient.start)}" viewBox="0 0 16 16"><path d="M2.822 2.06C2.222 2.06 2 2.222 2 2.822v10.356c0 .6.222.822.822.822h10.356c.6 0 .822-.222.822-.822V2.822c0-.6-.222-.822-.822-.822H2.822zm-.06 1.55H13.24v7.978H2.762V3.61zm1.22 1.168L2.762 6.33V4.778h1.22zm0 2.94L2.762 9.27V7.718h1.22zm0 2.94L2.762 12.2V10.658h1.22zM13.24 6.33l-1.22-1.552V6.33h1.22zm0 2.94l-1.22-1.552V9.27h1.22zm0 2.94l-1.22-1.552V12.2h1.22zM4.542 4.778h7.016v1.55H4.542V4.778zm0 2.94h7.016v1.55H4.542V7.718zm0 2.94h7.016v1.55H4.542v10.658zM12.02 4.778L10.8 6.33h1.22V4.778zm-1.22 2.94L9.58 9.27h1.22V7.718zm-1.22 2.94L8.36 12.2h1.22v-1.552z"/></svg>') 4 20, pointer`;break;
+                    case 'text':mainCanvas.style.cursor='text';break;
+                    case 'eyedropper':mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0L12 2.69z"></path><path d="M12 12.58V21.5"></path><path d="M8.27 8.27L4 12.54"></path></svg>') 0 24, crosshair`;break;
+                    case 'spray':mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${encodeURIComponent(currentColorMode==='solid'?currentSolidColor:currentGradient.start)}" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 5 V 2 M12 22 V 19 M19 12 H 22 M2 12 H 5 M17.65 6.35 L 19.07 4.93 M4.93 19.07 L 6.35 17.65 M17.65 17.65 L 19.07 19.07 M4.93 4.93 L 6.35 6.35"/></svg>') 12 12, crosshair`;break;
+                    case 'select': mainCanvas.style.cursor = 'crosshair'; break;
+                    case 'move': mainCanvas.style.cursor = (selectionRect ? 'grab' : 'default'); break; 
+                    default:mainCanvas.style.cursor='crosshair';break;
+                }
+            }
+
+            function snapCoord(coord, currentGridSize) { return (snapToGrid && currentGridSize > 0) ? Math.round(coord / currentGridSize) * currentGridSize : coord; }
+            
+            function handleTouchStart(e){ e.preventDefault(); if (e.touches.length === 1 && !isPanning) { startAction(e.touches[0]); } else if (e.touches.length === 2) { isDrawing = false; isSelecting = false; isMovingSelection = false; isPanning = true; pinchStartDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); const r=mainCanvas.getBoundingClientRect(); lastPinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left; lastPinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top; } } 
+            function handleTouchMove(e){ e.preventDefault(); if (e.touches.length === 1 && !isPanning) { performAction(e.touches[0]); } else if (e.touches.length === 2 && isPanning) { const currentPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); const r=mainCanvas.getBoundingClientRect(); const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left; const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top; const scaleAmount = currentPinchDistance / pinchStartDistance; zoom(scaleAmount, midX, midY); panX += (midX - lastPinchMidX); panY += (midY - lastPinchMidY); pinchStartDistance = currentPinchDistance; lastPinchMidX = midX; lastPinchMidY = midY; renderComposite(); } }
+            function handleTouchEnd(e){ e.preventDefault(); if (e.touches.length < 2 && isPanning) { isPanning = false; updateCursor(); } if (!isPanning && (isDrawing || isSelecting || isMovingSelection) && e.changedTouches.length > 0) { endAction(e.changedTouches[0]); } else if (!isPanning && !isDrawing && !isSelecting && !isMovingSelection && e.changedTouches.length > 0) { if (currentTool === 'eyedropper' || currentTool === 'fill') { startAction(e.changedTouches[0]); endAction(e.changedTouches[0]); } } } 
+            function handleWheelZoom(e) { 
+                e.preventDefault(); 
+                const rect = mainCanvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left; 
+                const mouseY = e.clientY - rect.top; 
+                const delta = e.deltaY > 0 ? 0.9 : 1.1; 
+                zoom(delta, mouseX, mouseY); 
+            }
+            
+            function zoom(factor, screenCenterX, screenCenterY) { 
+                // screenCenterX/Y are in CSS pixels relative to mainCanvas top-left
+                // These are considered logical coords for screenToWorld due to mainCtx early scale
+                const worldBeforeZoom = screenToWorld(screenCenterX + mainCanvas.getBoundingClientRect().left, screenCenterY + mainCanvas.getBoundingClientRect().top);
+                
+                zoomLevel = Math.max(0.05, Math.min(20, zoomLevel * factor)); 
+                
+                const worldAfterZoom = screenToWorld(screenCenterX + mainCanvas.getBoundingClientRect().left, screenCenterY + mainCanvas.getBoundingClientRect().top);
+                
+                panX += (worldAfterZoom.x - worldBeforeZoom.x) * zoomLevel;
+                panY += (worldAfterZoom.y - worldBeforeZoom.y) * zoomLevel;
+
+                renderComposite();
+                updateZoomPanDisplay();
+            }
+            function zoomAroundCenter(factor) { 
+                const centerX = mainCanvas.clientWidth / 2;
+                const centerY = mainCanvas.clientHeight / 2;
+                zoom(factor, centerX, centerY);
+            }
+            function resetView() { 
+                zoomLevel = 1.0; 
+                // Center the DEFAULT_LOGICAL_WIDTH/HEIGHT world canvas in the viewport
+                panX = (mainCanvas.clientWidth - DEFAULT_LOGICAL_WIDTH * zoomLevel) / 2;
+                panY = (mainCanvas.clientHeight - DEFAULT_LOGICAL_HEIGHT * zoomLevel) / 2;
+                renderComposite(); 
+                updateZoomPanDisplay(); 
+            }
+
+
+            function getDrawingStyle(ctx,p1x,p1y,p2x,p2y){ 
+                if(currentColorMode==='solid'){return currentSolidColor;}
+                else if(currentColorMode==='linear'){
+                    const physX1 = p1x * deviceScale; const physY1 = p1y * deviceScale;
+                    const physX2 = p2x * deviceScale; const physY2 = p2y * deviceScale;
+                    if(physX1===physX2 && physY1===physY2){return currentGradient.start;} 
+                    const grad=ctx.createLinearGradient(physX1,physY1,physX2,physY2);
+                    grad.addColorStop(0,currentGradient.start);grad.addColorStop(1,currentGradient.end);return grad;
+                }
+                return currentSolidColor;
+            }
+
+            function startAction(event){ 
+                const layerCtx=getActiveContext();if(!layerCtx){updateStatus("No active layer selected to draw on.");return;}
+                if (isPanning && event.type && event.type.startsWith('mouse')) return; 
+
+                // Middle-click (button=1) or Right-click (button=2) starts panning
+                if (event.button === 1 || event.button === 2) {
+                    isPanning = true;
+                    const r = mainCanvas.getBoundingClientRect();
+                    lastPanX_mouse = event.clientX - r.left;
+                    lastPanY_mouse = event.clientY - r.top;
+                    mainCanvas.style.cursor = 'grabbing';
+                    return;
+                }
+
+                const clientX = event.clientX;
+                const clientY = event.clientY;
+                let {x: worldX, y: worldY} = screenToWorld(clientX, clientY); 
+                
+                if (currentTool !== 'select' && currentTool !== 'move' && currentTool !== 'eyedropper') {
+                    worldX = snapCoord(worldX, gridSize); worldY = snapCoord(worldY, gridSize);
+                }
+                
+                saveHistory(); 
+                [lastX,lastY]=[worldX,worldY];[startX,startY]=[worldX,worldY];
+
+                if (currentTool === 'select') {
+                    isDrawing = false; isSelecting = true; isMovingSelection = false;
+                    deselect(); 
+                    selectionRect = { x: worldX, y: worldY, width: 0, height: 0 }; 
+                } else if (currentTool === 'move') {
+                    if (selectionRect && 
+                        worldX >= selectionRect.x && worldX <= selectionRect.x + (selectionRect.width < 0 ? 0 : selectionRect.width) && 
+                        worldY >= selectionRect.y && worldY <= selectionRect.y + (selectionRect.height < 0 ? 0 : selectionRect.height) ||
+                        worldX <= selectionRect.x && worldX >= selectionRect.x + (selectionRect.width >= 0 ? 0 : selectionRect.width) && 
+                        worldY <= selectionRect.y && worldY >= selectionRect.y + (selectionRect.height >= 0 ? 0 : selectionRect.height)
+                        ) {
+                        
+                        isMovingSelection = true; isDrawing = true; 
+                        
+                        let selNormX = selectionRect.x, selNormY = selectionRect.y;
+                        let selNormW = selectionRect.width, selNormH = selectionRect.height;
+                        if (selNormW < 0) { selNormX += selNormW; selNormW *= -1; }
+                        if (selNormH < 0) { selNormY += selNormH; selNormH *= -1; }
+
+                        const selPhysX = Math.round(selNormX * deviceScale);
+                        const selPhysY = Math.round(selNormY * deviceScale);
+                        const selPhysW = Math.round(selNormW * deviceScale);
+                        const selPhysH = Math.round(selNormH * deviceScale);
+
+                        if (selPhysW > 0 && selPhysH > 0) {
+                            movingSelectionData = {
+                                imageData: layerCtx.getImageData(selPhysX, selPhysY, selPhysW, selPhysH),
+                                x: selNormX, 
+                                y: selNormY,
+                                offsetX: worldX - selNormX, 
+                                offsetY: worldY - selNormY
+                            };
+                            layerCtx.save();
+                            const clipPath = getSelectionClipPath(true); 
+                            layerCtx.clip(clipPath);
+                            layerCtx.clearRect(0, 0, layerCtx.canvas.width, layerCtx.canvas.height);
+                            layerCtx.restore();
+                            updateStatus("Moving selection...");
+                        } else {
+                            isMovingSelection = false; isDrawing = false;
+                        }
+                    } else { 
+                        isPanning = true; 
+                        const r = mainCanvas.getBoundingClientRect();
+                        lastPanX_mouse = clientX - r.left; lastPanY_mouse = clientY - r.top;
+                    }
+                    updateCursor();
+                } else { 
+                    isDrawing=true; isSelecting = false; isMovingSelection = false;
+                    const noSym=['fill','eyedropper'].includes(currentTool);
+                    const sym=symmetryMode!=='OFF'&&!noSym;
+
+                    if(currentTool==='pixel'){
+                        pixelFilledCells = new Set();
+                        fillPixelCell(layerCtx, worldX, worldY, sym);
+                        currentVectorStroke = {
+                            layer: getActiveLayer() ? getActiveLayer().name : 'Layer_1',
+                            tool: 'pixel',
+                            shapeType: 'pixel',
+                            color: currentSolidColor,
+                            width: gridSize,
+                            symmetryMode: sym ? symmetryMode : 'OFF',
+                            points: []
+                        };
+                        // Add all cells filled during this first click
+                        pixelFilledCells.forEach(key => {
+                            const [cx, cy] = key.split(',').map(Number);
+                            currentVectorStroke.points.push({x: cx, y: cy});
+                        });
+                    }
+                    else if(['pen','eraser','line','shape'].includes(currentTool)){
+                        if(currentTool==='pen'||currentTool==='eraser'){
+                            setupLineDrawing(layerCtx,currentTool==='eraser',null);
+                            drawDot(layerCtx,worldX,worldY,sym);
+                        }
+                        currentVectorStroke = {
+                            layer: getActiveLayer() ? getActiveLayer().name : 'Layer_1',
+                            tool: currentTool,
+                            shapeType: currentShapeType,
+                            color: currentColorMode === 'solid' ? currentSolidColor : '#000000',
+                            width: currentWidth,
+                            symmetryMode: sym ? symmetryMode : 'OFF',
+                            points: [{x: worldX, y: worldY}]
+                        };
+                    }
+                    else if(currentTool==='eyedropper'){
+                        pickColor(clientX, clientY); 
+                        isDrawing=false; 
+                        if (!isAltEyedropperActive) {
+                             const prevToolElement = document.getElementById(previousToolBeforeEyedropper + 'Tool') || document.getElementById('penTool');
+                             if(prevToolElement) prevToolElement.click();
+                        }
+                        return; 
+                    }
+                    else if(currentTool==='spray'){
+                        setupLineDrawing(layerCtx,false,null);
+                        sprayAt(layerCtx,worldX,worldY,sym);
+                    }
+                }
+                renderComposite();
+            }
+
+            function performAction(event){ 
+                if(!isDrawing && !isSelecting && !isPanning && !isMovingSelection) return;
+                
+                const clientX = event.clientX;
+                const clientY = event.clientY;
+                let {x: worldX,y: worldY} = screenToWorld(clientX, clientY);
+                
+                if (isPanning) { 
+                     const r = mainCanvas.getBoundingClientRect();
+                     const canvasMouseX = clientX - r.left;
+                     const canvasMouseY = clientY - r.top;
+                    if (lastPanX_mouse === undefined) { lastPanX_mouse = canvasMouseX; lastPanY_mouse = canvasMouseY; }
+                    const dx = canvasMouseX - lastPanX_mouse; 
+                    const dy = canvasMouseY - lastPanY_mouse; 
+                    panX += dx; panY += dy;
+                    lastPanX_mouse = canvasMouseX; lastPanY_mouse = canvasMouseY;
+                    renderComposite();
+                    updateZoomPanDisplay();
+                    return;
+                }
+
+                const layerCtx = getActiveContext(); 
+                if (!layerCtx && (isDrawing || isMovingSelection)) { endAction(event); return; }
+
+
+                if (isSelecting && selectionRect) {
+                    selectionRect.width = worldX - selectionRect.x;
+                    selectionRect.height = worldY - selectionRect.y;
+                } else if (isMovingSelection && movingSelectionData) {
+                    movingSelectionData.x = worldX - movingSelectionData.offsetX; 
+                    movingSelectionData.y = worldY - movingSelectionData.offsetY;
+                } else if (isDrawing && layerCtx) {
+                    if (currentTool !== 'select' && currentTool !== 'move') {
+                        worldX = snapCoord(worldX, gridSize); worldY = snapCoord(worldY, gridSize);
+                    }
+                    const noSym=['fill','eyedropper'].includes(currentTool);
+                    const sym=symmetryMode!=='OFF'&&!noSym;
+                    
+                    if(currentTool==='pixel'){
+                        // Interpolate grid cells along the drag path
+                        interpolatePixelCells(layerCtx, lastX, lastY, worldX, worldY, sym);
+                        if (currentVectorStroke) {
+                            pixelFilledCells.forEach(key => {
+                                const [cx, cy] = key.split(',').map(Number);
+                                if (!currentVectorStroke.points.some(p => p.x === cx && p.y === cy)) {
+                                    currentVectorStroke.points.push({x: cx, y: cy});
+                                }
+                            });
+                        }
+                    }
+                    else if(currentTool==='pen'||currentTool==='eraser'){
+                        setupLineDrawing(layerCtx,currentTool==='eraser',{x1:lastX,y1:lastY,x2:worldX,y2:worldY});
+                        drawLine(layerCtx,lastX,lastY,worldX,worldY,sym);
+                        if (currentVectorStroke) {
+                            currentVectorStroke.points.push({x: worldX, y: worldY});
+                        }
+                    }
+                    else if(currentTool==='spray'){
+                        setupLineDrawing(layerCtx,false,null);
+                        sprayAt(layerCtx,worldX,worldY,sym);
+                    }
+                }
+                
+                [lastX,lastY]=[worldX,worldY]; 
+                renderComposite();
+            }
+
+            function endAction(event){ 
+                if (isPanning && event.type && event.type.startsWith('mouse')) { 
+                    isPanning = false;
+                    updateCursor();
+                    if (!isDrawing && !isSelecting && !isMovingSelection) return; 
+                }
+                if (!isDrawing && !isSelecting && !isMovingSelection) { 
+                    isPanning = false; 
+                    updateCursor(); 
+                    return;
+                }
+
+                const layerCtx=getActiveContext();
+                let worldX = lastX, worldY = lastY; 
+
+                if (event && event.clientX !== undefined) { 
+                     const {x: wX, y: wY} = screenToWorld(event.clientX, event.clientY);
+                     worldX = wX; worldY = wY;
+                }
+                if (layerCtx && currentTool !== 'select' && currentTool !== 'move' && currentTool !== 'eyedropper' ) {
+                    worldX = snapCoord(worldX, gridSize);
+                    worldY = snapCoord(worldY, gridSize);
+                }
+
+                if (isSelecting && selectionRect) {
+                    if (selectionRect.width < 0) { selectionRect.x += selectionRect.width; selectionRect.width *= -1; }
+                    if (selectionRect.height < 0) { selectionRect.y += selectionRect.height; selectionRect.height *= -1; }
+                    
+                    if (selectionRect.width < 1 || selectionRect.height < 1) {
+                        selectionRect = null; 
+                        updateStatus("Selection too small, cleared.");
+                    } else {
+                        updateStatus(`Selection made (${Math.round(selectionRect.width)}x${Math.round(selectionRect.height)}). Press Esc to clear.`);
+                    }
+                } else if (isMovingSelection && movingSelectionData && layerCtx) {
+                    if (movingSelectionData.imageData) {
+                        layerCtx.putImageData(movingSelectionData.imageData, Math.round(movingSelectionData.x * deviceScale), Math.round(movingSelectionData.y * deviceScale));
+                        saveHistory(); 
+                    }
+                    selectionRect = { 
+                        x: movingSelectionData.x, 
+                        y: movingSelectionData.y, 
+                        width: movingSelectionData.imageData.width / deviceScale, 
+                        height: movingSelectionData.imageData.height / deviceScale
+                    };
+                    movingSelectionData = null;
+                    updateStatus("Selection moved.");
+                } else if (isDrawing && layerCtx) {
+                    const noSym=['fill','eyedropper'].includes(currentTool);
+                    const sym=symmetryMode!=='OFF'&&!noSym;
+
+                    if(currentTool === 'shape' || currentTool === 'line'){
+                        drawShape(layerCtx,startX,startY,worldX,worldY,sym,{gradX1:startX,gradY1:startY,gradX2:worldX,gradY2:worldY});
+                    }
+                    else if(currentTool==='fill'){
+                        updateStatus("Filling area...");
+                        setTimeout(()=>{
+                            try{ floodFill(startX,startY); updateStatus("Fill complete.");} 
+                            catch(err){console.error("Fill Error:",err);updateStatus("Fill failed: " + err.message);}
+                            renderComposite(); saveHistory();
+                        },10);
+                        isDrawing = false; isSelecting = false; isMovingSelection = false; renderComposite(); updateCursor(); return; 
+                    }
+                    else if(currentTool==='text'){
+                        addText(startX,startY,sym); 
+                    } 
+                    if (currentVectorStroke) {
+                        if(['pen','eraser','line','shape'].includes(currentTool)){
+                            currentVectorStroke.points.push({x: worldX, y: worldY});
+                        } else if (currentTool === 'pixel') {
+                            // Final sync of pixel cells for this stroke
+                            pixelFilledCells.forEach(key => {
+                                const [cx, cy] = key.split(',').map(Number);
+                                if (!currentVectorStroke.points.some(p => p.x === cx && p.y === cy)) {
+                                    currentVectorStroke.points.push({x: cx, y: cy});
+                                }
+                            });
+                            pixelFilledCells = new Set();
+                        }
+                        vectorStrokes.push(currentVectorStroke);
+                        currentVectorStroke = null;
+                    }
+                    saveHistory(); 
+                }
+                
+                isDrawing=false; 
+                isSelecting=false; 
+                isMovingSelection = false;
+                renderComposite();
+                updateCursor();
+            }
+            
+            function setupLineDrawing(ctx,isEraser,linePoints){ 
+                ctx.lineWidth = currentWidth * deviceScale; 
+                ctx.lineCap='round';ctx.lineJoin='round';
+                
+                const scaledDash = val => val * deviceScale;
+                if(currentStrokeStyle==='dashed')ctx.setLineDash([scaledDash(10),scaledDash(5)]);
+                else if(currentStrokeStyle==='dotted')ctx.setLineDash([scaledDash(Math.max(1,currentWidth*0.25)), scaledDash(currentWidth*1.5)]);
+                else ctx.setLineDash([]);
+                
+                if (selectionRect && currentTool !== 'select' && currentTool !== 'move' ) { 
+                    ctx.save();
+                    const clipPath = getSelectionClipPath(true); 
+                    ctx.clip(clipPath);
+                }
+
+                if(isEraser){ctx.globalCompositeOperation='destination-out';ctx.strokeStyle="rgba(0,0,0,1)";}
+                else{ctx.globalCompositeOperation='source-over';
+                    if(currentColorMode==='linear'&& linePoints && (linePoints.x1 !== linePoints.x2 || linePoints.y1 !== linePoints.y2) ){
+                        ctx.strokeStyle=getDrawingStyle(ctx,linePoints.x1,linePoints.y1,linePoints.x2,linePoints.y2);
+                    }else{ctx.strokeStyle=currentSolidColor;}
+                }
+            }
+            function restoreContextAfterDraw(ctx) { 
+                if (selectionRect && currentTool !== 'select' && currentTool !== 'move' ) {
+                    ctx.restore(); 
+                }
+            }
+
+            // --- Pixel Art (Grid Fill) Functions ---
+            function fillPixelCell(ctx, worldX, worldY, applySymmetry) {
+                const gs = gridSize;
+                if (gs <= 0) return;
+                const cellX = Math.floor(worldX / gs) * gs;
+                const cellY = Math.floor(worldY / gs) * gs;
+
+                const _fillCell = (_ctx, _cx, _cy) => {
+                    const key = `${_cx},${_cy}`;
+                    if (pixelFilledCells.has(key)) return;
+                    pixelFilledCells.add(key);
+                    _ctx.fillStyle = currentSolidColor;
+                    _ctx.globalCompositeOperation = 'source-over';
+                    _ctx.fillRect(_cx * deviceScale, _cy * deviceScale, gs * deviceScale, gs * deviceScale);
+                };
+
+                _fillCell(ctx, cellX, cellY);
+
+                if (applySymmetry) {
+                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
+                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                    const mirrorCellX = Math.floor((logicalCanvasCenterX * 2 - worldX) / gs) * gs;
+                    const mirrorCellY = Math.floor((logicalCanvasCenterY * 2 - worldY) / gs) * gs;
+
+                    if (symmetryMode === 'Y') _fillCell(ctx, mirrorCellX, cellY);
+                    else if (symmetryMode === 'X') _fillCell(ctx, cellX, mirrorCellY);
+                    else if (symmetryMode === 'XY') {
+                        _fillCell(ctx, mirrorCellX, cellY);
+                        _fillCell(ctx, cellX, mirrorCellY);
+                        _fillCell(ctx, mirrorCellX, mirrorCellY);
+                    }
+                }
+            }
+
+            function interpolatePixelCells(ctx, wx1, wy1, wx2, wy2, applySymmetry) {
+                const gs = gridSize;
+                if (gs <= 0) return;
+                // Bresenham-style interpolation in grid-cell space
+                let gx0 = Math.floor(wx1 / gs);
+                let gy0 = Math.floor(wy1 / gs);
+                const gx1 = Math.floor(wx2 / gs);
+                const gy1 = Math.floor(wy2 / gs);
+
+                const dx = Math.abs(gx1 - gx0);
+                const dy = Math.abs(gy1 - gy0);
+                const sx = gx0 < gx1 ? 1 : -1;
+                const sy = gy0 < gy1 ? 1 : -1;
+                let err = dx - dy;
+
+                while (true) {
+                    fillPixelCell(ctx, gx0 * gs + gs / 2, gy0 * gs + gs / 2, applySymmetry);
+                    if (gx0 === gx1 && gy0 === gy1) break;
+                    const e2 = 2 * err;
+                    if (e2 > -dy) { err -= dy; gx0 += sx; }
+                    if (e2 < dx) { err += dx; gy0 += sy; }
+                }
+            }
+
+            function drawDot(ctx,worldX,worldY,applySymmetry){ 
+                const _draw=(_ctx, _wx, _wy)=>{
+                    const physX = _wx * deviceScale; 
+                    const physY = _wy * deviceScale; 
+                    const physWidth = currentWidth * deviceScale; 
+                    _ctx.beginPath();
+                    const style=(currentTool==='pen')?(currentColorMode==='solid'?currentSolidColor:getDrawingStyle(_ctx, _wx, _wy, _wx + 0.01, _wy)): 'rgba(0,0,0,1)'; 
+                    
+                    if (physWidth <= 1 * deviceScale) { 
+                        _ctx.fillStyle = style;
+                        _ctx.fillRect(Math.floor(physX - 0.5 * deviceScale), Math.floor(physY - 0.5 * deviceScale), Math.max(1, Math.ceil(deviceScale)), Math.max(1, Math.ceil(deviceScale)));
+                    } else {
+                        _ctx.arc(physX,physY,physWidth/2,0,Math.PI*2);
+                        _ctx.fillStyle=style;
+                        _ctx.fill();
+                    }
+                    _ctx.setLineDash([]); 
+                };
+                _draw(ctx,worldX,worldY);
+                if(applySymmetry){ 
+                    // Symmetry based on logical world coordinates relative to the canvas's logical center
+                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
+                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+
+                    if(symmetryMode==='Y')_draw(ctx, logicalCanvasCenterX * 2 - worldX ,worldY);
+                    else if(symmetryMode==='X')_draw(ctx,worldX, logicalCanvasCenterY * 2 - worldY);
+                    else if(symmetryMode==='XY'){
+                        _draw(ctx,logicalCanvasCenterX * 2 - worldX,worldY);
+                        _draw(ctx,worldX,logicalCanvasCenterY * 2 - worldY);
+                        _draw(ctx,logicalCanvasCenterX * 2 - worldX,logicalCanvasCenterY * 2 - worldY);
+                    }
+                }
+                restoreContextAfterDraw(ctx);
+            }
+            function drawLine(ctx,worldX1,worldY1,worldX2,worldY2,applySymmetry){ 
+                const _draw=(_ctx, _wx1, _wy1, _wx2, _wy2)=>{
+                    if(currentTool !=='eraser' && currentColorMode==='linear' && (_wx1 !== _wx2 || _wy1 !== _wy2)){
+                         _ctx.strokeStyle = getDrawingStyle(_ctx, _wx1, _wy1, _wx2, _wy2);
+                    } else if (currentTool!=='eraser') {
+                         _ctx.strokeStyle = currentSolidColor; 
+                    }
+                    _ctx.beginPath();
+                    _ctx.moveTo(_wx1 * deviceScale, _wy1 * deviceScale);
+                    _ctx.lineTo(_wx2 * deviceScale, _wy2 * deviceScale);
+                    _ctx.stroke();
+                };
+                _draw(ctx,worldX1,worldY1,worldX2,worldY2);
+                if(applySymmetry){
+                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
+                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                    if(symmetryMode==='Y'){_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2);}
+                    else if(symmetryMode==='X'){_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2);}
+                    else if(symmetryMode==='XY'){_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2);_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2);_draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2);}}
+                restoreContextAfterDraw(ctx);
+            }
+            
+            function drawShape(ctx,worldX1,worldY1,worldX2,worldY2,applySymmetry,gradPoints){ 
+                 setupLineDrawing(ctx, false, gradPoints); 
+
+                const _draw=(_ctx,_wx1,_wy1,_wx2,_wy2,_gradP)=>{ 
+                    const drawingStyle=getDrawingStyle(_ctx,_gradP.gradX1,_gradP.gradY1,_gradP.gradX2,_gradP.gradY2); 
+                    
+                    _ctx.strokeStyle=drawingStyle;
+                    if(fillShapeCheckbox.checked) _ctx.fillStyle=drawingStyle;
+                    
+                    _ctx.beginPath(); 
+                    let shapeToDraw=currentTool==='line'?'line':currentShapeType;
+                    
+                    const px1 = _wx1 * deviceScale, py1 = _wy1 * deviceScale; 
+                    const px2 = _wx2 * deviceScale, py2 = _wy2 * deviceScale;
+                    const pRadius = currentCornerRadius * deviceScale; 
+
+                    switch(shapeToDraw){
+                        case 'line':_ctx.moveTo(px1,py1);_ctx.lineTo(px2,py2);_ctx.stroke();break;
+                        case 'rectangle':const w=px2-px1,h=py2-py1;if(fillShapeCheckbox.checked)_ctx.fillRect(px1,py1,w,h);_ctx.strokeRect(px1,py1,w,h);break; 
+                        case 'roundedRect': 
+                            _ctx.beginPath();
+                            _ctx.moveTo(px1 + pRadius, py1);
+                            _ctx.lineTo(px1 + (px2-px1) - pRadius, py1);
+                            _ctx.arcTo(px1 + (px2-px1), py1, px1 + (px2-px1), py1 + pRadius, pRadius);
+                            _ctx.lineTo(px1 + (px2-px1), py1 + (py2-py1) - pRadius);
+                            _ctx.arcTo(px1 + (px2-px1), py1 + (py2-py1), px1 + (px2-px1) - pRadius, py1 + (py2-py1), pRadius);
+                            _ctx.lineTo(px1 + pRadius, py1 + (py2-py1));
+                            _ctx.arcTo(px1, py1 + (py2-py1), px1, py1 + (py2-py1) - pRadius, pRadius);
+                            _ctx.lineTo(px1, py1 + pRadius);
+                            _ctx.arcTo(px1, py1, px1 + pRadius, py1, pRadius);
+                            _ctx.closePath();
+                            if(fillShapeCheckbox.checked)_ctx.fill();
+                            _ctx.stroke();
+                            break;
+                        case 'circle':const r=Math.hypot(px2-px1,py2-py1)/2,cx=px1+(px2-px1)/2,cy=py1+(py2-py1)/2;_ctx.arc(cx,cy,Math.abs(r),0,Math.PI*2);if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
+                        case 'ellipse': const el_cx = px1+(px2-px1)/2; const el_cy = py1+(py2-py1)/2; const el_rx = Math.abs(px2-px1)/2; const el_ry = Math.abs(py2-py1)/2; _ctx.ellipse(el_cx, el_cy, el_rx, el_ry, 0, 0, 2 * Math.PI); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
+                        case 'triangle': _ctx.moveTo((px1+px2)/2, py1); _ctx.lineTo(px2, py2); _ctx.lineTo(px1, py2); _ctx.closePath(); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
+                        case 'star': const spikes=5,outerR=Math.hypot(px2-px1, py2-py1)/2,innerR=outerR/2.5,rot=Math.PI/2*3;let starCX=px1+(px2-px1)/2,starCY=py1+(py2-py1)/2;_ctx.moveTo(starCX,starCY-outerR*Math.sin(rot));for(let i=0;i<spikes;i++){_ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*i*2)*outerR,starCY+Math.sin(rot+Math.PI/spikes*i*2)*outerR);_ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*(i*2+1))*innerR,starCY+Math.sin(rot+Math.PI/spikes*(i*2+1))*innerR);}_ctx.closePath();if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
+                        case 'polygon': const sides=currentPolygonSides,polyR=Math.hypot(px2-px1,py2-py1)/2;const polyCX=px1+(px2-px1)/2,polyCY=py1+(py2-py1)/2;_ctx.moveTo(polyCX+polyR*Math.cos(0),polyCY+polyR*Math.sin(0));for(let i=1;i<=sides;i++)_ctx.lineTo(polyCX+polyR*Math.cos(i*2*Math.PI/sides),polyCY+polyR*Math.sin(i*2*Math.PI/sides));_ctx.closePath();if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
+                        case 'rhombus': _ctx.moveTo((px1+px2)/2, py1); _ctx.lineTo(px2, (py1+py2)/2); _ctx.lineTo((px1+px2)/2, py2); _ctx.lineTo(px1, (py1+py2)/2); _ctx.closePath(); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
+                    }
+                };
+                _draw(ctx,worldX1,worldY1,worldX2,worldY2,gradPoints); 
+                if(applySymmetry){ 
+                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
+                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+
+                    const symGrad = (op, wx1, wy1, wx2, wy2, baseGradP) => {
+                         if (op === 'Y') return {gradX1:logicalCanvasCenterX*2-baseGradP.gradX1,gradY1:baseGradP.gradY1,gradX2:logicalCanvasCenterX*2-baseGradP.gradX2,gradY2:baseGradP.gradY2};
+                         if (op === 'X') return {gradX1:baseGradP.gradX1,gradY1:logicalCanvasCenterY*2-baseGradP.gradY1,gradX2:baseGradP.gradX2,gradY2:logicalCanvasCenterY*2-baseGradP.gradY2};
+                         // For XY combined, it's more complex, for now use transformed coords simply.
+                         return {gradX1:logicalCanvasCenterX*2-baseGradP.gradX1, gradY1:logicalCanvasCenterY*2-baseGradP.gradY1, gradX2:logicalCanvasCenterX*2-baseGradP.gradX2, gradY2:logicalCanvasCenterY*2-baseGradP.gradY2};
+                    };
+
+
+                    if(symmetryMode==='Y')_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2, symGrad('Y',0,0,0,0,gradPoints));
+                    else if(symmetryMode==='X')_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2, symGrad('X',0,0,0,0,gradPoints));
+                    else if(symmetryMode==='XY'){
+                        _draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2,symGrad('Y',0,0,0,0,gradPoints));
+                        _draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2,symGrad('X',0,0,0,0,gradPoints));
+                        _draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2,symGrad('XY',0,0,0,0,gradPoints));
+                    }
+                }
+                 restoreContextAfterDraw(ctx);
+            }
+
+            function addText(worldX,worldY,applySymmetry){ 
+                const ctx=getActiveContext();if(!ctx)return;
+                const text=prompt("Enter text to add to canvas:","Hello World!");
+                if(text && text.trim()){
+                    saveHistory();
+                    setupLineDrawing(ctx, false, {x1:worldX, y1:worldY, x2:worldX + 100, y2:worldY}); 
+
+                    const _draw=(_ctx,_x,_y,_align)=>{ 
+                        const physicalFontSize = currentFontSize * deviceScale; 
+                        _ctx.font=`${physicalFontSize}px ${currentFontFamily}`; 
+                        _ctx.textAlign=_align;_ctx.textBaseline="top"; 
+                        
+                        const metrics=_ctx.measureText(text); 
+                        const textWidthPhysical = metrics.width;
+
+                        let gradWorldX1 = _x, gradWorldY1 = _y;
+                        let gradWorldX2 = _x + (textWidthPhysical / deviceScale), gradWorldY2 = _y; 
+                         if(_align === 'center') { gradWorldX1 = _x - (textWidthPhysical / deviceScale / 2); gradWorldX2 = _x + (textWidthPhysical / deviceScale / 2); }
+                         else if (_align === 'right') { gradWorldX1 = _x - (textWidthPhysical / deviceScale); gradWorldX2 = _x; }
+
+                        _ctx.fillStyle=getDrawingStyle(_ctx, gradWorldX1, gradWorldY1, gradWorldX2, gradWorldY2); 
+                        _ctx.fillText(text, _x * deviceScale, _y * deviceScale); 
+                    };
+                    _draw(ctx,worldX,worldY,currentTextAlign);
+                    if(applySymmetry){
+                        const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
+                        const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                        let mirroredX;
+                        if(symmetryMode==='Y'||symmetryMode==='XY'){mirroredX=logicalCanvasCenterX*2-worldX;_draw(ctx,mirroredX,worldY,currentTextAlign);}
+                        if(symmetryMode==='X'||symmetryMode==='XY'){mirroredX=(symmetryMode==='XY')?logicalCanvasCenterX*2-worldX:worldX;_draw(ctx,mirroredX,logicalCanvasCenterY*2-worldY,currentTextAlign);}
+                    }
+                    restoreContextAfterDraw(ctx);
+                    renderComposite();saveHistory();updateStatus(`Added text: "${text.substring(0,20)}...".`);
+                } else if (text !== null) { 
+                    updateStatus("No text entered.");
+                }
+            }
+
+            function sprayAt(ctx,worldCX,worldCY,applySymmetry){ 
+                setupLineDrawing(ctx, false, {x1:worldCX, y1:worldCY, x2:worldCX + currentWidth*1.5, y2:worldCY}); 
+                const _draw=(_ctx,_cx,_cy)=>{ 
+                    const density=20 + Math.floor(currentWidth/2); 
+                    const spreadWorld = currentWidth * 1.5; 
+                    
+                     if (currentColorMode === 'solid') _ctx.fillStyle = currentSolidColor;
+                     else _ctx.fillStyle = getDrawingStyle(_ctx, _cx - spreadWorld/2, _cy, _cx + spreadWorld/2, _cy);
+
+
+                    for(let i=0;i<density;i++){
+                        const a=Math.random()*2*Math.PI;
+                        const rWorld=Math.pow(Math.random(), 1.5) * (spreadWorld / 2); 
+                        const xWorld=_cx+rWorld*Math.cos(a);
+                        const yWorld=_cy+rWorld*Math.sin(a);
+                        _ctx.beginPath();
+                        const particleRadiusPhysical = Math.max(1, (currentWidth*0.08 + 0.5) * deviceScale ); 
+                        _ctx.arc(xWorld * deviceScale, yWorld * deviceScale, particleRadiusPhysical ,0,Math.PI*2);
+                        _ctx.fill();
+                    }
+                };
+                _draw(ctx,worldCX,worldCY);
+                if(applySymmetry){
+                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
+                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                    if(symmetryMode==='Y')_draw(ctx,logicalCanvasCenterX*2-worldCX,worldCY);
+                    else if(symmetryMode==='X')_draw(ctx,worldCX,logicalCanvasCenterY*2-worldCY);
+                    else if(symmetryMode==='XY'){_draw(ctx,logicalCanvasCenterX*2-worldCX,worldCY);_draw(ctx,worldCX,logicalCanvasCenterY*2-worldCY);_draw(ctx,logicalCanvasCenterX*2-worldCX,logicalCanvasCenterY*2-worldCY);}}
+                restoreContextAfterDraw(ctx);
+            }
+
+            function pickColor(screenClientX, screenClientY){ 
+                const rect = mainCanvas.getBoundingClientRect();
+                const canvasPhysicalX = Math.round((screenClientX - rect.left) * deviceScale);
+                const canvasPhysicalY = Math.round((screenClientY - rect.top) * deviceScale);
+                
+                // Correct way to get pixel data from mainCtx, as it's scaled.
+                // So provide physical coords to its getImageData call.
+                const p = mainCtx.getImageData( (screenClientX - rect.left), (screenClientY - rect.top), 1, 1).data;
+
+                const c=`rgb(${p[0]},${p[1]},${p[2]})`;
+                currentSolidColor=c;
+                lineColorPicker.value=rgbToHex(p[0],p[1],p[2]);
+                colorTypeSelect.value='solid';currentColorMode='solid';
+                updateColorPropertiesUI();updateStatus(`Color picked: ${c}. Switched to Solid Color mode.`);
+            }
+            function rgbToHex(r,g,b){return"#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1).toUpperCase();}
+            
+            function floodFill(worldStartX, worldStartY){ 
+                const l=getActiveLayer();if(!l)return;const ctx=l.context; 
+                
+                const physicalStartX = Math.round(worldStartX * deviceScale); 
+                const physicalStartY = Math.round(worldStartY * deviceScale);
+
+                if(physicalStartX<0||physicalStartX>=ctx.canvas.width||physicalStartY<0||physicalStartY>=ctx.canvas.height){updateStatus("Fill start point outside canvas bounds.");return;}
+                
+                let selectionClip = null;
+                if (selectionRect) {
+                    const selNormX = selectionRect.x < selectionRect.x + selectionRect.width ? selectionRect.x : selectionRect.x + selectionRect.width;
+                    const selNormY = selectionRect.y < selectionRect.y + selectionRect.height ? selectionRect.y : selectionRect.y + selectionRect.height;
+                    const selNormW = Math.abs(selectionRect.width);
+                    const selNormH = Math.abs(selectionRect.height);
+
+                    selectionClip = {
+                        x1: Math.round(selNormX * deviceScale),
+                        y1: Math.round(selNormY * deviceScale),
+                        x2: Math.round((selNormX + selNormW) * deviceScale),
+                        y2: Math.round((selNormY + selNormH) * deviceScale),
+                    };
+                    if (physicalStartX < selectionClip.x1 || physicalStartX >= selectionClip.x2 ||
+                        physicalStartY < selectionClip.y1 || physicalStartY >= selectionClip.y2) {
+                        updateStatus("Fill start point outside current selection.");
+                        return;
+                    }
+                }
+
+                
+                const effFillClr=(currentColorMode==='solid')?currentSolidColor:(currentGradient.start); 
+                const fillClrComponents=hexToRgbWithAlpha(effFillClr);if(!fillClrComponents)return;
+                const[tR,tG,tB,tA]=fillClrComponents;
+                
+                const imageData=ctx.getImageData(0,0,ctx.canvas.width,ctx.canvas.height); 
+                const data=imageData.data; const canvasWidth=ctx.canvas.width; 
+
+                const startPos=(physicalStartY*canvasWidth+physicalStartX)*4;
+                const[startR,startG,startB,startA]=[data[startPos],data[startPos+1],data[startPos+2],data[startPos+3]];
+                
+                if(startR===tR&&startG===tG&&startB===tB&&startA===tA){updateStatus("Target area already has the selected fill color.");return;}
+                
+                const tolerance=20; 
+                const colorMatch=(pos, physicalX, physicalY)=>{ 
+                    if(pos<0||pos+3>=data.length)return false;
+                    if (selectionClip) {
+                        if (physicalX < selectionClip.x1 || physicalX >= selectionClip.x2 ||
+                            physicalY < selectionClip.y1 || physicalY >= selectionClip.y2) return false;
+                    }
+
+                    const r=data[pos],g=data[pos+1],b=data[pos+2],a=data[pos+3];
+                    if(r===tR&&g===tG&&b===tB&&a===tA && Math.abs(a-startA) <= tolerance)return false; 
+
+                    return (Math.abs(r-startR) <= tolerance &&
+                            Math.abs(g-startG) <= tolerance &&
+                            Math.abs(b-startB) <= tolerance &&
+                            Math.abs(a-startA) <= tolerance); 
+                };
+                
+                const q=[[physicalStartX,physicalStartY]];
+                let iterations=0;const maxIterations=canvasWidth*ctx.canvas.height; 
+
+                while(q.length>0&&iterations<maxIterations){
+                    const[x_phys,y_phys]=q.shift(); 
+                    
+                    const currentPos=(y_phys*canvasWidth+x_phys)*4;
+                    
+                    if(!colorMatch(currentPos, x_phys, y_phys))continue; 
+                
+                    data[currentPos]=tR;data[currentPos+1]=tG;data[currentPos+2]=tB;data[currentPos+3]=tA;
+                    iterations++;
+                
+                    if(x_phys-1 >= 0) q.push([x_phys-1,y_phys]);
+                    if(x_phys+1 < canvasWidth) q.push([x_phys+1,y_phys]);
+                    if(y_phys-1 >= 0) q.push([x_phys,y_phys-1]);
+                    if(y_phys+1 < ctx.canvas.height) q.push([x_phys,y_phys+1]);
+                }
+                if(iterations>=maxIterations)updateStatus("Fill might be incomplete due to complexity or large area.");
+                ctx.putImageData(imageData,0,0);
+            }
+            function hexToRgbWithAlpha(hex){let c;if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){c=hex.substring(1).split('');if(c.length==3)c=[c[0],c[0],c[1],c[1],c[2],c[2]];c='0x'+c.join('');return[(c>>16)&255,(c>>8)&255,c&255,255];}const m=hex.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)$/);if(m)return[parseInt(m[1]),parseInt(m[2]),parseInt(m[3]),m[4]?Math.round(parseFloat(m[4])*255):255];return[0,0,0,255];} 
+
+            function applyEffectToLayer(effectFn) {
+                const layerCtx = getActiveContext();
+                if (!layerCtx) return;
+                saveHistory();
+
+                const processRegion = (x_phys, y_phys, w_phys, h_phys) => {
+                    if (w_phys <= 0 || h_phys <= 0) return; 
+                    try {
+                        const imageData = layerCtx.getImageData(x_phys, y_phys, w_phys, h_phys);
+                        effectFn(imageData.data);
+                        layerCtx.putImageData(imageData, x_phys, y_phys);
+                    } catch (e) {
+                        console.error("Error applying effect:", e);
+                        updateStatus("Effect application failed. See console.");
+                    }
+                };
+
+                if (selectionRect && selectionRect.width > 0 && selectionRect.height > 0) {
+                    let selNormX = selectionRect.x, selNormY = selectionRect.y;
+                    let selNormW = selectionRect.width, selNormH = selectionRect.height;
+                    if (selNormW < 0) { selNormX += selNormW; selNormW *= -1; }
+                    if (selNormH < 0) { selNormY += selNormH; selNormH *= -1; }
+
+                    const physX = Math.round(selNormX * deviceScale);
+                    const physY = Math.round(selNormY * deviceScale);
+                    const physW = Math.round(selNormW * deviceScale);
+                    const physH = Math.round(selNormH * deviceScale);
+                    processRegion(physX, physY, physW, physH);
+                } else {
+                    processRegion(0, 0, layerCtx.canvas.width, layerCtx.canvas.height);
+                }
+                saveHistory();
+                renderComposite();
+            }
+
+            function applyGrayscaleEffect(){ applyEffectToLayer(data => { for(let i=0;i<data.length;i+=4){const avg=Math.round(data[i]*0.299+data[i+1]*0.587+data[i+2]*0.114);data[i]=data[i+1]=data[i+2]=avg;}}); updateStatus(`Grayscale applied to ${getActiveLayer().name}${selectionRect ? ' (selection only)' : ''}.`);}
+            function applyInvertEffect(){ applyEffectToLayer(data => { for(let i=0;i<data.length;i+=4){data[i]=255-data[i];data[i+1]=255-data[i+1];data[i+2]=255-data[i+2];}}); updateStatus(`Inverted colors on ${getActiveLayer().name}${selectionRect ? ' (selection only)' : ''}.`);}
+            
+            function flipLayer(horizontal, vertical) {
+                const layerCtx = getActiveContext();
+                if (!layerCtx) return;
+                saveHistory();
+
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d', {willReadFrequently: true});
+                tempCanvas.width = layerCtx.canvas.width; 
+                tempCanvas.height = layerCtx.canvas.height;
+
+                tempCtx.save();
+                let scaleH = 1, scaleV = 1;
+                let transX = 0, transY = 0;
+
+                if (horizontal) {
+                    scaleH = -1;
+                    transX = -tempCanvas.width;
+                }
+                if (vertical) {
+                    scaleV = -1;
+                    transY = -tempCanvas.height;
+                }
+                tempCtx.scale(scaleH, scaleV);
+                tempCtx.translate(transX, transY);
+                tempCtx.drawImage(layerCtx.canvas, 0, 0);
+                tempCtx.restore();
+
+                layerCtx.clearRect(0, 0, layerCtx.canvas.width, layerCtx.canvas.height);
+                layerCtx.drawImage(tempCanvas, 0, 0);
+
+                saveHistory();
+                renderComposite();
+                updateStatus(`Layer ${getActiveLayer().name} flipped ${horizontal && vertical ? 'Horizontally & Vertically' : horizontal ? 'Horizontally' : vertical ? 'Vertically' : ' (no change)'}.`);
+            }
+
+            function addCurrentColorToPalette(){const cToAdd=(currentColorMode==='solid')?currentSolidColor:currentGradient.start;if(paletteColors.length>=MAX_PALETTE_COLORS){updateStatus("Color palette is full.");return;}if(!paletteColors.includes(cToAdd)){paletteColors.push(cToAdd);savePalette();renderPalette();updateStatus(`Color ${cToAdd} added to palette.`);}else{updateStatus(`Color ${cToAdd} is already in palette.`);}}
+            function renderPalette(){paletteContainer.innerHTML='';paletteColors.forEach(c=>{const s=document.createElement('div');s.className='swatch palette-swatch';s.style.backgroundColor=c;s.title=`Select color ${c}`;s.onclick=()=>{currentSolidColor=c;lineColorPicker.value=c;colorTypeSelect.value='solid';currentColorMode='solid';updateColorPropertiesUI();updateStatus(`Selected color ${c} from palette.`);};paletteContainer.appendChild(s);});}
+            function savePalette(){try{localStorage.setItem('sketcherPalette',JSON.stringify(paletteColors));}catch(e){console.warn("Could not save palette to localStorage:", e);}}
+            function loadPalette(){try{const s=localStorage.getItem('sketcherPalette');if(s)paletteColors=JSON.parse(s);renderPalette();}catch(e){paletteColors=[]; console.warn("Could not load palette from localStorage:", e);}}
+            function renderSolidColorTemplates(){solidTemplatesContainer.innerHTML='';solidColorTemplates.forEach(c=>{const s=document.createElement('div');s.className='swatch solid-template-swatch';s.style.backgroundColor=c;s.title=`Use solid color template ${c}`;s.onclick=()=>{currentSolidColor=c;lineColorPicker.value=c;colorTypeSelect.value='solid';currentColorMode='solid';updateColorPropertiesUI();updateStatus(`Template color ${c} selected.`);};solidTemplatesContainer.appendChild(s);});}
+            function renderGradientTemplates(){gradientTemplatesContainer.innerHTML='';gradientTemplates.forEach(t=>{const s=document.createElement('div');s.className='swatch gradient-template-swatch';s.style.background=`linear-gradient(to right, ${t.start}, ${t.end})`;s.title=`Use gradient template: ${t.name}`;s.onclick=()=>{currentGradient.start=t.start;currentGradient.end=t.end;gradientStartColorPicker.value=t.start;gradientEndColorPicker.value=t.end;colorTypeSelect.value='linear';currentColorMode='linear';updateColorPropertiesUI();updateStatus(`Template gradient "${t.name}" selected.`);};gradientTemplatesContainer.appendChild(s);});}
+
+            function handleImageUpload(e){const ctx=getActiveContext();if(!ctx){updateStatus("No active layer to load image onto.");return;}const f=e.target.files[0];if(!f)return;updateStatus("Loading image...");const r=new FileReader();r.onload=(ev)=>{const i=new Image();i.onload=()=>{saveHistory(); 
+                const layerLogicalWidth = ctx.canvas.width / deviceScale; // This is now DEFAULT_LOGICAL_WIDTH
+                const layerLogicalHeight = ctx.canvas.height / deviceScale; // This is now DEFAULT_LOGICAL_HEIGHT
+                
+                const ratio = Math.min(layerLogicalWidth / i.width, layerLogicalHeight / i.height, 1); 
+                const drawWidthWorld = i.width * ratio;
+                const drawHeightWorld = i.height * ratio;
+                
+                const worldX = (layerLogicalWidth - drawWidthWorld) / 2;
+                const worldY = (layerLogicalHeight - drawHeightWorld) / 2;
+                
+                ctx.globalCompositeOperation='source-over'; 
+                ctx.drawImage(i, 
+                    0, 0, i.width, i.height, 
+                    worldX * deviceScale, worldY * deviceScale, 
+                    drawWidthWorld * deviceScale, drawHeightWorld * deviceScale 
+                ); 
+                renderComposite();saveHistory();updateStatus("Image loaded successfully.");};i.onerror=()=>{updateStatus("Error loading image data.");};i.src=ev.target.result;};r.onerror=()=>{updateStatus("Error reading image file.");};r.readAsDataURL(f);e.target.value=null;} 
+            
+            function clearCanvas(){
+                if(confirm('This will clear ALL content from ALL layers. Are you sure?')){
+                    layers.forEach((l,idx)=>{
+                        saveHistory(idx); 
+                        l.context.clearRect(0,0,l.canvas.width,l.canvas.height);
+                        saveHistory(idx); 
+                    });
+                    vectorStrokes = []; // Also clear vector strokes
+                    deselect();renderComposite();updateStatus("All layers cleared.");
+                }
+            }
+            
+            // Path smoothing functions
+            function getSqDist(p1, p2) {
+                const dx = p1.x - p2.x, dy = p1.y - p2.y;
+                return dx * dx + dy * dy;
+            }
+            function simplifyDPStep(points, first, last, sqTolerance, simplified) {
+                let maxSqDist = sqTolerance;
+                let index;
+                for (let i = first + 1; i < last; i++) {
+                    let p = points[i], p1 = points[first], p2 = points[last], sqDist;
+                    if (p1.x === p2.x && p1.y === p2.y) {
+                        sqDist = getSqDist(p, p1);
+                    } else {
+                        let dx = p2.x - p1.x, dy = p2.y - p1.y;
+                        let t = ((p.x - p1.x) * dx + (p.y - p1.y) * dy) / (dx * dx + dy * dy);
+                        if (t > 1) sqDist = getSqDist(p, p2);
+                        else if (t > 0) sqDist = getSqDist(p, { x: p1.x + t * dx, y: p1.y + t * dy });
+                        else sqDist = getSqDist(p, p1);
+                    }
+                    if (sqDist > maxSqDist) {
+                        index = i;
+                        maxSqDist = sqDist;
+                    }
+                }
+                if (maxSqDist > sqTolerance) {
+                    if (index - first > 1) simplifyDPStep(points, first, index, sqTolerance, simplified);
+                    simplified.push(points[index]);
+                    if (last - index > 1) simplifyDPStep(points, index, last, sqTolerance, simplified);
+                }
+            }
+            function simplifyPoints(points, tolerance = 1.5) {
+                if (points.length <= 2) return points;
+                let sqTolerance = tolerance * tolerance;
+                let simplified = [points[0]];
+                simplifyDPStep(points, 0, points.length - 1, sqTolerance, simplified);
+                simplified.push(points[points.length - 1]);
+                return simplified;
+            }
+            function getSmoothSvgPath(points) {
+                if (points.length === 0) return '';
+                if (points.length === 1) return `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+                if (points.length === 2) return `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)} L ${points[1].x.toFixed(1)} ${points[1].y.toFixed(1)}`;
+                let d = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)} `;
+                for (let i = 1; i < points.length - 2; i++) {
+                    const xc = (points[i].x + points[i + 1].x) / 2;
+                    const yc = (points[i].y + points[i + 1].y) / 2;
+                    d += `Q ${points[i].x.toFixed(1)} ${points[i].y.toFixed(1)} ${xc.toFixed(1)} ${yc.toFixed(1)} `;
+                }
+                d += `Q ${points[points.length - 2].x.toFixed(1)} ${points[points.length - 2].y.toFixed(1)} ${points[points.length - 1].x.toFixed(1)} ${points[points.length - 1].y.toFixed(1)}`;
+                return d;
+            }
+
+            function exportToSVG() {
+                if (vectorStrokes.length === 0) {
+                    alert('No vector strokes to export! Draw something with the pen tool first.');
+                    return;
+                }
+                
+                let svgContent = `<svg viewBox="0 0 ${DEFAULT_LOGICAL_WIDTH} ${DEFAULT_LOGICAL_HEIGHT}" xmlns="http://www.w3.org/2000/svg" style="background-color: #0d0d0d">\n`;
+                
+                // Group strokes by layer
+                const layerGroups = {};
+                vectorStrokes.forEach(stroke => {
+                    const layerName = stroke.layer || 'Layer';
+                    if (!layerGroups[layerName]) layerGroups[layerName] = [];
+                    layerGroups[layerName].push(stroke);
+                });
+                
+                Object.keys(layerGroups).forEach((layerName, layerIdx) => {
+                    let layerSafeName = layerName.replace(/[^a-zA-Z0-9]/g, '_') + '_' + layerIdx;
+                    svgContent += `  <g id="${layerSafeName}">\n`;
+                    let hasMask = false;
+                    let maskId = `mask_${layerSafeName}`;
+
+                    const getShapeDPath = (stroke) => {
+                        if (stroke.tool === 'pen' || stroke.tool === 'eraser') {
+                            if (stroke.points.length < 2) return '';
+                            const simplified = simplifyPoints(stroke.points, 1.5);
+                            return getSmoothSvgPath(simplified);
+                        } else if (stroke.tool === 'line') {
+                            if (stroke.points.length < 2) return '';
+                            return `M ${stroke.points[0].x.toFixed(1)} ${stroke.points[0].y.toFixed(1)} L ${stroke.points[1].x.toFixed(1)} ${stroke.points[1].y.toFixed(1)}`;
+                        } else if (stroke.tool === 'shape') {
+                            if (stroke.points.length < 2) return '';
+                            const px1 = stroke.points[0].x, py1 = stroke.points[0].y;
+                            const px2 = stroke.points[1].x, py2 = stroke.points[1].y;
+                            const w = px2 - px1, h = py2 - py1;
+                            const cx = px1 + w/2, cy = py1 + h/2;
+                            switch(stroke.shapeType) {
+                                case 'rectangle': case 'roundedRect': return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                case 'circle': case 'ellipse': 
+                                    const rx = Math.abs(w/2), ry = Math.abs(h/2);
+                                    return `M ${(cx-rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx+rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx-rx).toFixed(1)} ${cy.toFixed(1)}`;
+                                case 'triangle': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                case 'rhombus': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${cy.toFixed(1)} L ${cx.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${cy.toFixed(1)} Z`;
+                                default: return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                            }
+                        }
+                        return '';
+                    };
+
+                    const writeStrokePaths = (stroke, isMask) => {
+                        let out = '';
+                        const dRaw = getShapeDPath(stroke);
+                        if (!dRaw) return out;
+                        let paths = [{ d: dRaw, xForm: "" }];
+                        const cw = DEFAULT_LOGICAL_WIDTH;
+                        const ch = DEFAULT_LOGICAL_HEIGHT;
+                        if (stroke.symmetryMode === 'Y') {
+                            paths.push({ d: dRaw, xForm: `translate(${cw}, 0) scale(-1, 1)` });
+                        } else if (stroke.symmetryMode === 'X') {
+                            paths.push({ d: dRaw, xForm: `translate(0, ${ch}) scale(1, -1)` });
+                        } else if (stroke.symmetryMode === 'XY') {
+                            paths.push({ d: dRaw, xForm: `translate(${cw}, 0) scale(-1, 1)` });
+                            paths.push({ d: dRaw, xForm: `translate(0, ${ch}) scale(1, -1)` });
+                            paths.push({ d: dRaw, xForm: `translate(${cw}, ${ch}) scale(-1, -1)` });
+                        }
+                        paths.forEach(p => {
+                            const tAttr = p.xForm ? ` transform="${p.xForm}"` : '';
+                            if (isMask) out += `      <path d="${p.d}"${tAttr} stroke="black" stroke-width="${stroke.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
+                            else out += `      <path class="anim-stroke" d="${p.d}"${tAttr} stroke="${stroke.color}" stroke-width="${stroke.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
+                        });
+                        return out;
+                    };
+                    
+                    // First pass: erasings to create mask
+                    const erasings = layerGroups[layerName].filter(s => s.tool === 'eraser');
+                    if (erasings.length > 0) {
+                        hasMask = true;
+                        svgContent += `    <mask id="${maskId}">\n`;
+                        svgContent += `      <rect x="-10%" y="-10%" width="120%" height="120%" fill="white" />\n`;
+                        erasings.forEach(stroke => {
+                            svgContent += writeStrokePaths(stroke, true);
+                        });
+                        svgContent += `    </mask>\n`;
+                    }
+                    
+                    let groupProps = hasMask ? ` mask="url(#${maskId})"` : '';
+                    svgContent += `    <g${groupProps}>\n`;
+                    
+                    // Second pass: normal strokes
+                    layerGroups[layerName].forEach(stroke => {
+                        if (stroke.tool === 'eraser') return;
+                        if (stroke.tool === 'pixel') {
+                            // Render pixel strokes as filled rects
+                            const gs = stroke.width || gridSize;
+                            stroke.points.forEach(p => {
+                                svgContent += `      <rect x="${p.x}" y="${p.y}" width="${gs}" height="${gs}" fill="${stroke.color}" shape-rendering="crispEdges"/>\n`;
+                            });
+                            // Symmetry mirrors are already baked into the points
+                            return;
+                        }
+                        svgContent += writeStrokePaths(stroke, false);
+                    });
+                    
+                    svgContent += `    </g>\n  </g>\n`;
+                });
+                
+                svgContent += `</svg>`;
+                localStorage.setItem('sketcher_vector_export', svgContent);
+                updateStatus('SVG exported to localStorage. Opening SVG Studio...');
+                window.open('svgviewer.html?import=sketcher', '_blank');
+            }
+
+            function saveProject() {
+                const projectData = {
+                    width: mainCanvas.width,
+                    height: mainCanvas.height,
+                    vectorStrokes: vectorStrokes,
+                    paletteColors: paletteColors,
+                    layers: layers.map(l => ({
+                        id: l.id,
+                        name: l.name,
+                        visible: l.visible,
+                        opacity: l.opacity,
+                        blendMode: l.blendMode,
+                        dataURL: l.canvas.toDataURL()
+                    }))
+                };
+                const blob = new Blob([JSON.stringify(projectData)], {type: "application/json"});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `sketch_${Date.now()}.sketch`;
+                a.click();
+                updateStatus("Project saved successfully.");
+            }
+
+            function loadProject(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    try {
+                        const data = JSON.parse(evt.target.result);
+                        if (data.vectorStrokes) vectorStrokes = data.vectorStrokes;
+                        if (data.paletteColors) {
+                            paletteColors = data.paletteColors;
+                            savePalette();
+                            renderPalette();
+                        }
+                        
+                        layerList.innerHTML = '';
+                        layers = [];
+                        let loadedCount = 0;
+                        
+                        data.layers.forEach((lData, index) => {
+                            const l = createLayer(lData.id, lData.name);
+                            l.visible = lData.visible;
+                            l.opacity = lData.opacity !== undefined ? lData.opacity : 1;
+                            l.blendMode = lData.blendMode || 'source-over';
+                            
+                            const img = new Image();
+                            img.onload = function() {
+                                l.context.drawImage(img, 0, 0);
+                                loadedCount++;
+                                if (loadedCount === data.layers.length) {
+                                    renderLayerList();
+                                    selectLayer(layers[0].id);
+                                    renderComposite();
+                                    saveHistory();
+                                    updateStatus("Project loaded successfully.");
+                                }
+                            };
+                            img.src = lData.dataURL;
+                        });
+                        
+                    } catch (err) {
+                        alert("Invalid project file.");
+                        console.error(err);
+                    }
+                };
+                reader.readAsText(file);
+                e.target.value = '';
+            }
+
+            let replayPoints = [];
+            let currentReplayFrame = 0;
+            
+            function startReplayAnimation() {
+                if (vectorStrokes.length === 0 || isReplaying) return;
+                
+                // Flatten all points into a timeline
+                replayPoints = [];
+                vectorStrokes.forEach(stroke => {
+                    stroke.points.forEach((p, index) => {
+                        replayPoints.push({
+                            stroke: stroke,
+                            point: p,
+                            isFirst: index === 0
+                        });
+                    });
+                });
+                
+                isReplaying = true;
+                currentReplayFrame = 0;
+                replayControls.style.display = 'flex';
+                replayScrubber.value = 0;
+                replayScrubber.max = replayPoints.length - 1;
+                
+                updateStatus("Replaying animation...");
+                
+                const activeL = getActiveLayer();
+                if (!activeL) { stopReplayAnimation(); return; }
+                const ctx = activeL.context;
+                ctx.clearRect(0,0,activeL.canvas.width,activeL.canvas.height);
+                renderComposite();
+                
+                requestAnimationFrame(playReplayFrame);
+            }
+            
+            function scrubReplay() {
+                if (!isReplaying) return;
+                currentReplayFrame = parseInt(replayScrubber.value);
+                drawReplayUpTo(currentReplayFrame);
+            }
+            
+            function stopReplayAnimation() {
+                isReplaying = false;
+                replayControls.style.display = 'none';
+                saveHistory(); // restores the actual layer state which we didn't touch
+                renderComposite();
+                updateStatus("Replay stopped.");
+            }
+            
+            function drawReplayUpTo(frameIndex) {
+                const activeL = getActiveLayer();
+                if (!activeL) return;
+                const ctx = activeL.context;
+                ctx.clearRect(0,0,activeL.canvas.width,activeL.canvas.height);
+                
+                let lastP = null;
+                const originalSymmetry = symmetryMode;
+                const originalTool = currentTool;
+                const originalShapeType = currentShapeType;
+                
+                for (let i = 0; i <= frameIndex; i++) {
+                    const rp = replayPoints[i];
+                    symmetryMode = rp.stroke.symmetryMode || 'OFF';
+                    currentTool = rp.stroke.tool;
+                    if(rp.stroke.shapeType) currentShapeType = rp.stroke.shapeType;
+                    
+                    if (rp.isFirst) {
+                        if(currentTool === 'pixel') {
+                            // Pixel replay: just fill the grid cell
+                            ctx.fillStyle = rp.stroke.color;
+                            ctx.globalCompositeOperation = 'source-over';
+                            const gs = rp.stroke.width || gridSize;
+                            ctx.fillRect(rp.point.x * deviceScale, rp.point.y * deviceScale, gs * deviceScale, gs * deviceScale);
+                        } else if(currentTool !== 'shape' && currentTool !== 'line') {
+                            setupLineDrawing(ctx, rp.stroke.tool === 'eraser', null);
+                            ctx.lineWidth = rp.stroke.width;
+                            ctx.strokeStyle = rp.stroke.color;
+                            ctx.fillStyle = rp.stroke.color;
+                            drawDot(ctx, rp.point.x, rp.point.y, symmetryMode !== 'OFF');
+                        }
+                    } else if (lastP && lastP.stroke === rp.stroke) {
+                        if(currentTool === 'pixel') {
+                            ctx.fillStyle = rp.stroke.color;
+                            ctx.globalCompositeOperation = 'source-over';
+                            const gs = rp.stroke.width || gridSize;
+                            ctx.fillRect(rp.point.x * deviceScale, rp.point.y * deviceScale, gs * deviceScale, gs * deviceScale);
+                        } else if(currentTool === 'shape' || currentTool === 'line') {
+                            ctx.lineWidth = rp.stroke.width;
+                            ctx.strokeStyle = rp.stroke.color;
+                            ctx.fillStyle = rp.stroke.color;
+                            drawShape(ctx, rp.stroke.points[0].x, rp.stroke.points[0].y, rp.point.x, rp.point.y, symmetryMode !== 'OFF', {gradX1: rp.stroke.points[0].x, gradY1: rp.stroke.points[0].y, gradX2: rp.point.x, gradY2: rp.point.y});
+                        } else {
+                            drawLine(ctx, lastP.point.x, lastP.point.y, rp.point.x, rp.point.y, symmetryMode !== 'OFF');
+                        }
+                    }
+                    lastP = rp;
+                }
+                
+                symmetryMode = originalSymmetry;
+                currentTool = originalTool;
+                currentShapeType = originalShapeType;
+                renderComposite();
+            }
+
+            function playReplayFrame() {
+                if (!isReplaying) return;
+                if (currentReplayFrame >= replayPoints.length) {
+                    stopReplayAnimation();
+                    if (mediaRecorder && mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
+                        replayRecordBtn.textContent = 'Record';
+                        replayRecordBtn.style.background = '#e74c3c';
+                    }
+                    return;
+                }
+                
+                const activeL = getActiveLayer();
+                const ctx = activeL.context;
+                const rp = replayPoints[currentReplayFrame];
+                
+                const originalSymmetry = symmetryMode;
+                const originalTool = currentTool;
+                const originalShapeType = currentShapeType;
+                
+                symmetryMode = rp.stroke.symmetryMode || 'OFF';
+                currentTool = rp.stroke.tool;
+                if(rp.stroke.shapeType) currentShapeType = rp.stroke.shapeType;
+                
+                if (rp.isFirst) {
+                    if(currentTool !== 'shape' && currentTool !== 'line') {
+                        setupLineDrawing(ctx, rp.stroke.tool === 'eraser', null);
+                        ctx.lineWidth = rp.stroke.width;
+                        ctx.strokeStyle = rp.stroke.color;
+                        ctx.fillStyle = rp.stroke.color;
+                        drawDot(ctx, rp.point.x, rp.point.y, symmetryMode !== 'OFF');
+                    }
+                } else if (currentReplayFrame > 0 && replayPoints[currentReplayFrame-1].stroke === rp.stroke) {
+                    const lastP = replayPoints[currentReplayFrame-1];
+                    if(currentTool === 'shape' || currentTool === 'line') {
+                        ctx.lineWidth = rp.stroke.width;
+                        ctx.strokeStyle = rp.stroke.color;
+                        ctx.fillStyle = rp.stroke.color;
+                        drawShape(ctx, rp.stroke.points[0].x, rp.stroke.points[0].y, rp.point.x, rp.point.y, symmetryMode !== 'OFF', {gradX1: rp.stroke.points[0].x, gradY1: rp.stroke.points[0].y, gradX2: rp.point.x, gradY2: rp.point.y});
+                    } else {
+                        drawLine(ctx, lastP.point.x, lastP.point.y, rp.point.x, rp.point.y, symmetryMode !== 'OFF');
+                    }
+                }
+                
+                symmetryMode = originalSymmetry;
+                currentTool = originalTool;
+                currentShapeType = originalShapeType;
+                
+                replayScrubber.value = currentReplayFrame;
+                renderComposite();
+                
+                currentReplayFrame++;
+                requestAnimationFrame(playReplayFrame);
+            }
+
+            function saveCanvas(){
+                const format=saveFormatSelect.value;
+                if (format === 'svg-animated' || format === 'svg-static') {
+                    downloadStandaloneSVG(format === 'svg-animated');
+                    return;
+                }
+                const actualFormat = format === 'png-transparent' ? 'png' : format;
+                const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+                const tempSaveCanvas = document.createElement('canvas'); 
+                // Logical dimensions are now the fixed DEFAULT_LOGICAL_WIDTH/HEIGHT
+                const logicalWidth = DEFAULT_LOGICAL_WIDTH;
+                const logicalHeight = DEFAULT_LOGICAL_HEIGHT;
+                
+                tempSaveCanvas.width = logicalWidth; 
+                tempSaveCanvas.height = logicalHeight;
+                const tempCtx = tempSaveCanvas.getContext('2d');
+                
+                if (format !== 'png-transparent') {
+                    const canvasActualBg = getComputedStyle(document.getElementById('drawingCanvas')).getPropertyValue('background-color').trim();
+                    tempCtx.fillStyle = canvasActualBg;
+                    tempCtx.fillRect(0,0,logicalWidth,logicalHeight);
+                }
+
+                layers.forEach(layer => {
+                    if(layer.visible && layer.canvas && layer.context){
+                        tempCtx.globalAlpha = layer.opacity;
+                        tempCtx.globalCompositeOperation = layer.blendMode || 'source-over';
+                        tempCtx.drawImage(layer.canvas, 
+                            0, 0, layer.canvas.width, layer.canvas.height, 
+                            0, 0, logicalWidth, logicalHeight);
+                    }
+                });
+                tempCtx.globalAlpha = 1.0; 
+                tempCtx.globalCompositeOperation = 'source-over'; 
+
+                const dataURL=tempSaveCanvas.toDataURL(mimeType,actualFormat==='jpeg'?0.92:1.0); 
+                const link=document.createElement('a');
+                link.download=`SSSS_Lv_Sketcher_Image.${actualFormat}`;
+                link.href=dataURL;
+                link.click();
+                updateStatus(`Image saved as ${format.toUpperCase()}.`);
+            }
+
+            function downloadStandaloneSVG(isAnimated) {
+                let svgContent = `<svg viewBox="0 0 ${DEFAULT_LOGICAL_WIDTH} ${DEFAULT_LOGICAL_HEIGHT}" xmlns="http://www.w3.org/2000/svg" style="background-color: ${isAnimated ? 'transparent' : '#0d0d0d'}">\n`;
+                
+                let styleContent = '';
+                if (isAnimated) {
+                    svgContent += `<style>\n@keyframes drawAnim { to { stroke-dashoffset: 0; } }\n@keyframes pixelAppear { to { opacity: 1; } }\n`;
+                }
+
+                const layerGroups = {};
+                vectorStrokes.forEach((stroke, idx) => {
+                    stroke._globalIdx = idx; // Inject chronological index
+                    const layerName = stroke.layer || 'Layer';
+                    if (!layerGroups[layerName]) layerGroups[layerName] = [];
+                    layerGroups[layerName].push(stroke);
+                });
+
+                const tempSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                const tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                tempSvg.appendChild(tempPath);
+                document.body.appendChild(tempSvg);
+
+                const totalStrokes = vectorStrokes.length;
+                const TOTAL_DURATION = Math.max(3, totalStrokes * 0.1); 
+                const strokeDuration = TOTAL_DURATION / (totalStrokes || 1);
+
+                let pathsContent = '';
+
+                Object.keys(layerGroups).forEach((layerName, layerIdx) => {
+                    let layerSafeName = layerName.replace(/[^a-zA-Z0-9]/g, '_') + '_' + layerIdx;
+                    pathsContent += `  <g id="${layerSafeName}">\n`;
+                    let hasMask = false;
+                    let maskId = `mask_${layerSafeName}`;
+
+                    const getShapeDPath = (stroke) => {
+                        if (stroke.tool === 'pen' || stroke.tool === 'eraser') {
+                            if (stroke.points.length < 2) return '';
+                            const simplified = simplifyPoints(stroke.points, 1.5);
+                            return getSmoothSvgPath(simplified);
+                        } else if (stroke.tool === 'line') {
+                            if (stroke.points.length < 2) return '';
+                            return `M ${stroke.points[0].x.toFixed(1)} ${stroke.points[0].y.toFixed(1)} L ${stroke.points[1].x.toFixed(1)} ${stroke.points[1].y.toFixed(1)}`;
+                        } else if (stroke.tool === 'shape') {
+                            if (stroke.points.length < 2) return '';
+                            const px1 = stroke.points[0].x, py1 = stroke.points[0].y;
+                            const px2 = stroke.points[1].x, py2 = stroke.points[1].y;
+                            const w = px2 - px1, h = py2 - py1;
+                            const cx = px1 + w/2, cy = py1 + h/2;
+                            switch(stroke.shapeType) {
+                                case 'rectangle': case 'roundedRect': return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                case 'circle': case 'ellipse': 
+                                    const rx = Math.abs(w/2), ry = Math.abs(h/2);
+                                    return `M ${(cx-rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx+rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx-rx).toFixed(1)} ${cy.toFixed(1)}`;
+                                case 'triangle': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                case 'rhombus': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${cy.toFixed(1)} L ${cx.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${cy.toFixed(1)} Z`;
+                                default: return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                            }
+                        }
+                        return '';
+                    };
+
+                    const writeStrokePaths = (stroke, isMask) => {
+                        let out = '';
+                        const dRaw = getShapeDPath(stroke);
+                        if (!dRaw) return out;
+                        
+                        tempPath.setAttribute('d', dRaw);
+                        const length = Math.ceil(tempPath.getTotalLength()) + 5; 
+                        
+                        let paths = [{ d: dRaw, xForm: "" }];
+                        const cw = DEFAULT_LOGICAL_WIDTH;
+                        const ch = DEFAULT_LOGICAL_HEIGHT;
+                        if (stroke.symmetryMode === 'Y') { paths.push({ d: dRaw, xForm: `translate(${cw}, 0) scale(-1, 1)` }); }
+                        else if (stroke.symmetryMode === 'X') { paths.push({ d: dRaw, xForm: `translate(0, ${ch}) scale(1, -1)` }); }
+                        else if (stroke.symmetryMode === 'XY') {
+                            paths.push({ d: dRaw, xForm: `translate(${cw}, 0) scale(-1, 1)` });
+                            paths.push({ d: dRaw, xForm: `translate(0, ${ch}) scale(1, -1)` });
+                            paths.push({ d: dRaw, xForm: `translate(${cw}, ${ch}) scale(-1, -1)` });
+                        }
+                        
+                        paths.forEach((p, pIdx) => {
+                            const tAttr = p.xForm ? ` transform="${p.xForm}"` : '';
+                            const id = `stroke_${stroke._globalIdx}_${pIdx}`;
+                            
+                            if (isAnimated) {
+                                styleContent += `#${id} { stroke-dasharray: ${length}; stroke-dashoffset: ${length}; animation: drawAnim ${strokeDuration}s linear ${stroke._globalIdx * strokeDuration}s forwards; }\n`;
+                            }
+                            
+                            const color = isMask ? 'black' : stroke.color;
+                            out += `      <path id="${id}" d="${p.d}"${tAttr} stroke="${color}" stroke-width="${stroke.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
+                        });
+                        return out;
+                    };
+                    
+                    const erasings = layerGroups[layerName].filter(s => s.tool === 'eraser');
+                    if (erasings.length > 0) {
+                        hasMask = true;
+                        pathsContent += `    <mask id="${maskId}">\n`;
+                        pathsContent += `      <rect x="-10%" y="-10%" width="120%" height="120%" fill="white" />\n`;
+                        erasings.forEach(stroke => { pathsContent += writeStrokePaths(stroke, true); });
+                        pathsContent += `    </mask>\n`;
+                    }
+                    
+                    let groupProps = hasMask ? ` mask="url(#${maskId})"` : '';
+                    pathsContent += `    <g${groupProps}>\n`;
+                    
+                    layerGroups[layerName].forEach(stroke => {
+                        if (stroke.tool === 'eraser') return;
+                        if (stroke.tool === 'pixel') {
+                            const gs = stroke.width || gridSize;
+                            stroke.points.forEach((p, pIdx) => {
+                                const id = `stroke_${stroke._globalIdx}_rect_${pIdx}`;
+                                let rectStr = `      <rect id="${id}" x="${p.x}" y="${p.y}" width="${gs}" height="${gs}" fill="${stroke.color}" shape-rendering="crispEdges"`;
+                                if (isAnimated) {
+                                    styleContent += `#${id} { opacity: 0; animation: pixelAppear ${strokeDuration * 0.5}s linear ${stroke._globalIdx * strokeDuration + (pIdx * strokeDuration * 0.5 / (stroke.points.length || 1))}s forwards; }\n`;
+                                }
+                                rectStr += `/>\n`;
+                                pathsContent += rectStr;
+                            });
+                            return;
+                        }
+                        pathsContent += writeStrokePaths(stroke, false);
+                    });
+                    pathsContent += `    </g>\n  </g>\n`;
+                });
+
+                document.body.removeChild(tempSvg);
+                
+                if (isAnimated) {
+                    svgContent += styleContent + `</style>\n`;
+                }
+                svgContent += pathsContent + `</svg>`;
+
+                const blob = new Blob([svgContent], {type: "image/svg+xml"});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `SSSS_Lv_Sketcher_${isAnimated ? 'Animated' : 'Static'}.${Date.now()}.svg`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+                updateStatus(`${isAnimated ? 'Animated' : 'Static'} SVG Exported.`);
+            }
+
+            function saveHistory(idx=activeLayerIndex){
+                if(idx<0||idx>=layers.length)return;
+                const l=layers[idx];if(!l||!l.canvas)return;
+                try{
+                    const dU=l.canvas.toDataURL();
+                    const currentLayerStrokes = vectorStrokes.filter(vs => vs.layer === l.name);
+                    const stateObj = { dU: dU, strokes: JSON.parse(JSON.stringify(currentLayerStrokes)) };
+
+                    const h=history[idx]||[];
+                    let s=historyStep[idx]; 
+                    
+                    if (s < h.length - 1) {
+                        h.length = s + 1; 
+                    }
+                    
+                    if (h.length === 0 || (h[h.length-1].dU || h[h.length-1]) !== dU) { 
+                         if(h.length>=MAX_HISTORY_STEPS) {
+                            h.shift(); 
+                         }
+                         h.push(stateObj);
+                    }
+                    historyStep[idx]=h.length-1; 
+                    updateUndoRedoButtonStates();
+                } catch(err){
+                    console.warn(`History save failed for layer ${l.name}: ${err.message}. This might be due to canvas size or security restrictions.`);
+                    updateStatus("Could not save history step.");
+                }
+            }
+            
+            function undoLast(){
+                if(activeLayerIndex<0||activeLayerIndex>=layers.length)return;
+                const h=history[activeLayerIndex]||[];
+                let s=historyStep[activeLayerIndex];
+                if(s>0){ 
+                    try{
+                        s--;historyStep[activeLayerIndex]=s;
+                        const l=layers[activeLayerIndex],c=l.context,i=new Image();
+                        i.onload=()=>{
+                            c.clearRect(0,0,l.canvas.width,l.canvas.height);
+                            c.drawImage(i,0,0);
+                            
+                            const state = h[s];
+                            if (state && state.strokes) {
+                                vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                            }
+                            
+                            renderComposite();
+                            updateStatus(`Undo performed on ${l.name}.`);
+                        };
+                        i.onerror=()=>{updateStatus("Undo failed: Could not load history image.");};
+                        i.src=h[s].dU || h[s];
+                        updateUndoRedoButtonStates();
+                    }catch(err){updateStatus("Undo operation failed."); console.error("Undo error:", err);}
+                } else {updateStatus("No more undo steps for this layer.");}
+            }
+
+            function redoLast(){
+                if(activeLayerIndex<0||activeLayerIndex>=layers.length)return;
+                const h=history[activeLayerIndex]||[];
+                let s=historyStep[activeLayerIndex];
+                if(s < h.length - 1){ 
+                    try{
+                        s++;historyStep[activeLayerIndex]=s;
+                        const l=layers[activeLayerIndex],c=l.context,i=new Image();
+                        i.onload=()=>{
+                            c.clearRect(0,0,l.canvas.width,l.canvas.height);
+                            c.drawImage(i,0,0);
+                            
+                            const state = h[s];
+                            if (state && state.strokes) {
+                                vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                            }
+                            
+                            renderComposite();
+                            updateStatus(`Redo performed on ${l.name}.`);
+                        };
+                        i.onerror=()=>{updateStatus("Redo failed: Could not load history image.");};
+                        i.src=h[s].dU || h[s];
+                        updateUndoRedoButtonStates();
+                    }catch(err){updateStatus("Redo operation failed."); console.error("Redo error:", err);}
+                } else {updateStatus("No more redo steps for this layer.");}
+            }
+
+            function updateUndoRedoButtonStates(){
+                if(activeLayerIndex<0||activeLayerIndex>=layers.length){undoBtn.disabled=true; redoBtn.disabled=true; return;}
+                const h=history[activeLayerIndex]||[];
+                const s=historyStep[activeLayerIndex];
+                undoBtn.disabled = s <= 0; 
+                redoBtn.disabled = s >= h.length - 1; 
+                updateMergeButtonState(); 
+            }
+            
+            function handleResize(){
+                clearTimeout(handleResize.timeoutId);
+                handleResize.timeoutId = setTimeout(() => {
+                    console.log("Handling resize or orientation change event.");
+                    const oldDeviceScale = deviceScale;
+                    deviceScale = window.devicePixelRatio || 1;
+                    
+                    // Viewport (mainCanvas) changes size
+                    const container = document.getElementById('canvas-container'); 
+                    const cs = getComputedStyle(container);
+                    const pX = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+                    const pY = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
+                    let displayWidth = Math.max(100, container.clientWidth - pX);
+                    let displayHeight = Math.max(100, container.clientHeight - pY);
+                    if (container.clientWidth === 0 || displayWidth <=0 ) {
+                        const sidebarCurrentWidth = sidebar.classList.contains('collapsed') ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-collapsed')) : parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width'));
+                        displayWidth = Math.max(300, window.innerWidth - sidebarCurrentWidth - pX - 30); 
+                    }
+                    if (container.clientHeight === 0 || displayHeight <=0) {
+                        displayHeight = Math.max(300, window.innerHeight - pY - 30); 
+                    }
+                    mainCanvas.style.width = displayWidth + 'px';
+                    mainCanvas.style.height = displayHeight + 'px';
+                    mainCanvas.width = Math.round(displayWidth * deviceScale); 
+                    mainCanvas.height = Math.round(displayHeight * deviceScale);
+                    mainCtx.scale(deviceScale, deviceScale); // Re-apply scale after resize
+
+                    // Layer canvases remain their fixed large size. Pan/zoom adjusted by resetView.
+                    // If deviceScale changed, all layer canvases need their physical backing stores adjusted if we wanted perfect pixel mapping
+                    // but for simplicity and because logical world size is fixed, we don't rebuild layer content here, just re-render view.
+                    // If deviceScale changes, current drawing quality might degrade/improve until redrawn on layers, but that's an advanced topic.
+                    if (oldDeviceScale !== deviceScale) {
+                        // Optionally, re-scale all layer content (complex and slow) or just accept that display fidelity may shift
+                        console.warn("Device pixel ratio changed. Layer content might not appear as sharp until further edits or a more complex layer rescaling is implemented.");
+                        // Force re-creation of layer contexts might be needed for some browsers if internal scaling factors get mixed up.
+                        // layers.forEach(l => {l.context = l.canvas.getContext('2d', {willReadFrequently: true})}); // this clears content
+                    }
+
+                    resetView(); // Adjusts pan/zoom for new viewport size, re-renders
+                }, 200); 
+            }
+            handleResize.timeoutId = null;
+            
+            function updateStatus(message) {
+                if(statusText) statusText.textContent = message;
+            }
+
+            function updateZoomPanDisplay() {
+                if(zoomLevelDisplay) zoomLevelDisplay.textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+            }
+
+            function updateCursorCoordinatesDisplay(event) {
+                if (!mainCanvas || !cursorCoordsDisplay) return;
+                const {x: worldX, y: worldY} = screenToWorld(event.clientX, event.clientY);
+                cursorCoordsDisplay.textContent = `X: ${Math.round(worldX)}, Y: ${Math.round(worldY)}`;
+            }
+
+            initializeApp();
+        });
+    </script>
+</body>
+</html>
