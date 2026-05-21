@@ -41,3 +41,5 @@ __pycache__/
 .orchids/
 temp_search.txt
 bun.lock
+
+.vercel

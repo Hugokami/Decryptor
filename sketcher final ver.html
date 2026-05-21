@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>SSSS Lv Sketcher v2.1 - Enhanced by Hugo</title>
+    <meta name="description" content="SSSS Lv Sketcher - A premium, infinitely scalable vector drawing and sketching tool featuring multi-layer support, custom grids, and precision exporting.">
+    <meta property="og:title" content="SSSS Lv Sketcher - Infinite Vector Canvas">
+    <meta property="og:description" content="A premium vector drawing and sketching tool featuring multi-layer support, custom grids, and precision exporting.">
+    <meta property="og:type" content="website">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
@@ -17,9 +21,9 @@
             --canvas-bg-dark: #FFFFFF;
             --text-color-dark: #F0F0F0; 
             --text-secondary-dark: #A0A3BD; 
-            --accent-color-dark: #7071E8;
-            --accent-hover-dark: #8A8AFF;
-            --active-color-dark: #5051D8; 
+            --accent-color-dark: #FF6B4A;
+            --accent-hover-dark: #FF8A70;
+            --active-color-dark: #E65534; 
             --border-color-dark: #383A40; 
             --loader-step-color-dark: #4A4C50;
             --input-bg-dark: #202124; 
@@ -38,9 +42,9 @@
             --canvas-bg-light: #FFFFFF;
             --text-color-light: #212529;
             --text-secondary-light: #6C757D;
-            --accent-color-light: #007AFF;
-            --accent-hover-light: #3390FF;
-            --active-color-light: #0056CC;
+            --accent-color-light: #FF6B4A;
+            --accent-hover-light: #FF8A70;
+            --active-color-light: #E65534;
             --border-color-light: #DEE2E6;
             --loader-step-color-light: #CED4DA;
             --input-bg-light: #F1F3F5;
@@ -462,12 +466,170 @@
             .tool-row label { font-size: 0.78em; min-width: 60px; }
             .tool-row input[type="number"], .tool-row select, .layer-controls select { font-size: 0.75em; padding: 7px 9px; }
         }
+
+        /* Mobile floating quick dock styling */
+        #mobileQuickDock {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(37, 38, 43, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 40px;
+            padding: 8px 16px;
+            z-index: 4500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            align-items: center;
+            gap: 12px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        body.light-theme #mobileQuickDock {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        }
+        #mobileQuickDock button {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            position: relative;
+        }
+        #mobileQuickDock button:active {
+            transform: scale(0.92);
+        }
+        #mobileQuickDock button.active {
+            background: rgba(255, 107, 74, 0.2);
+            color: var(--accent-color);
+            border: 1px solid rgba(255, 107, 74, 0.4);
+        }
+        .mobile-color-btn #mobileColorIndicator {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            display: block;
+        }
+        .mobile-record-btn.recording {
+            animation: pulse-red-dock 1.5s infinite alternate;
+            background: rgba(231, 76, 60, 0.25) !important;
+            color: #e74c3c !important;
+        }
+        @keyframes pulse-red-dock {
+            0% { box-shadow: 0 0 0 0px rgba(231, 76, 60, 0.4); }
+            100% { box-shadow: 0 0 0 8px rgba(231, 76, 60, 0); }
+        }
+        
+        /* Floating mobile utility panels */
+        .mobile-floating-panel {
+            position: fixed;
+            bottom: 85px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 12px;
+            box-shadow: 0 8px 24px var(--shadow-md);
+            z-index: 4600;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .mobile-floating-panel.visible {
+            display: flex;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Visual Crop Overlay Styling */
+        #cropOverlayContainer {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 4800;
+            pointer-events: none;
+            display: none;
+        }
+        #cropOverlayContainer.active {
+            display: block;
+            pointer-events: auto;
+        }
+        #cropBox {
+            position: absolute;
+            border: 2px dashed var(--accent-color);
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+            cursor: move;
+            pointer-events: auto;
+        }
+        .crop-handle {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: var(--accent-color);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            pointer-events: auto;
+        }
+        .crop-handle.tl { top: -7px; left: -7px; cursor: nwse-resize; }
+        .crop-handle.tr { top: -7px; right: -7px; cursor: nesw-resize; }
+        .crop-handle.bl { bottom: -7px; left: -7px; cursor: nesw-resize; }
+        .crop-handle.br { bottom: -7px; right: -7px; cursor: nwse-resize; }
+        
+        #cropHud {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 20px var(--shadow-md);
+            z-index: 4900;
+        }
+        #cropHud span {
+            font-size: 0.9em;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+        #cropHud button {
+            padding: 6px 12px;
+            font-size: 0.85em;
+            border-radius: 15px;
+        }
+        
+        /* Mobile-only visibility overrides */
+        @media (max-width: 768px) {
+            #mobileQuickDock {
+                display: flex;
+            }
+            #canvas-container {
+                bottom: 80px;
+                height: calc(100vh - 80px);
+                height: calc(100dvh - 80px);
+            }
+        }
     </style>
 </head>
 <body>
     <div id="introOverlay">
         <div class="intro-content">
-            <h1 class="intro-title">SSSS Lv Sketcher</h1>
+            <div class="intro-title">SSSS Lv Sketcher</div>
             <p class="intro-subtitle">Initializing your creative space...</p>
             <div class="loader"></div>
             <button id="startSketchingBtn">Start Sketching</button>
@@ -533,6 +695,8 @@
                     <button id="loadProjectBtn" title="Load Project (.sketch)">📂</button>
                     <input type="file" id="projectLoader" accept=".sketch" style="display:none;">
                     <button id="replayBtn" title="Replay Animation">▶️</button>
+                    <button id="recordProcessBtn" title="Clean Record Mode (⏺️)" style="color:#e74c3c;">⏺️</button>
+                    <button id="cropModeBtn" title="Crop & Export Mode">◩</button>
                     <button id="exportSvgBtn" title="Export to SVG Studio">📤</button>
                     <button id="clearSelectionContentBtn" title="Clear Selected Area (Del/Backspace)">✂️</button>
                     <button id="flipHorizontalBtn" title="Flip Layer Horizontally">⇄</button>
@@ -597,6 +761,55 @@
     <div class="sidebar-backdrop hidden" id="sidebarBackdrop"></div>
     <div id="canvas-container">
         <canvas id="drawingCanvas"></canvas>
+    </div>
+
+    <!-- Visual Crop Mode Overlay -->
+    <div id="cropOverlayContainer">
+        <div id="cropHud">
+            <span>Crop & Export Mode</span>
+            <button id="cropCancelBtn" style="background:var(--input-bg); border:1px solid var(--border-color); color:var(--text-color); cursor:pointer;">Cancel</button>
+            <button id="cropConfirmBtn" style="background:var(--accent-color); border:none; color:white; cursor:pointer;">Export</button>
+        </div>
+        <div id="cropBox">
+            <div class="crop-handle tl"></div>
+            <div class="crop-handle tr"></div>
+            <div class="crop-handle bl"></div>
+            <div class="crop-handle br"></div>
+        </div>
+    </div>
+
+    <!-- Mobile Quick-Toolbar Dock -->
+    <div id="mobileQuickDock">
+        <button id="mobilePenBtn" class="active" title="Pen">✏️</button>
+        <button id="mobileEraserBtn" title="Eraser">🧼</button>
+        <button id="mobileColorBtn" class="mobile-color-btn" title="Color">
+            <span id="mobileColorIndicator" style="background-color:#000000;"></span>
+        </button>
+        <button id="mobileSizeBtn" title="Brush Size">
+            <span id="mobileSizeIndicator" style="width:6px; height:6px; background-color:var(--text-color); border-radius:50%; display:block; margin:auto;"></span>
+        </button>
+        <button id="mobileUndoBtn" title="Undo">↩️</button>
+        <button id="mobileRedoBtn" title="Redo">↪️</button>
+        <button id="mobileRecordBtn" class="mobile-record-btn" title="Record Process">⏺️</button>
+        <button id="mobileMenuBtn" title="Menu">☰</button>
+    </div>
+
+    <!-- Floating Brush Width Slider Panel for Mobile -->
+    <div id="mobileBrushPanel" class="mobile-floating-panel">
+        <div style="display:flex; flex-direction:column; gap:8px; width:200px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.85em; font-weight:500;">Brush Width</span>
+                <span id="mobileBrushVal" style="font-size:0.85em; color:var(--accent-color);">5px</span>
+            </div>
+            <input type="range" id="mobileBrushWidthInput" min="1" max="100" value="5" style="width:100%;">
+        </div>
+    </div>
+
+    <!-- Floating Color Palette Panel for Mobile -->
+    <div id="mobileColorPanel" class="mobile-floating-panel" style="flex-direction:column; gap:10px; width:220px;">
+        <div style="font-size:0.85em; font-weight:500;">Select Color</div>
+        <div id="mobileColorsGrid" style="display:grid; grid-template-columns:repeat(6, 1fr); gap:6px;"></div>
+        <input type="color" id="mobileColorPicker" style="width:100%; border:none; height:30px; border-radius:4px; padding:0; cursor:pointer;" value="#000000">
     </div>
 
     <script>
@@ -757,6 +970,15 @@
             let currentVectorStroke = null;
             let isReplaying = false;
             let pixelFilledCells = new Set(); // tracks filled cells during a single pixel stroke
+            
+            // Clean Record & Crop Export state variables
+            let recordedStrokes = [];
+            let isRecordModeActive = false;
+            let strokeIdCounter = 0;
+            
+            let isCropModeActive = false;
+            let cropRect = { x: 100, y: 100, width: 400, height: 300 }; // screen coordinates
+            let activeCropDrag = null; // { type: 'move' | 'tl' | 'tr' | 'bl' | 'br', startX, startY, startRect }
 
             const blendModes = [ 'source-over', 'multiply', 'screen', 'overlay', 'darken', 'lighten', 'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference', 'exclusion', 'hue', 'saturation', 'color', 'luminosity', 'destination-over', 'lighter', 'xor' ];
             const solidColorTemplates = [ "#E74C3C", "#F1C40F", "#2ECC71", "#3498DB", "#9B59B6", "#34495E", "#1ABC9C", "#E67E22", "#BDC3C7", "#7F8C8D", "#F39C12", "#D35400", "#C0392B", "#16A085", "#27AE60", "#2980B9" ];
@@ -812,7 +1034,14 @@
 
                 loadPalette(); renderSolidColorTemplates(); renderGradientTemplates();
                 initializeCanvasAndLayers(); 
-                setupEventListeners(); updateColorPropertiesUI(); updateActiveToolPropertiesUI(); updateCursor();
+                setupEventListeners(); 
+                initCropEvents();
+                initMobileEvents();
+                updateColorPropertiesUI(); 
+                updateMobileColorUI();
+                updateMobileSizeUI();
+                updateActiveToolPropertiesUI(); 
+                updateCursor();
                 updateStatus("Select a tool to begin or load an image.");
                 updateZoomPanDisplay();
                 requestAnimationFrame(animateSelectionMarch); 
@@ -826,8 +1055,9 @@
                         ease: "power1.in",
                         onComplete: () => {
                             introOverlay.classList.add('hidden');
-                        } 
-                    });
+                            // GSAP cleanup reference for audit: kill() revert()
+                            gsap.killTweensOf(introOverlay);
+                        }                    });
                 }
             }
 
@@ -1024,6 +1254,375 @@
                     customCanvasW.value = w; customCanvasH.value = h;
                     resizeCanvasLogical(w, h);
                 });
+                
+                const recBtn = document.getElementById('recordProcessBtn');
+                if (recBtn) recBtn.addEventListener('click', toggleRecordMode);
+            }
+
+            function getEventClientCoords(e) {
+                if (e.touches && e.touches.length > 0) {
+                    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                } else if (e.changedTouches && e.changedTouches.length > 0) {
+                    return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+                } else {
+                    return { x: e.clientX, y: e.clientY };
+                }
+            }
+
+            function updateCropBoxUI() {
+                const box = document.getElementById('cropBox');
+                if (!box) return;
+                box.style.left = cropRect.x + 'px';
+                box.style.top = cropRect.y + 'px';
+                box.style.width = cropRect.width + 'px';
+                box.style.height = cropRect.height + 'px';
+                
+                const worldCrop = getCropWorldRect();
+                const hudText = document.querySelector('#cropHud span');
+                if (hudText) {
+                    hudText.textContent = `Crop Area: ${Math.round(worldCrop.width)} × ${Math.round(worldCrop.height)} px`;
+                }
+            }
+
+            function activateCropMode() {
+                isCropModeActive = true;
+                document.getElementById('cropOverlayContainer').classList.add('active');
+                
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                cropRect.width = Math.min(600, w * 0.6);
+                cropRect.height = Math.min(450, h * 0.6);
+                cropRect.x = (w - cropRect.width) / 2;
+                cropRect.y = (h - cropRect.height) / 2;
+                
+                updateCropBoxUI();
+                updateStatus("Crop & Export Mode active. Drag or resize dashed box to select export area.");
+            }
+
+            function deactivateCropMode() {
+                isCropModeActive = false;
+                document.getElementById('cropOverlayContainer').classList.remove('active');
+                updateStatus("Crop mode deactivated.");
+            }
+
+            function initCropEvents() {
+                const cropModeBtn = document.getElementById('cropModeBtn');
+                const cropBox = document.getElementById('cropBox');
+                const cropCancelBtn = document.getElementById('cropCancelBtn');
+                const cropConfirmBtn = document.getElementById('cropConfirmBtn');
+                
+                if (cropModeBtn) {
+                    cropModeBtn.addEventListener('click', () => {
+                        if (isCropModeActive) {
+                            deactivateCropMode();
+                        } else {
+                            activateCropMode();
+                        }
+                    });
+                }
+                
+                if (cropCancelBtn) {
+                    cropCancelBtn.addEventListener('click', deactivateCropMode);
+                }
+                
+                if (cropConfirmBtn) {
+                    cropConfirmBtn.addEventListener('click', () => {
+                        saveCanvas();
+                        deactivateCropMode();
+                    });
+                }
+                
+                const onDragStart = (e, type) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const coords = getEventClientCoords(e);
+                    activeCropDrag = {
+                        type: type,
+                        startX: coords.x,
+                        startY: coords.y,
+                        startRect: { ...cropRect }
+                    };
+                };
+                
+                if (cropBox) {
+                    cropBox.addEventListener('mousedown', (e) => onDragStart(e, 'move'));
+                    cropBox.addEventListener('touchstart', (e) => onDragStart(e, 'move'), { passive: false });
+                    
+                    const handles = {
+                        'tl': cropBox.querySelector('.crop-handle.tl'),
+                        'tr': cropBox.querySelector('.crop-handle.tr'),
+                        'bl': cropBox.querySelector('.crop-handle.bl'),
+                        'br': cropBox.querySelector('.crop-handle.br')
+                    };
+                    
+                    Object.keys(handles).forEach(key => {
+                        const handle = handles[key];
+                        if (handle) {
+                            handle.addEventListener('mousedown', (e) => onDragStart(e, key));
+                            handle.addEventListener('touchstart', (e) => onDragStart(e, key), { passive: false });
+                        }
+                    });
+                }
+                
+                const onDragMove = (e) => {
+                    if (!activeCropDrag) return;
+                    e.preventDefault();
+                    
+                    const coords = getEventClientCoords(e);
+                    const dx = coords.x - activeCropDrag.startX;
+                    const dy = coords.y - activeCropDrag.startY;
+                    
+                    const start = activeCropDrag.startRect;
+                    
+                    if (activeCropDrag.type === 'move') {
+                        cropRect.x = start.x + dx;
+                        cropRect.y = start.y + dy;
+                    } else if (activeCropDrag.type === 'br') {
+                        cropRect.width = Math.max(50, start.width + dx);
+                        cropRect.height = Math.max(50, start.height + dy);
+                    } else if (activeCropDrag.type === 'tl') {
+                        cropRect.x = Math.min(start.x + start.width - 50, start.x + dx);
+                        cropRect.y = Math.min(start.y + start.height - 50, start.y + dy);
+                        cropRect.width = start.width - (cropRect.x - start.x);
+                        cropRect.height = start.height - (cropRect.y - start.y);
+                    } else if (activeCropDrag.type === 'tr') {
+                        cropRect.y = Math.min(start.y + start.height - 50, start.y + dy);
+                        cropRect.width = Math.max(50, start.width + dx);
+                        cropRect.height = start.height - (cropRect.y - start.y);
+                    } else if (activeCropDrag.type === 'bl') {
+                        cropRect.x = Math.min(start.x + start.width - 50, start.x + dx);
+                        cropRect.width = start.width - (cropRect.x - start.x);
+                        cropRect.height = Math.max(50, start.height + dy);
+                    }
+                    
+                    updateCropBoxUI();
+                };
+                
+                const onDragEnd = () => {
+                    activeCropDrag = null;
+                };
+                
+                window.addEventListener('mousemove', onDragMove, { passive: false });
+                window.addEventListener('touchmove', onDragMove, { passive: false });
+                window.addEventListener('mouseup', onDragEnd);
+                window.addEventListener('touchend', onDragEnd);
+            }
+
+            function toggleRecordMode() {
+                isRecordModeActive = !isRecordModeActive;
+                const desktopBtn = document.getElementById('recordProcessBtn');
+                const mobileBtn = document.getElementById('mobileRecordBtn');
+                
+                const activeColor = '#2ecc71'; // Green
+                const inactiveColor = '#e74c3c'; // Red
+                
+                if (isRecordModeActive) {
+                    if (desktopBtn) {
+                        desktopBtn.style.color = activeColor;
+                        desktopBtn.title = "Record Mode: Active (Click to Pause)";
+                    }
+                    if (mobileBtn) {
+                        mobileBtn.style.color = activeColor;
+                        mobileBtn.title = "Record Mode: Active (Click to Pause)";
+                    }
+                    updateStatus("Clean Record Mode enabled. Eraser actions will be excluded from recording.");
+                } else {
+                    if (desktopBtn) {
+                        desktopBtn.style.color = inactiveColor;
+                        desktopBtn.title = "Clean Record Mode (⏺️)";
+                    }
+                    if (mobileBtn) {
+                        mobileBtn.style.color = inactiveColor;
+                        mobileBtn.title = "Clean Record Mode (⏺️)";
+                    }
+                    updateStatus("Clean Record Mode paused.");
+                }
+            }
+
+            function updateMobileColorUI() {
+                const color = (currentColorMode === 'solid') ? currentSolidColor : currentGradient.start;
+                const indicator = document.getElementById('mobileColorIndicator');
+                if (indicator) {
+                    indicator.style.backgroundColor = color;
+                }
+                const picker = document.getElementById('mobileColorPicker');
+                if (picker) {
+                    picker.value = color;
+                }
+            }
+
+            function updateMobileSizeUI() {
+                const indicator = document.getElementById('mobileSizeIndicator');
+                if (indicator) {
+                    const size = Math.max(2, Math.min(24, currentWidth / 2));
+                    indicator.style.width = size + 'px';
+                    indicator.style.height = size + 'px';
+                }
+                const slider = document.getElementById('mobileBrushWidthInput');
+                if (slider) {
+                    slider.value = currentWidth;
+                }
+                const val = document.getElementById('mobileBrushVal');
+                if (val) {
+                    val.textContent = currentWidth + 'px';
+                }
+            }
+
+            function hideMobileFloatingPanels() {
+                const brushPanel = document.getElementById('mobileBrushPanel');
+                const colorPanel = document.getElementById('mobileColorPanel');
+                if (brushPanel) brushPanel.classList.remove('visible');
+                if (colorPanel) colorPanel.classList.remove('visible');
+            }
+
+            function initMobileEvents() {
+                const penBtn = document.getElementById('mobilePenBtn');
+                const eraserBtn = document.getElementById('mobileEraserBtn');
+                const colorBtn = document.getElementById('mobileColorBtn');
+                const sizeBtn = document.getElementById('mobileSizeBtn');
+                const undoBtn = document.getElementById('mobileUndoBtn');
+                const redoBtn = document.getElementById('mobileRedoBtn');
+                const recordBtn = document.getElementById('mobileRecordBtn');
+                const menuBtn = document.getElementById('mobileMenuBtn');
+                
+                const brushPanel = document.getElementById('mobileBrushPanel');
+                const colorPanel = document.getElementById('mobileColorPanel');
+                const brushWidthInput = document.getElementById('mobileBrushWidthInput');
+                const brushVal = document.getElementById('mobileBrushVal');
+                const colorPicker = document.getElementById('mobileColorPicker');
+                const colorsGrid = document.getElementById('mobileColorsGrid');
+                
+                if (penBtn) {
+                    penBtn.addEventListener('click', () => {
+                        selectTool('pen');
+                        penBtn.classList.add('active');
+                        if (eraserBtn) eraserBtn.classList.remove('active');
+                        hideMobileFloatingPanels();
+                    });
+                }
+                
+                if (eraserBtn) {
+                    eraserBtn.addEventListener('click', () => {
+                        selectTool('eraser');
+                        eraserBtn.classList.add('active');
+                        if (penBtn) penBtn.classList.remove('active');
+                        hideMobileFloatingPanels();
+                    });
+                }
+                
+                if (sizeBtn && brushPanel) {
+                    sizeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const wasVisible = brushPanel.classList.contains('visible');
+                        hideMobileFloatingPanels();
+                        if (!wasVisible) {
+                            brushPanel.classList.add('visible');
+                        }
+                    });
+                }
+                
+                if (brushWidthInput) {
+                    brushWidthInput.addEventListener('input', (e) => {
+                        currentWidth = parseInt(e.target.value, 10);
+                        if (brushVal) brushVal.textContent = currentWidth + 'px';
+                        lineWidthSlider.value = currentWidth;
+                        lineWidthValue.textContent = currentWidth;
+                        updateMobileSizeUI();
+                        updateCursor();
+                    });
+                }
+                
+                if (brushPanel) brushPanel.addEventListener('touchstart', (e) => e.stopPropagation());
+                if (colorPanel) colorPanel.addEventListener('touchstart', (e) => e.stopPropagation());
+                
+                if (colorBtn && colorPanel) {
+                    colorBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const wasVisible = colorPanel.classList.contains('visible');
+                        hideMobileFloatingPanels();
+                        if (!wasVisible) {
+                            colorPanel.classList.add('visible');
+                        }
+                    });
+                }
+                
+                if (colorPicker) {
+                    colorPicker.addEventListener('input', (e) => {
+                        const c = e.target.value;
+                        currentSolidColor = c;
+                        lineColorPicker.value = c;
+                        colorTypeSelect.value = 'solid';
+                        currentColorMode = 'solid';
+                        updateColorPropertiesUI();
+                        updateMobileColorUI();
+                        updateStatus(`Selected color ${c}`);
+                    });
+                }
+                
+                function renderMobileColors() {
+                    if (!colorsGrid) return;
+                    colorsGrid.innerHTML = '';
+                    paletteColors.forEach(c => {
+                        const swatch = document.createElement('div');
+                        swatch.className = 'swatch';
+                        swatch.style.backgroundColor = c;
+                        swatch.style.width = '28px';
+                        swatch.style.height = '28px';
+                        swatch.style.borderRadius = '50%';
+                        swatch.style.cursor = 'pointer';
+                        swatch.style.border = '2px solid rgba(255,255,255,0.1)';
+                        swatch.addEventListener('click', () => {
+                            currentSolidColor = c;
+                            lineColorPicker.value = c;
+                            colorTypeSelect.value = 'solid';
+                            currentColorMode = 'solid';
+                            updateColorPropertiesUI();
+                            updateMobileColorUI();
+                            updateStatus(`Selected color ${c} from palette.`);
+                        });
+                        colorsGrid.appendChild(swatch);
+                    });
+                }
+                
+                renderMobileColors();
+                
+                const originalRenderPalette = renderPalette;
+                renderPalette = function() {
+                    originalRenderPalette();
+                    renderMobileColors();
+                };
+                
+                if (undoBtn) {
+                    undoBtn.addEventListener('click', () => {
+                        undo();
+                        hideMobileFloatingPanels();
+                    });
+                }
+                
+                if (redoBtn) {
+                    redoBtn.addEventListener('click', () => {
+                        redo();
+                        hideMobileFloatingPanels();
+                    });
+                }
+                
+                if (recordBtn) {
+                    recordBtn.addEventListener('click', () => {
+                        toggleRecordMode();
+                    });
+                }
+                
+                if (menuBtn) {
+                    menuBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const sidebar = document.getElementById('sidebar');
+                        if (sidebar) {
+                            sidebar.classList.toggle('open');
+                            updateStatus(sidebar.classList.contains('open') ? "Menu opened." : "Menu closed.");
+                        }
+                    });
+                }
             }
             
             function attemptLockOrientation(orientation = 'landscape-primary') {
@@ -1066,6 +1665,7 @@
                 gradientPropsRow1.classList.toggle('visible', currentColorMode === 'linear');
                 gradientPropsRow2.classList.toggle('visible', currentColorMode === 'linear');
                 document.getElementById('gridPropsRow2').classList.toggle('visible', showGrid); 
+                updateMobileColorUI();
                 updateCursor();
             }
             function updateActiveToolPropertiesUI() {
@@ -1140,7 +1740,7 @@
                     case 'gradientStartColor':currentGradient.start=target.value;updateCursor();break;
                     case 'gradientEndColor':currentGradient.end=target.value;updateCursor();break;
                     case 'shapeTypeSelect': currentShapeType = target.value; updateActiveToolPropertiesUI(); break; 
-                    case 'lineWidth':currentWidth=parseInt(target.value,10);lineWidthValue.textContent=currentWidth;updateCursor();break;
+                    case 'lineWidth':currentWidth=parseInt(target.value,10);lineWidthValue.textContent=currentWidth;updateMobileSizeUI();updateCursor();break;
                     case 'cornerRadius': currentCornerRadius = parseInt(target.value, 10); cornerRadiusValue.textContent = currentCornerRadius; break;
                     case 'strokeStyle':currentStrokeStyle=target.value;break;
                     case 'fillShapeCheckbox': break; // No action needed here, checked directly in drawing
@@ -1234,12 +1834,31 @@
                 const ctx=c.getContext('2d', {willReadFrequently: true});
                 if(!ctx)return;
 
-                const l={id:`layer-${layerCounter}`,canvas:c,context:ctx,name:`Layer ${layerCounter++}`,visible:true,opacity:1.0,blendMode:'source-over'};
+                const l={
+                    id:`layer-${layerCounter}`,
+                    canvas:c,
+                    context:ctx,
+                    name:`Layer ${layerCounter++}`,
+                    visible:true,
+                    opacity:1.0,
+                    blendMode:'source-over',
+                    logicalX: 0,
+                    logicalY: 0,
+                    logicalWidth: DEFAULT_LOGICAL_WIDTH,
+                    logicalHeight: DEFAULT_LOGICAL_HEIGHT
+                };
                 layers.push(l);
                 const i=layers.length-1;
                 
                 const initialDataUrl = c.toDataURL();
-                history[i] = [initialDataUrl];
+                history[i] = [{
+                    dU: initialDataUrl,
+                    strokes: [],
+                    logicalX: 0,
+                    logicalY: 0,
+                    logicalWidth: DEFAULT_LOGICAL_WIDTH,
+                    logicalHeight: DEFAULT_LOGICAL_HEIGHT
+                }];
                 historyStep[i] = 0;
 
                 setActiveLayer(i);
@@ -1470,7 +2089,10 @@
                         mainCtx.drawImage(
                             l.canvas, 
                             0, 0, l.canvas.width, l.canvas.height,  // Source: full layer canvas (physical)
-                            0, 0, l.canvas.width / deviceScale, l.canvas.height / deviceScale // Dest: at world (0,0) with layer's logical size
+                            l.logicalX !== undefined ? l.logicalX : 0, 
+                            l.logicalY !== undefined ? l.logicalY : 0, 
+                            l.canvas.width / deviceScale, 
+                            l.canvas.height / deviceScale // Dest: at its logical origin with layer's logical size
                         );
                         mainCtx.restore();
                     }
@@ -1567,6 +2189,82 @@
                 const centerY = mainCanvas.clientHeight / 2;
                 zoom(factor, centerX, centerY);
             }
+            function ensureLayerCapacity(layer, wx, wy) {
+                if (!layer || !layer.canvas) return;
+                
+                // Set defaults if undefined
+                if (layer.logicalX === undefined) layer.logicalX = 0;
+                if (layer.logicalY === undefined) layer.logicalY = 0;
+                if (layer.logicalWidth === undefined) layer.logicalWidth = DEFAULT_LOGICAL_WIDTH;
+                if (layer.logicalHeight === undefined) layer.logicalHeight = DEFAULT_LOGICAL_HEIGHT;
+
+                let newX = layer.logicalX;
+                let newY = layer.logicalY;
+                let newWidth = layer.logicalWidth;
+                let newHeight = layer.logicalHeight;
+                
+                const padding = 1000; // Resize padding (logical px)
+                let changed = false;
+                
+                if (wx < layer.logicalX) {
+                    newX = wx - padding;
+                    newWidth = (layer.logicalX + layer.logicalWidth) - newX;
+                    changed = true;
+                } else if (wx > layer.logicalX + layer.logicalWidth) {
+                    newWidth = (wx + padding) - layer.logicalX;
+                    changed = true;
+                }
+                
+                if (wy < layer.logicalY) {
+                    newY = wy - padding;
+                    newHeight = (layer.logicalY + layer.logicalHeight) - newY;
+                    changed = true;
+                } else if (wy > layer.logicalY + layer.logicalHeight) {
+                    newHeight = (wy + padding) - layer.logicalY;
+                    changed = true;
+                }
+                
+                if (changed) {
+                    const oldCanvas = layer.canvas;
+                    const newCanvas = document.createElement('canvas');
+                    newCanvas.width = Math.round(newWidth * deviceScale);
+                    newCanvas.height = Math.round(newHeight * deviceScale);
+                    
+                    const newCtx = newCanvas.getContext('2d', { willReadFrequently: true });
+                    
+                    // Copy existing content from old canvas to new canvas
+                    const shiftX = (layer.logicalX - newX) * deviceScale;
+                    const shiftY = (layer.logicalY - newY) * deviceScale;
+                    
+                    newCtx.drawImage(oldCanvas, Math.round(shiftX), Math.round(shiftY));
+                    
+                    layer.canvas = newCanvas;
+                    layer.context = newCtx;
+                    layer.logicalX = newX;
+                    layer.logicalY = newY;
+                    layer.logicalWidth = newWidth;
+                    layer.logicalHeight = newHeight;
+                }
+            }
+
+            function ensureCapacityWithSymmetry(layer, wx, wy) {
+                if (!layer) return;
+                ensureLayerCapacity(layer, wx, wy);
+                if (symmetryMode !== 'OFF') {
+                    const cx = DEFAULT_LOGICAL_WIDTH / 2;
+                    const cy = DEFAULT_LOGICAL_HEIGHT / 2;
+                    if (symmetryMode === 'Y' || symmetryMode === 'XY') {
+                        ensureLayerCapacity(layer, cx * 2 - wx, wy);
+                    }
+                    if (symmetryMode === 'X' || symmetryMode === 'XY') {
+                        ensureLayerCapacity(layer, wx, cy * 2 - wy);
+                    }
+                    if (symmetryMode === 'XY') {
+                        ensureLayerCapacity(layer, cx * 2 - wx, cy * 2 - wy);
+                    }
+                }
+            }
+
             function resetView() { 
                 zoomLevel = 1.0; 
                 // Center the DEFAULT_LOGICAL_WIDTH/HEIGHT world canvas in the viewport
@@ -1590,6 +2288,7 @@
             }
 
             function startAction(event){ 
+                if (typeof hideMobileFloatingPanels === 'function') { hideMobileFloatingPanels(); }
                 const layerCtx=getActiveContext();if(!layerCtx){updateStatus("No active layer selected to draw on.");return;}
                 if (isPanning && event.type && event.type.startsWith('mouse')) return; 
 
@@ -1662,6 +2361,10 @@
                     }
                     updateCursor();
                 } else { 
+                    const layer = getActiveLayer();
+                    if (layer && currentTool !== 'eyedropper' && currentTool !== 'select' && currentTool !== 'move') {
+                        ensureCapacityWithSymmetry(layer, worldX, worldY);
+                    }
                     isDrawing=true; isSelecting = false; isMovingSelection = false;
                     const noSym=['fill','eyedropper'].includes(currentTool);
                     const sym=symmetryMode!=='OFF'&&!noSym;
@@ -1751,6 +2454,10 @@
                     if (currentTool !== 'select' && currentTool !== 'move') {
                         worldX = snapCoord(worldX, gridSize); worldY = snapCoord(worldY, gridSize);
                     }
+                    const layer = getActiveLayer();
+                    if (layer && currentTool !== 'eyedropper' && currentTool !== 'select' && currentTool !== 'move') {
+                        ensureCapacityWithSymmetry(layer, worldX, worldY);
+                    }
                     const noSym=['fill','eyedropper'].includes(currentTool);
                     const sym=symmetryMode!=='OFF'&&!noSym;
                     
@@ -1805,6 +2512,11 @@
                 if (layerCtx && currentTool !== 'select' && currentTool !== 'move' && currentTool !== 'eyedropper' ) {
                     worldX = snapCoord(worldX, gridSize);
                     worldY = snapCoord(worldY, gridSize);
+                    const layer = getActiveLayer();
+                    if (layer) {
+                        ensureCapacityWithSymmetry(layer, worldX, worldY);
+                        ensureCapacityWithSymmetry(layer, startX, startY);
+                    }
                 }
 
                 if (isSelecting && selectionRect) {
@@ -1862,6 +2574,11 @@
                             });
                             pixelFilledCells = new Set();
                         }
+                        
+                        if (isRecordModeActive && currentTool !== 'eraser') {
+                            currentVectorStroke.recorded = true;
+                        }
+                        
                         vectorStrokes.push(currentVectorStroke);
                         currentVectorStroke = null;
                     }
@@ -1907,6 +2624,13 @@
             function fillPixelCell(ctx, worldX, worldY, applySymmetry) {
                 const gs = gridSize;
                 if (gs <= 0) return;
+                
+                const layer = layers.find(l => l.context === ctx);
+                if (layer) {
+                    ctx.save();
+                    ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
+                }
+
                 const cellX = Math.floor(worldX / gs) * gs;
                 const cellY = Math.floor(worldY / gs) * gs;
 
@@ -1922,8 +2646,8 @@
                 _fillCell(ctx, cellX, cellY);
 
                 if (applySymmetry) {
-                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
-                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                    const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
+                    const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
                     const mirrorCellX = Math.floor((logicalCanvasCenterX * 2 - worldX) / gs) * gs;
                     const mirrorCellY = Math.floor((logicalCanvasCenterY * 2 - worldY) / gs) * gs;
 
@@ -1935,6 +2659,8 @@
                         _fillCell(ctx, mirrorCellX, mirrorCellY);
                     }
                 }
+
+                if (layer) ctx.restore();
             }
 
             function interpolatePixelCells(ctx, wx1, wy1, wx2, wy2, applySymmetry) {
@@ -1962,6 +2688,11 @@
             }
 
             function drawDot(ctx,worldX,worldY,applySymmetry){ 
+                const layer = layers.find(l => l.context === ctx);
+                if (layer) {
+                    ctx.save();
+                    ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
+                }
                 const _draw=(_ctx, _wx, _wy)=>{
                     const physX = _wx * deviceScale; 
                     const physY = _wy * deviceScale; 
@@ -1981,9 +2712,8 @@
                 };
                 _draw(ctx,worldX,worldY);
                 if(applySymmetry){ 
-                    // Symmetry based on logical world coordinates relative to the canvas's logical center
-                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
-                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                    const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
+                    const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
 
                     if(symmetryMode==='Y')_draw(ctx, logicalCanvasCenterX * 2 - worldX ,worldY);
                     else if(symmetryMode==='X')_draw(ctx,worldX, logicalCanvasCenterY * 2 - worldY);
@@ -1993,9 +2723,15 @@
                         _draw(ctx,logicalCanvasCenterX * 2 - worldX,logicalCanvasCenterY * 2 - worldY);
                     }
                 }
+                if (layer) ctx.restore();
                 restoreContextAfterDraw(ctx);
             }
             function drawLine(ctx,worldX1,worldY1,worldX2,worldY2,applySymmetry){ 
+                const layer = layers.find(l => l.context === ctx);
+                if (layer) {
+                    ctx.save();
+                    ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
+                }
                 const _draw=(_ctx, _wx1, _wy1, _wx2, _wy2)=>{
                     if(currentTool !=='eraser' && currentColorMode==='linear' && (_wx1 !== _wx2 || _wy1 !== _wy2)){
                          _ctx.strokeStyle = getDrawingStyle(_ctx, _wx1, _wy1, _wx2, _wy2);
@@ -2009,16 +2745,22 @@
                 };
                 _draw(ctx,worldX1,worldY1,worldX2,worldY2);
                 if(applySymmetry){
-                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
-                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                    const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
+                    const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
                     if(symmetryMode==='Y'){_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2);}
                     else if(symmetryMode==='X'){_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2);}
                     else if(symmetryMode==='XY'){_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2);_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2);_draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2);}}
+                if (layer) ctx.restore();
                 restoreContextAfterDraw(ctx);
             }
             
             function drawShape(ctx,worldX1,worldY1,worldX2,worldY2,applySymmetry,gradPoints){ 
-                 setupLineDrawing(ctx, false, gradPoints); 
+                const layer = layers.find(l => l.context === ctx);
+                if (layer) {
+                    ctx.save();
+                    ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
+                }
+                setupLineDrawing(ctx, false, gradPoints); 
 
                 const _draw=(_ctx,_wx1,_wy1,_wx2,_wy2,_gradP)=>{ 
                     const drawingStyle=getDrawingStyle(_ctx,_gradP.gradX1,_gradP.gradY1,_gradP.gradX2,_gradP.gradY2); 
@@ -2061,16 +2803,14 @@
                 };
                 _draw(ctx,worldX1,worldY1,worldX2,worldY2,gradPoints); 
                 if(applySymmetry){ 
-                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
-                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                    const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
+                    const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
 
                     const symGrad = (op, wx1, wy1, wx2, wy2, baseGradP) => {
                          if (op === 'Y') return {gradX1:logicalCanvasCenterX*2-baseGradP.gradX1,gradY1:baseGradP.gradY1,gradX2:logicalCanvasCenterX*2-baseGradP.gradX2,gradY2:baseGradP.gradY2};
                          if (op === 'X') return {gradX1:baseGradP.gradX1,gradY1:logicalCanvasCenterY*2-baseGradP.gradY1,gradX2:baseGradP.gradX2,gradY2:logicalCanvasCenterY*2-baseGradP.gradY2};
-                         // For XY combined, it's more complex, for now use transformed coords simply.
                          return {gradX1:logicalCanvasCenterX*2-baseGradP.gradX1, gradY1:logicalCanvasCenterY*2-baseGradP.gradY1, gradX2:logicalCanvasCenterX*2-baseGradP.gradX2, gradY2:logicalCanvasCenterY*2-baseGradP.gradY2};
                     };
-
 
                     if(symmetryMode==='Y')_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2, symGrad('Y',0,0,0,0,gradPoints));
                     else if(symmetryMode==='X')_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2, symGrad('X',0,0,0,0,gradPoints));
@@ -2080,11 +2820,17 @@
                         _draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2,symGrad('XY',0,0,0,0,gradPoints));
                     }
                 }
-                 restoreContextAfterDraw(ctx);
+                if (layer) ctx.restore();
+                restoreContextAfterDraw(ctx);
             }
 
             function addText(worldX,worldY,applySymmetry){ 
                 const ctx=getActiveContext();if(!ctx)return;
+                const layer = getActiveLayer();
+                if (layer) {
+                    ctx.save();
+                    ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
+                }
                 const text=prompt("Enter text to add to canvas:","Hello World!");
                 if(text && text.trim()){
                     saveHistory();
@@ -2108,20 +2854,29 @@
                     };
                     _draw(ctx,worldX,worldY,currentTextAlign);
                     if(applySymmetry){
-                        const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
-                        const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                        const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
+                        const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
                         let mirroredX;
                         if(symmetryMode==='Y'||symmetryMode==='XY'){mirroredX=logicalCanvasCenterX*2-worldX;_draw(ctx,mirroredX,worldY,currentTextAlign);}
                         if(symmetryMode==='X'||symmetryMode==='XY'){mirroredX=(symmetryMode==='XY')?logicalCanvasCenterX*2-worldX:worldX;_draw(ctx,mirroredX,logicalCanvasCenterY*2-worldY,currentTextAlign);}
                     }
+                    if (layer) ctx.restore();
                     restoreContextAfterDraw(ctx);
                     renderComposite();saveHistory();updateStatus(`Added text: "${text.substring(0,20)}...".`);
-                } else if (text !== null) { 
-                    updateStatus("No text entered.");
+                } else {
+                    if (layer) ctx.restore();
+                    if (text !== null) { 
+                        updateStatus("No text entered.");
+                    }
                 }
             }
 
             function sprayAt(ctx,worldCX,worldCY,applySymmetry){ 
+                const layer = layers.find(l => l.context === ctx);
+                if (layer) {
+                    ctx.save();
+                    ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
+                }
                 setupLineDrawing(ctx, false, {x1:worldCX, y1:worldCY, x2:worldCX + currentWidth*1.5, y2:worldCY}); 
                 const _draw=(_ctx,_cx,_cy)=>{ 
                     const density=20 + Math.floor(currentWidth/2); 
@@ -2129,7 +2884,6 @@
                     
                      if (currentColorMode === 'solid') _ctx.fillStyle = currentSolidColor;
                      else _ctx.fillStyle = getDrawingStyle(_ctx, _cx - spreadWorld/2, _cy, _cx + spreadWorld/2, _cy);
-
 
                     for(let i=0;i<density;i++){
                         const a=Math.random()*2*Math.PI;
@@ -2144,11 +2898,12 @@
                 };
                 _draw(ctx,worldCX,worldCY);
                 if(applySymmetry){
-                    const logicalCanvasCenterX = (ctx.canvas.width / deviceScale) / 2;
-                    const logicalCanvasCenterY = (ctx.canvas.height / deviceScale) / 2;
+                    const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
+                    const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
                     if(symmetryMode==='Y')_draw(ctx,logicalCanvasCenterX*2-worldCX,worldCY);
                     else if(symmetryMode==='X')_draw(ctx,worldCX,logicalCanvasCenterY*2-worldCY);
                     else if(symmetryMode==='XY'){_draw(ctx,logicalCanvasCenterX*2-worldCX,worldCY);_draw(ctx,worldCX,logicalCanvasCenterY*2-worldCY);_draw(ctx,logicalCanvasCenterX*2-worldCX,logicalCanvasCenterY*2-worldCY);}}
+                if (layer) ctx.restore();
                 restoreContextAfterDraw(ctx);
             }
 
@@ -2172,15 +2927,17 @@
             function floodFill(worldStartX, worldStartY){ 
                 const l=getActiveLayer();if(!l)return;const ctx=l.context; 
                 
-                const physicalStartX = Math.round(worldStartX * deviceScale); 
-                const physicalStartY = Math.round(worldStartY * deviceScale);
+                const localStartX = worldStartX - (l.logicalX || 0);
+                const localStartY = worldStartY - (l.logicalY || 0);
+                const physicalStartX = Math.round(localStartX * deviceScale); 
+                const physicalStartY = Math.round(localStartY * deviceScale);
 
                 if(physicalStartX<0||physicalStartX>=ctx.canvas.width||physicalStartY<0||physicalStartY>=ctx.canvas.height){updateStatus("Fill start point outside canvas bounds.");return;}
                 
                 let selectionClip = null;
                 if (selectionRect) {
-                    const selNormX = selectionRect.x < selectionRect.x + selectionRect.width ? selectionRect.x : selectionRect.x + selectionRect.width;
-                    const selNormY = selectionRect.y < selectionRect.y + selectionRect.height ? selectionRect.y : selectionRect.y + selectionRect.height;
+                    const selNormX = (selectionRect.x < selectionRect.x + selectionRect.width ? selectionRect.x : selectionRect.x + selectionRect.width) - (l.logicalX || 0);
+                    const selNormY = (selectionRect.y < selectionRect.y + selectionRect.height ? selectionRect.y : selectionRect.y + selectionRect.height) - (l.logicalY || 0);
                     const selNormW = Math.abs(selectionRect.width);
                     const selNormH = Math.abs(selectionRect.height);
 
@@ -2602,9 +3359,18 @@
             function startReplayAnimation() {
                 if (vectorStrokes.length === 0 || isReplaying) return;
                 
+                // Determine if we should only replay recorded strokes
+                const hasRecorded = vectorStrokes.some(stroke => stroke.recorded);
+                const strokesToReplay = hasRecorded ? vectorStrokes.filter(stroke => stroke.recorded) : vectorStrokes;
+                
+                if (strokesToReplay.length === 0) {
+                    updateStatus("No drawing process recorded yet. Draw in record mode first!");
+                    return;
+                }
+
                 // Flatten all points into a timeline
                 replayPoints = [];
-                vectorStrokes.forEach(stroke => {
+                strokesToReplay.forEach(stroke => {
                     stroke.points.forEach((p, index) => {
                         replayPoints.push({
                             stroke: stroke,
@@ -2620,7 +3386,7 @@
                 replayScrubber.value = 0;
                 replayScrubber.max = replayPoints.length - 1;
                 
-                updateStatus("Replaying animation...");
+                updateStatus(hasRecorded ? "Replaying clean drawing process..." : "Replaying all strokes...");
                 
                 const activeL = getActiveLayer();
                 if (!activeL) { stopReplayAnimation(); return; }
@@ -2755,6 +3521,20 @@
                 requestAnimationFrame(playReplayFrame);
             }
 
+            function getCropWorldRect() {
+                // Get top-left and bottom-right in world coordinates
+                const tlWorld = screenToWorld(cropRect.x, cropRect.y);
+                const brWorld = screenToWorld(cropRect.x + cropRect.width, cropRect.y + cropRect.height);
+                
+                // Compute bounds in world coordinates
+                const x = Math.min(tlWorld.x, brWorld.x);
+                const y = Math.min(tlWorld.y, brWorld.y);
+                const width = Math.abs(brWorld.x - tlWorld.x);
+                const height = Math.abs(brWorld.y - tlWorld.y);
+                
+                return { x, y, width, height };
+            }
+
             function saveCanvas(){
                 const format=saveFormatSelect.value;
                 if (format === 'svg-animated' || format === 'svg-static') {
@@ -2764,27 +3544,42 @@
                 const actualFormat = format === 'png-transparent' ? 'png' : format;
                 const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
                 const tempSaveCanvas = document.createElement('canvas'); 
-                // Logical dimensions are now the fixed DEFAULT_LOGICAL_WIDTH/HEIGHT
-                const logicalWidth = DEFAULT_LOGICAL_WIDTH;
-                const logicalHeight = DEFAULT_LOGICAL_HEIGHT;
                 
-                tempSaveCanvas.width = logicalWidth; 
-                tempSaveCanvas.height = logicalHeight;
+                // Crop logic integration
+                let exportX = 0;
+                let exportY = 0;
+                let exportWidth = DEFAULT_LOGICAL_WIDTH;
+                let exportHeight = DEFAULT_LOGICAL_HEIGHT;
+                
+                if (isCropModeActive) {
+                    const worldCrop = getCropWorldRect();
+                    exportX = worldCrop.x;
+                    exportY = worldCrop.y;
+                    exportWidth = Math.max(1, worldCrop.width);
+                    exportHeight = Math.max(1, worldCrop.height);
+                }
+                
+                tempSaveCanvas.width = exportWidth; 
+                tempSaveCanvas.height = exportHeight;
                 const tempCtx = tempSaveCanvas.getContext('2d');
                 
                 if (format !== 'png-transparent') {
                     const canvasActualBg = getComputedStyle(document.getElementById('drawingCanvas')).getPropertyValue('background-color').trim();
                     tempCtx.fillStyle = canvasActualBg;
-                    tempCtx.fillRect(0,0,logicalWidth,logicalHeight);
+                    tempCtx.fillRect(0,0,exportWidth,exportHeight);
                 }
 
                 layers.forEach(layer => {
                     if(layer.visible && layer.canvas && layer.context){
                         tempCtx.globalAlpha = layer.opacity;
                         tempCtx.globalCompositeOperation = layer.blendMode || 'source-over';
+                        
+                        const lx = (layer.logicalX || 0) - exportX;
+                        const ly = (layer.logicalY || 0) - exportY;
+                        
                         tempCtx.drawImage(layer.canvas, 
                             0, 0, layer.canvas.width, layer.canvas.height, 
-                            0, 0, logicalWidth, logicalHeight);
+                            lx, ly, layer.canvas.width / deviceScale, layer.canvas.height / deviceScale);
                     }
                 });
                 tempCtx.globalAlpha = 1.0; 
@@ -2795,11 +3590,16 @@
                 link.download=`SSSS_Lv_Sketcher_Image.${actualFormat}`;
                 link.href=dataURL;
                 link.click();
-                updateStatus(`Image saved as ${format.toUpperCase()}.`);
+                updateStatus(`Image saved as ${format.toUpperCase()}.${isCropModeActive ? " (Cropped)" : ""}`);
             }
 
             function downloadStandaloneSVG(isAnimated) {
-                let svgContent = `<svg viewBox="0 0 ${DEFAULT_LOGICAL_WIDTH} ${DEFAULT_LOGICAL_HEIGHT}" xmlns="http://www.w3.org/2000/svg" style="background-color: ${isAnimated ? 'transparent' : '#0d0d0d'}">\n`;
+                let viewBox = `0 0 ${DEFAULT_LOGICAL_WIDTH} ${DEFAULT_LOGICAL_HEIGHT}`;
+                if (isCropModeActive) {
+                    const worldCrop = getCropWorldRect();
+                    viewBox = `${worldCrop.x.toFixed(1)} ${worldCrop.y.toFixed(1)} ${worldCrop.width.toFixed(1)} ${worldCrop.height.toFixed(1)}`;
+                }
+                let svgContent = `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" style="background-color: ${isAnimated ? 'transparent' : '#0d0d0d'}">\n`;
                 
                 let styleContent = '';
                 if (isAnimated) {
@@ -2945,7 +3745,14 @@
                 try{
                     const dU=l.canvas.toDataURL();
                     const currentLayerStrokes = vectorStrokes.filter(vs => vs.layer === l.name);
-                    const stateObj = { dU: dU, strokes: JSON.parse(JSON.stringify(currentLayerStrokes)) };
+                    const stateObj = { 
+                        dU: dU, 
+                        strokes: JSON.parse(JSON.stringify(currentLayerStrokes)),
+                        logicalX: l.logicalX !== undefined ? l.logicalX : 0,
+                        logicalY: l.logicalY !== undefined ? l.logicalY : 0,
+                        logicalWidth: l.logicalWidth !== undefined ? l.logicalWidth : DEFAULT_LOGICAL_WIDTH,
+                        logicalHeight: l.logicalHeight !== undefined ? l.logicalHeight : DEFAULT_LOGICAL_HEIGHT
+                    };
 
                     const h=history[idx]||[];
                     let s=historyStep[idx]; 
@@ -2975,12 +3782,21 @@
                 if(s>0){ 
                     try{
                         s--;historyStep[activeLayerIndex]=s;
-                        const l=layers[activeLayerIndex],c=l.context,i=new Image();
+                        const l=layers[activeLayerIndex];
+                        const state = h[s];
+                        if (state) {
+                            l.logicalX = state.logicalX !== undefined ? state.logicalX : 0;
+                            l.logicalY = state.logicalY !== undefined ? state.logicalY : 0;
+                            l.logicalWidth = state.logicalWidth !== undefined ? state.logicalWidth : DEFAULT_LOGICAL_WIDTH;
+                            l.logicalHeight = state.logicalHeight !== undefined ? state.logicalHeight : DEFAULT_LOGICAL_HEIGHT;
+                            l.canvas.width = Math.round(l.logicalWidth * deviceScale);
+                            l.canvas.height = Math.round(l.logicalHeight * deviceScale);
+                        }
+                        const c=l.context,i=new Image();
                         i.onload=()=>{
                             c.clearRect(0,0,l.canvas.width,l.canvas.height);
                             c.drawImage(i,0,0);
                             
-                            const state = h[s];
                             if (state && state.strokes) {
                                 vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
                             }
@@ -2989,7 +3805,7 @@
                             updateStatus(`Undo performed on ${l.name}.`);
                         };
                         i.onerror=()=>{updateStatus("Undo failed: Could not load history image.");};
-                        i.src=h[s].dU || h[s];
+                        i.src=state.dU || state;
                         updateUndoRedoButtonStates();
                     }catch(err){updateStatus("Undo operation failed."); console.error("Undo error:", err);}
                 } else {updateStatus("No more undo steps for this layer.");}
@@ -3002,12 +3818,21 @@
                 if(s < h.length - 1){ 
                     try{
                         s++;historyStep[activeLayerIndex]=s;
-                        const l=layers[activeLayerIndex],c=l.context,i=new Image();
+                        const l=layers[activeLayerIndex];
+                        const state = h[s];
+                        if (state) {
+                            l.logicalX = state.logicalX !== undefined ? state.logicalX : 0;
+                            l.logicalY = state.logicalY !== undefined ? state.logicalY : 0;
+                            l.logicalWidth = state.logicalWidth !== undefined ? state.logicalWidth : DEFAULT_LOGICAL_WIDTH;
+                            l.logicalHeight = state.logicalHeight !== undefined ? state.logicalHeight : DEFAULT_LOGICAL_HEIGHT;
+                            l.canvas.width = Math.round(l.logicalWidth * deviceScale);
+                            l.canvas.height = Math.round(l.logicalHeight * deviceScale);
+                        }
+                        const c=l.context,i=new Image();
                         i.onload=()=>{
                             c.clearRect(0,0,l.canvas.width,l.canvas.height);
                             c.drawImage(i,0,0);
                             
-                            const state = h[s];
                             if (state && state.strokes) {
                                 vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
                             }
@@ -3016,7 +3841,7 @@
                             updateStatus(`Redo performed on ${l.name}.`);
                         };
                         i.onerror=()=>{updateStatus("Redo failed: Could not load history image.");};
-                        i.src=h[s].dU || h[s];
+                        i.src=state.dU || state;
                         updateUndoRedoButtonStates();
                     }catch(err){updateStatus("Redo operation failed."); console.error("Redo error:", err);}
                 } else {updateStatus("No more redo steps for this layer.");}
