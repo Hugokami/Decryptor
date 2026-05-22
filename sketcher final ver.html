@@ -14,41 +14,41 @@
         :root {
             --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             
-            /* Dark Theme (Default) */
-            --bg-color-dark: #1A1B1E; 
-            --panel-bg-dark: #25262B; 
-            --panel-bg-alt-dark: #2C2D32;
-            --canvas-bg-dark: #FFFFFF;
-            --text-color-dark: #F0F0F0; 
-            --text-secondary-dark: #A0A3BD; 
+            /* Dark Theme (Default) - Warm Sunset aesthetic */
+            --bg-color-dark: #121316; 
+            --panel-bg-dark: #181A20; 
+            --panel-bg-alt-dark: #22252D;
+            --canvas-bg-dark: #181A20;
+            --text-color-dark: #F5F5F7; 
+            --text-secondary-dark: #8E929E; 
             --accent-color-dark: #FF6B4A;
             --accent-hover-dark: #FF8A70;
             --active-color-dark: #E65534; 
-            --border-color-dark: #383A40; 
-            --loader-step-color-dark: #4A4C50;
-            --input-bg-dark: #202124; 
-            --input-border-dark: #4A4C50;
+            --border-color-dark: #2A2D35; 
+            --loader-step-color-dark: #2A2D35;
+            --input-bg-dark: #121316; 
+            --input-border-dark: #2A2D35;
             --danger-color-dark: #F44336;
             --danger-hover-dark: #E57373;
             --success-color-dark: #4CAF50;
             --success-hover-dark: #66BB6A;
-            --shadow-sm-dark: rgba(0, 0, 0, 0.3);
-            --shadow-md-dark: rgba(0, 0, 0, 0.4);
+            --shadow-sm-dark: rgba(0, 0, 0, 0.4);
+            --shadow-md-dark: rgba(0, 0, 0, 0.6);
 
-            /* Light Theme */
-            --bg-color-light: #F4F6F8;
-            --panel-bg-light: #FFFFFF;
-            --panel-bg-alt-light: #F9FAFB;
+            /* Light Theme - Warm cream/off-white tone */
+            --bg-color-light: #FDFBF7;
+            --panel-bg-light: #F4F0E6;
+            --panel-bg-alt-light: #EBE6D8;
             --canvas-bg-light: #FFFFFF;
-            --text-color-light: #212529;
-            --text-secondary-light: #6C757D;
+            --text-color-light: #1A1A1A;
+            --text-secondary-light: #6E6E6E;
             --accent-color-light: #FF6B4A;
             --accent-hover-light: #FF8A70;
             --active-color-light: #E65534;
-            --border-color-light: #DEE2E6;
-            --loader-step-color-light: #CED4DA;
-            --input-bg-light: #F1F3F5;
-            --input-border-light: #CED4DA;
+            --border-color-light: #D5CFC1;
+            --loader-step-color-light: #D5CFC1;
+            --input-bg-light: #EBE6D8;
+            --input-border-light: #D5CFC1;
             --danger-color-light: #DC3545;
             --danger-hover-light: #E4606D;
             --success-color-light: #28A745;
@@ -78,7 +78,7 @@
             --shadow-md: var(--shadow-md-dark);
 
             --icon-size: 1.25em; 
-            --sidebar-width: 320px; /* Slightly wider */
+            --sidebar-width: 320px; 
             --sidebar-width-collapsed: 55px;
             --border-radius-sm: 4px;
             --border-radius-md: 6px;
@@ -89,6 +89,7 @@
             --bg-color: var(--bg-color-light);
             --panel-bg: var(--panel-bg-light);
             --panel-bg-alt: var(--panel-bg-alt-light);
+            --canvas-bg: var(--canvas-bg-light);
             --text-color: var(--text-color-light);
             --text-secondary: var(--text-secondary-light);
             --accent-color: var(--accent-color-light);
@@ -388,6 +389,37 @@
         @keyframes loading-bounce { 0% {transform: scale(1, 0.7);} 40% {transform: scale(0.8, 1.2);} 60% {transform: scale(1, 1);} 100% {bottom: 120px;}}
         @keyframes loading-step { 0% {box-shadow: 0 10px 0 rgba(0,0,0,0), 0 10px 0 var(--loader-step-color), -35px 50px 0 var(--loader-step-color), -70px 90px 0 var(--loader-step-color);} 100% {box-shadow: 0 10px 0 var(--loader-step-color), -35px 50px 0 var(--loader-step-color), -70px 90px 0 var(--loader-step-color), -70px 90px 0 rgba(0,0,0,0);}}
 
+        #backToDashboardBtn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 5001;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background-color: var(--panel-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-color);
+            border-radius: var(--border-radius-md);
+            text-decoration: none;
+            font-size: 0.85em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+        #backToDashboardBtn:hover {
+            background-color: var(--input-bg);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+        #backToDashboardBtn .dashboard-icon {
+            width: 14px;
+            height: 14px;
+            transition: stroke 0.2s ease;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             body { flex-direction: column; height: 100vh; height: 100dvh; }
@@ -427,10 +459,29 @@
                 padding: 8px 10px;
             }
 
+            #backToDashboardBtn {
+                top: auto;
+                right: 20px;
+                bottom: 85px; /* Above the mobile dock */
+                padding: 10px;
+                border-radius: 50%;
+                width: 44px;
+                height: 44px;
+                justify-content: center;
+                box-shadow: 0 4px 16px var(--shadow-md);
+            }
+            #backToDashboardBtn span {
+                display: none;
+            }
+            #backToDashboardBtn .dashboard-icon {
+                width: 20px;
+                height: 20px;
+            }
+
             /* Overlay backdrop when sidebar is open */
             .sidebar-backdrop {
                 position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                background: rgba(0,0,0,0.4); z-index: 4999;
+                background: rgba(0,0,0,0.4); z-index: 5099;
                 opacity: 1; pointer-events: auto;
                 transition: opacity 0.3s ease;
             }
@@ -449,7 +500,7 @@
 
             /* Floating status bar */
             .sidebar #status {
-                position: fixed; bottom: 0; left: 0; width: 100vw; z-index: 4998;
+                position: fixed; bottom: 0; left: 0; width: 100vw; z-index: 4990;
                 font-size: 0.75em; padding: 6px 12px;
                 background-color: var(--panel-bg); border-top: 1px solid var(--border-color);
                 box-shadow: 0 -2px 8px var(--shadow-sm);
@@ -480,7 +531,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 40px;
             padding: 8px 16px;
-            z-index: 4500;
+            z-index: 4995;
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             align-items: center;
             gap: 12px;
@@ -514,6 +565,11 @@
             color: var(--accent-color);
             border: 1px solid rgba(255, 107, 74, 0.4);
         }
+        #mobileQuickDock button:disabled {
+            opacity: 0.4;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
         .mobile-color-btn #mobileColorIndicator {
             width: 22px;
             height: 22px;
@@ -543,7 +599,7 @@
             border-radius: var(--border-radius-lg);
             padding: 12px;
             box-shadow: 0 8px 24px var(--shadow-md);
-            z-index: 4600;
+            z-index: 4997;
             display: none;
             opacity: 0;
             transition: opacity 0.2s, transform 0.2s;
@@ -627,6 +683,16 @@
     </style>
 </head>
 <body>
+    <a id="backToDashboardBtn" href="index.html" title="Back to Dashboard">
+        <span>Dashboard</span>
+        <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+        </svg>
+    </a>
+
     <div id="introOverlay">
         <div class="intro-content">
             <div class="intro-title">SSSS Lv Sketcher</div>
@@ -650,6 +716,7 @@
                 <button id="penTool" class="active" title="Pen (P)">✏️</button>
                 <button id="pixelTool" title="Pixel Art (X)">🔲</button>
                 <button id="eraserTool" title="Eraser (E)">🧼</button>
+                <button id="grideraserTool" title="Grid Eraser (G)">🧽</button>
                 <button id="fillTool" title="Fill Bucket (F)">🪣</button>
                 <button id="lineTool" title="Line (L)">📏</button>
                 <button id="shapeTool" title="Shape Tool (H)">💠</button> 
@@ -736,6 +803,7 @@
                     <div style="display:flex; justify-content:space-between; width:100%;">
                         <label style="min-width:auto;">Replay</label>
                         <div>
+                            <button id="replayPlayPauseBtn" style="padding: 2px 5px; font-size: 10px; background: var(--accent-color, #FF6B4A); color: white;">Pause</button>
                             <button id="replayRecordBtn" style="padding: 2px 5px; font-size: 10px; background: #e74c3c;">Record</button>
                             <button id="replayCloseBtn" style="padding: 2px 5px; font-size: 10px;">Close</button>
                         </div>
@@ -782,6 +850,7 @@
     <div id="mobileQuickDock">
         <button id="mobilePenBtn" class="active" title="Pen">✏️</button>
         <button id="mobileEraserBtn" title="Eraser">🧼</button>
+        <button id="mobileGrideraserBtn" title="Grid Eraser">🧽</button>
         <button id="mobileColorBtn" class="mobile-color-btn" title="Color">
             <span id="mobileColorIndicator" style="background-color:#000000;"></span>
         </button>
@@ -821,7 +890,7 @@
 
             // --- DOM Elements ---
             const mainCanvas = document.getElementById('drawingCanvas');
-            const mainCtx = mainCanvas.getContext('2d', { willReadFrequently: true });
+            const mainCtx = mainCanvas.getContext('2d');
             const colorTypeSelect = document.getElementById('colorTypeSelect');
             const solidColorPropsRow = document.getElementById('solidColorPropsRow');
             const lineColorPicker = document.getElementById('lineColor');
@@ -866,6 +935,7 @@
             const replayScrubber = document.getElementById('replayScrubber');
             const replayCloseBtn = document.getElementById('replayCloseBtn');
             const replayRecordBtn = document.getElementById('replayRecordBtn');
+            const replayPlayPauseBtn = document.getElementById('replayPlayPauseBtn');
             let mediaRecorder = null;
             let recordedChunks = [];
             const saveFormatSelect = document.getElementById('saveFormat');
@@ -969,7 +1039,8 @@
             let vectorStrokes = [];
             let currentVectorStroke = null;
             let isReplaying = false;
-            let pixelFilledCells = new Set(); // tracks filled cells during a single pixel stroke
+            let isReplayPaused = false;
+            let pixelFilledCells = new Map(); // tracks filled cells and their mirror types during a single pixel stroke
             
             // Clean Record & Crop Export state variables
             let recordedStrokes = [];
@@ -1095,7 +1166,7 @@
                         if (!layer.canvas) { 
                             const c = document.createElement('canvas');
                             layer.canvas = c;
-                            layer.context = c.getContext('2d', {willReadFrequently: true});
+                            layer.context = c.getContext('2d');
                             // This case might need to re-establish old content or history might be tricky
                         }
                          // Update layer canvas dimensions if they ever changed from default
@@ -1128,7 +1199,7 @@
                     const newCanvas = document.createElement('canvas');
                     newCanvas.width = Math.round(newW * deviceScale);
                     newCanvas.height = Math.round(newH * deviceScale);
-                    const newCtx = newCanvas.getContext('2d', { willReadFrequently: true });
+                    const newCtx = newCanvas.getContext('2d');
                     // Copy old content
                     newCtx.drawImage(oldCanvas, 0, 0);
                     layer.canvas = newCanvas;
@@ -1224,6 +1295,7 @@
                 replayBtn.addEventListener('click', startReplayAnimation);
                 replayCloseBtn.addEventListener('click', stopReplayAnimation);
                 replayScrubber.addEventListener('input', scrubReplay);
+                replayPlayPauseBtn.addEventListener('click', toggleReplayPause);
                 exportSvgBtn.addEventListener('click', exportToSVG);
                 grayscaleBtn.addEventListener('click',applyGrayscaleEffect); 
                 invertBtn.addEventListener('click',applyInvertEffect);
@@ -1257,6 +1329,19 @@
                 
                 const recBtn = document.getElementById('recordProcessBtn');
                 if (recBtn) recBtn.addEventListener('click', toggleRecordMode);
+
+                // Capture clicks/touches on global buttons during replay to auto-pause
+                const handleGlobalReplayPauseEvent = (e) => {
+                    if (isReplaying && !isReplayPaused) {
+                        const rc = document.getElementById('replayControls');
+                        if (rc && !rc.contains(e.target)) {
+                            if (mainCanvas && mainCanvas.contains(e.target)) return;
+                            pauseReplayAnimation();
+                        }
+                    }
+                };
+                document.addEventListener('click', handleGlobalReplayPauseEvent, true);
+                document.addEventListener('touchstart', handleGlobalReplayPauseEvent, { capture: true, passive: true });
             }
 
             function getEventClientCoords(e) {
@@ -1425,6 +1510,7 @@
                     if (mobileBtn) {
                         mobileBtn.style.color = activeColor;
                         mobileBtn.title = "Record Mode: Active (Click to Pause)";
+                        mobileBtn.classList.add('recording');
                     }
                     updateStatus("Clean Record Mode enabled. Eraser actions will be excluded from recording.");
                 } else {
@@ -1435,6 +1521,7 @@
                     if (mobileBtn) {
                         mobileBtn.style.color = inactiveColor;
                         mobileBtn.title = "Clean Record Mode (⏺️)";
+                        mobileBtn.classList.remove('recording');
                     }
                     updateStatus("Clean Record Mode paused.");
                 }
@@ -1476,9 +1563,25 @@
                 if (colorPanel) colorPanel.classList.remove('visible');
             }
 
+            function activateTool(toolName) {
+                const btn = document.getElementById(toolName + 'Tool');
+                if (btn) {
+                    btn.click();
+                }
+            }
+            function syncMobileToolButtons() {
+                const penBtn = document.getElementById('mobilePenBtn');
+                const eraserBtn = document.getElementById('mobileEraserBtn');
+                const grideraserBtn = document.getElementById('mobileGrideraserBtn');
+                if (penBtn) penBtn.classList.toggle('active', currentTool === 'pen');
+                if (eraserBtn) eraserBtn.classList.toggle('active', currentTool === 'eraser');
+                if (grideraserBtn) grideraserBtn.classList.toggle('active', currentTool === 'grideraser');
+            }
+
             function initMobileEvents() {
                 const penBtn = document.getElementById('mobilePenBtn');
                 const eraserBtn = document.getElementById('mobileEraserBtn');
+                const grideraserBtn = document.getElementById('mobileGrideraserBtn');
                 const colorBtn = document.getElementById('mobileColorBtn');
                 const sizeBtn = document.getElementById('mobileSizeBtn');
                 const undoBtn = document.getElementById('mobileUndoBtn');
@@ -1493,34 +1596,49 @@
                 const colorPicker = document.getElementById('mobileColorPicker');
                 const colorsGrid = document.getElementById('mobileColorsGrid');
                 
-                if (penBtn) {
-                    penBtn.addEventListener('click', () => {
-                        selectTool('pen');
-                        penBtn.classList.add('active');
-                        if (eraserBtn) eraserBtn.classList.remove('active');
-                        hideMobileFloatingPanels();
-                    });
-                }
-                
-                if (eraserBtn) {
-                    eraserBtn.addEventListener('click', () => {
-                        selectTool('eraser');
-                        eraserBtn.classList.add('active');
-                        if (penBtn) penBtn.classList.remove('active');
-                        hideMobileFloatingPanels();
-                    });
-                }
-                
-                if (sizeBtn && brushPanel) {
-                    sizeBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const wasVisible = brushPanel.classList.contains('visible');
-                        hideMobileFloatingPanels();
-                        if (!wasVisible) {
-                            brushPanel.classList.add('visible');
+                // Helper: bind both touchstart (instant) and click (fallback for desktop)
+                // touchstart calls preventDefault to suppress the delayed click event
+                function bindPressEvent(element, handler) {
+                    if (!element) return;
+                    let touchFired = false;
+                    element.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        touchFired = true;
+                        handler(e);
+                    }, { passive: false });
+                    element.addEventListener('click', (e) => {
+                        if (touchFired) {
+                            touchFired = false;
+                            return; // skip click if touchstart already handled it
                         }
+                        handler(e);
                     });
                 }
+                
+                bindPressEvent(penBtn, () => {
+                    activateTool('pen');
+                    hideMobileFloatingPanels();
+                });
+                
+                bindPressEvent(eraserBtn, () => {
+                    activateTool('eraser');
+                    hideMobileFloatingPanels();
+                });
+
+                bindPressEvent(grideraserBtn, () => {
+                    activateTool('grideraser');
+                    hideMobileFloatingPanels();
+                });
+                
+                bindPressEvent(sizeBtn, (e) => {
+                    e.stopPropagation();
+                    if (!brushPanel) return;
+                    const wasVisible = brushPanel.classList.contains('visible');
+                    hideMobileFloatingPanels();
+                    if (!wasVisible) {
+                        brushPanel.classList.add('visible');
+                    }
+                });
                 
                 if (brushWidthInput) {
                     brushWidthInput.addEventListener('input', (e) => {
@@ -1536,16 +1654,15 @@
                 if (brushPanel) brushPanel.addEventListener('touchstart', (e) => e.stopPropagation());
                 if (colorPanel) colorPanel.addEventListener('touchstart', (e) => e.stopPropagation());
                 
-                if (colorBtn && colorPanel) {
-                    colorBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const wasVisible = colorPanel.classList.contains('visible');
-                        hideMobileFloatingPanels();
-                        if (!wasVisible) {
-                            colorPanel.classList.add('visible');
-                        }
-                    });
-                }
+                bindPressEvent(colorBtn, (e) => {
+                    e.stopPropagation();
+                    if (!colorPanel) return;
+                    const wasVisible = colorPanel.classList.contains('visible');
+                    hideMobileFloatingPanels();
+                    if (!wasVisible) {
+                        colorPanel.classList.add('visible');
+                    }
+                });
                 
                 if (colorPicker) {
                     colorPicker.addEventListener('input', (e) => {
@@ -1593,36 +1710,24 @@
                     renderMobileColors();
                 };
                 
-                if (undoBtn) {
-                    undoBtn.addEventListener('click', () => {
-                        undo();
-                        hideMobileFloatingPanels();
-                    });
-                }
+                bindPressEvent(undoBtn, () => {
+                    undoLast();
+                    hideMobileFloatingPanels();
+                });
                 
-                if (redoBtn) {
-                    redoBtn.addEventListener('click', () => {
-                        redo();
-                        hideMobileFloatingPanels();
-                    });
-                }
+                bindPressEvent(redoBtn, () => {
+                    redoLast();
+                    hideMobileFloatingPanels();
+                });
                 
-                if (recordBtn) {
-                    recordBtn.addEventListener('click', () => {
-                        toggleRecordMode();
-                    });
-                }
+                bindPressEvent(recordBtn, () => {
+                    toggleRecordMode();
+                });
                 
-                if (menuBtn) {
-                    menuBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const sidebar = document.getElementById('sidebar');
-                        if (sidebar) {
-                            sidebar.classList.toggle('open');
-                            updateStatus(sidebar.classList.contains('open') ? "Menu opened." : "Menu closed.");
-                        }
-                    });
-                }
+                bindPressEvent(menuBtn, (e) => {
+                    e.stopPropagation();
+                    toggleSidebarBtn.click();
+                });
             }
             
             function attemptLockOrientation(orientation = 'landscape-primary') {
@@ -1682,7 +1787,7 @@
                     textPropsRow2.classList.add('visible');
                     textPropsRow3.classList.add('visible');
                 }
-                const showColorControls = !['select', 'move', 'eyedropper', 'fill'].includes(currentTool);
+                const showColorControls = !['select', 'move', 'eyedropper', 'fill', 'grideraser'].includes(currentTool);
                 if (currentTool === 'pixel') {
                     // Pixel tool: show only solid color picker, no gradient/type switcher
                     colorTypeRow.style.display = 'none';
@@ -1700,15 +1805,16 @@
 
                 document.getElementById('lineWidth').parentElement.style.display = ['pen', 'eraser', 'line', 'shape', 'spray'].includes(currentTool) ? 'flex' : 'none';
                 document.getElementById('strokeStyle').parentElement.style.display = ['pen', 'line', 'shape'].includes(currentTool) ? 'flex' : 'none';
-                // Auto-enable grid when pixel tool selected
-                if (currentTool === 'pixel' && !showGrid) {
+                // Auto-enable grid when pixel or grideraser tool selected
+                if ((currentTool === 'pixel' || currentTool === 'grideraser') && !showGrid) {
                     showGrid = true;
                     showGridCheckbox.checked = true;
                     updateColorPropertiesUI();
-                    updateStatus('Grid auto-enabled for Pixel tool.');
+                    updateStatus(`Grid auto-enabled for ${currentTool === 'pixel' ? 'Pixel' : 'Grid Eraser'} tool.`);
                 }
                  
                 updateColorPropertiesUI(); 
+                syncMobileToolButtons(); 
             }
 
             function toggleTheme() { document.body.classList.toggle('light-theme'); const isLight=document.body.classList.contains('light-theme'); themeToggleBtn.textContent=isLight?'🌙':'☀️'; try { localStorage.setItem('sketcherTheme',isLight?'light':'dark'); } catch(e) {console.warn("Could not save theme:", e);} updateStatus(`${isLight?'Light':'Dark'} Theme activated.`); renderComposite(); }
@@ -1756,6 +1862,10 @@
             }
 
             function handleKeyUp(e) { 
+                if (isCanvasLocked()) {
+                    if (e && e.preventDefault) e.preventDefault();
+                    return;
+                }
                  if (e.key === ' ') { 
                      isPanning = false; 
                      if (!isMovingSelection && !(currentTool === 'move' && selectionRect)) {
@@ -1770,6 +1880,26 @@
                 }
             }
             function handleKeyboardShortcuts(e) { 
+                if (isReplaying && !isReplayPaused) {
+                    const keyLower = e.key.toLowerCase();
+                    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+                    const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
+                    const isUndoRedo = ctrlKey && (keyLower === 'z' || keyLower === 'y');
+                    const isToolMap = !e.ctrlKey && !e.metaKey && !e.altKey && (
+                        ['p','e','g','x','l','h','f','t','i','s','m','v'].includes(keyLower) ||
+                        e.key === '[' || e.key === ']'
+                    );
+                    const isOtherShortcuts = (ctrlKey && (keyLower === 'x' || keyLower === 'g')) ||
+                                             (e.key === 'Escape') ||
+                                             (e.key === 'Delete' || e.key === 'Backspace');
+                    if (isUndoRedo || isToolMap || isOtherShortcuts) {
+                        pauseReplayAnimation();
+                    }
+                }
+                if (isCanvasLocked()) {
+                    if (e && e.preventDefault) e.preventDefault();
+                    return;
+                }
                 const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
                 const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
 
@@ -1782,7 +1912,7 @@
 
                 if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='SELECT'||document.activeElement.tagName==='TEXTAREA')return; 
                 
-                const toolMap={p:'penTool',e:'eraserTool',x:'pixelTool',l:'lineTool',h:'shapeTool',f:'fillTool',t:'textTool',i:'eyedropperTool',s:'sprayTool', m:'selectTool', v:'moveTool'}; 
+                const toolMap={p:'penTool',e:'eraserTool',g:'grideraserTool',x:'pixelTool',l:'lineTool',h:'shapeTool',f:'fillTool',t:'textTool',i:'eyedropperTool',s:'sprayTool', m:'selectTool', v:'moveTool'}; 
                 if(!e.ctrlKey && !e.metaKey && !e.altKey) {
                     if (toolMap[e.key.toLowerCase()]) {
                         e.preventDefault();
@@ -1827,32 +1957,43 @@
                 }
             }
 
-            function addLayer(){ // canvasWidth & canvasHeight parameters are removed, uses defaults
-                const c=document.createElement('canvas');
-                c.width = Math.round(DEFAULT_LOGICAL_WIDTH * deviceScale); 
-                c.height = Math.round(DEFAULT_LOGICAL_HEIGHT * deviceScale);
-                const ctx=c.getContext('2d', {willReadFrequently: true});
-                if(!ctx)return;
+            function createLayer(id, name, width, height) {
+                const c = document.createElement('canvas');
+                const w = width || DEFAULT_LOGICAL_WIDTH;
+                const h = height || DEFAULT_LOGICAL_HEIGHT;
+                c.width = Math.round(w * deviceScale); 
+                c.height = Math.round(h * deviceScale);
+                const ctx = c.getContext('2d');
+                if(!ctx) return null;
 
-                const l={
-                    id:`layer-${layerCounter}`,
-                    canvas:c,
-                    context:ctx,
-                    name:`Layer ${layerCounter++}`,
-                    visible:true,
-                    opacity:1.0,
-                    blendMode:'source-over',
+                const l = {
+                    id: id || `layer-${layerCounter}`,
+                    canvas: c,
+                    context: ctx,
+                    name: name || `Layer ${layerCounter++}`,
+                    visible: true,
+                    opacity: 1.0,
+                    blendMode: 'source-over',
                     logicalX: 0,
                     logicalY: 0,
-                    logicalWidth: DEFAULT_LOGICAL_WIDTH,
-                    logicalHeight: DEFAULT_LOGICAL_HEIGHT
+                    logicalWidth: w,
+                    logicalHeight: h
                 };
                 layers.push(l);
+                return l;
+            }
+
+            function addLayer(){ // canvasWidth & canvasHeight parameters are removed, uses defaults
+                const l = createLayer(null, null);
+                if(!l) return;
                 const i=layers.length-1;
                 
-                const initialDataUrl = c.toDataURL();
+                const offscreen = document.createElement('canvas');
+                offscreen.width = l.canvas.width;
+                offscreen.height = l.canvas.height;
+                
                 history[i] = [{
-                    dU: initialDataUrl,
+                    canvas: offscreen,
                     strokes: [],
                     logicalX: 0,
                     logicalY: 0,
@@ -2144,6 +2285,10 @@
                         const fillColor = encodeURIComponent(currentSolidColor);
                         mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${cellScreenSize}" height="${cellScreenSize}"><rect x="0" y="0" width="${cellScreenSize}" height="${cellScreenSize}" fill="${fillColor}" opacity="0.5" stroke="white" stroke-width="1"/></svg>') ${Math.round(cellScreenSize/2)} ${Math.round(cellScreenSize/2)}, crosshair`;break;
                     }
+                    case 'grideraser':{
+                        const cellScreenSize = Math.max(4, Math.round(gridSize * zoomLevel));
+                        mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${cellScreenSize}" height="${cellScreenSize}"><rect x="0" y="0" width="${cellScreenSize}" height="${cellScreenSize}" fill="none" stroke="%23FF6B4A" stroke-dasharray="2,2" stroke-width="1.5"/></svg>') ${Math.round(cellScreenSize/2)} ${Math.round(cellScreenSize/2)}, crosshair`;break;
+                    }
                     case 'eraser':const sc=(currentSolidColor==='#ffffff'||currentSolidColor==='rgb(255,255,255)')?'black':'white';mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${s*2+2}" height="${s*2+2}" viewport="0 0 ${s*2+2} ${s*2+2}"><circle cx="${s+1}" cy="${s+1}" r="${s}" fill="rgba(255,255,255,0.3)" stroke="${sc}" stroke-width="1.5"/></svg>') ${s+1} ${s+1}, crosshair`;break;
                     case 'fill':mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="${encodeURIComponent(currentColorMode==='solid'?currentSolidColor:currentGradient.start)}" viewBox="0 0 16 16"><path d="M2.822 2.06C2.222 2.06 2 2.222 2 2.822v10.356c0 .6.222.822.822.822h10.356c.6 0 .822-.222.822-.822V2.822c0-.6-.222-.822-.822-.822H2.822zm-.06 1.55H13.24v7.978H2.762V3.61zm1.22 1.168L2.762 6.33V4.778h1.22zm0 2.94L2.762 9.27V7.718h1.22zm0 2.94L2.762 12.2V10.658h1.22zM13.24 6.33l-1.22-1.552V6.33h1.22zm0 2.94l-1.22-1.552V9.27h1.22zm0 2.94l-1.22-1.552V12.2h1.22zM4.542 4.778h7.016v1.55H4.542V4.778zm0 2.94h7.016v1.55H4.542V7.718zm0 2.94h7.016v1.55H4.542v10.658zM12.02 4.778L10.8 6.33h1.22V4.778zm-1.22 2.94L9.58 9.27h1.22V7.718zm-1.22 2.94L8.36 12.2h1.22v-1.552z"/></svg>') 4 20, pointer`;break;
                     case 'text':mainCanvas.style.cursor='text';break;
@@ -2157,10 +2302,15 @@
 
             function snapCoord(coord, currentGridSize) { return (snapToGrid && currentGridSize > 0) ? Math.round(coord / currentGridSize) * currentGridSize : coord; }
             
-            function handleTouchStart(e){ e.preventDefault(); if (e.touches.length === 1 && !isPanning) { startAction(e.touches[0]); } else if (e.touches.length === 2) { isDrawing = false; isSelecting = false; isMovingSelection = false; isPanning = true; pinchStartDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); const r=mainCanvas.getBoundingClientRect(); lastPinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left; lastPinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top; } } 
-            function handleTouchMove(e){ e.preventDefault(); if (e.touches.length === 1 && !isPanning) { performAction(e.touches[0]); } else if (e.touches.length === 2 && isPanning) { const currentPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); const r=mainCanvas.getBoundingClientRect(); const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left; const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top; const scaleAmount = currentPinchDistance / pinchStartDistance; zoom(scaleAmount, midX, midY); panX += (midX - lastPinchMidX); panY += (midY - lastPinchMidY); pinchStartDistance = currentPinchDistance; lastPinchMidX = midX; lastPinchMidY = midY; renderComposite(); } }
-            function handleTouchEnd(e){ e.preventDefault(); if (e.touches.length < 2 && isPanning) { isPanning = false; updateCursor(); } if (!isPanning && (isDrawing || isSelecting || isMovingSelection) && e.changedTouches.length > 0) { endAction(e.changedTouches[0]); } else if (!isPanning && !isDrawing && !isSelecting && !isMovingSelection && e.changedTouches.length > 0) { if (currentTool === 'eyedropper' || currentTool === 'fill') { startAction(e.changedTouches[0]); endAction(e.changedTouches[0]); } } } 
+            function isCanvasLocked() {
+                return isReplaying && !isReplayPaused;
+            }
+            
+            function handleTouchStart(e){ if (isCanvasLocked()) { e.preventDefault(); return; } e.preventDefault(); if (e.touches.length === 1 && !isPanning) { startAction(e.touches[0]); } else if (e.touches.length === 2) { isDrawing = false; isSelecting = false; isMovingSelection = false; isPanning = true; pinchStartDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); const r=mainCanvas.getBoundingClientRect(); lastPinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left; lastPinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top; } } 
+            function handleTouchMove(e){ if (isCanvasLocked()) { e.preventDefault(); return; } e.preventDefault(); if (e.touches.length === 1 && !isPanning) { performAction(e.touches[0]); } else if (e.touches.length === 2 && isPanning) { const currentPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); const r=mainCanvas.getBoundingClientRect(); const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left; const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top; const scaleAmount = currentPinchDistance / pinchStartDistance; zoom(scaleAmount, midX, midY); panX += (midX - lastPinchMidX); panY += (midY - lastPinchMidY); pinchStartDistance = currentPinchDistance; lastPinchMidX = midX; lastPinchMidY = midY; renderComposite(); } }
+            function handleTouchEnd(e){ if (isCanvasLocked()) { e.preventDefault(); return; } e.preventDefault(); if (e.touches.length < 2 && isPanning) { isPanning = false; updateCursor(); } if (!isPanning && (isDrawing || isSelecting || isMovingSelection) && e.changedTouches.length > 0) { endAction(e.changedTouches[0]); } else if (!isPanning && !isDrawing && !isSelecting && !isMovingSelection && e.changedTouches.length > 0) { if (currentTool === 'eyedropper' || currentTool === 'fill') { startAction(e.changedTouches[0]); endAction(e.changedTouches[0]); } } } 
             function handleWheelZoom(e) { 
+                if (isCanvasLocked()) { e.preventDefault(); return; }
                 e.preventDefault(); 
                 const rect = mainCanvas.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left; 
@@ -2230,7 +2380,7 @@
                     newCanvas.width = Math.round(newWidth * deviceScale);
                     newCanvas.height = Math.round(newHeight * deviceScale);
                     
-                    const newCtx = newCanvas.getContext('2d', { willReadFrequently: true });
+                    const newCtx = newCanvas.getContext('2d');
                     
                     // Copy existing content from old canvas to new canvas
                     const shiftX = (layer.logicalX - newX) * deviceScale;
@@ -2275,19 +2425,58 @@
             }
 
 
-            function getDrawingStyle(ctx,p1x,p1y,p2x,p2y){ 
-                if(currentColorMode==='solid'){return currentSolidColor;}
-                else if(currentColorMode==='linear'){
+            function getDrawingStyle(ctx,p1x,p1y,p2x,p2y,strokeOpts){ 
+                const mode = strokeOpts ? strokeOpts.colorMode : currentColorMode;
+                const solid = strokeOpts ? strokeOpts.color : currentSolidColor;
+                const gradColors = strokeOpts ? strokeOpts.gradient : currentGradient;
+
+                if(mode==='solid'){return solid;}
+                else if(mode==='linear'){
                     const physX1 = p1x * deviceScale; const physY1 = p1y * deviceScale;
                     const physX2 = p2x * deviceScale; const physY2 = p2y * deviceScale;
-                    if(physX1===physX2 && physY1===physY2){return currentGradient.start;} 
+                    if(physX1===physX2 && physY1===physY2){return gradColors ? gradColors.start : '#000000';} 
                     const grad=ctx.createLinearGradient(physX1,physY1,physX2,physY2);
-                    grad.addColorStop(0,currentGradient.start);grad.addColorStop(1,currentGradient.end);return grad;
+                    grad.addColorStop(0,gradColors ? gradColors.start : '#000000');
+                    grad.addColorStop(1,gradColors ? gradColors.end : '#ffffff');
+                    return grad;
                 }
-                return currentSolidColor;
+                return solid;
+            }
+
+            function getMirroredGradPoints(gradPoints, mode) {
+                if (!gradPoints) return null;
+                const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
+                const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
+                if (mode === 'Y') {
+                    return {
+                        x1: logicalCanvasCenterX * 2 - gradPoints.x1,
+                        y1: gradPoints.y1,
+                        x2: logicalCanvasCenterX * 2 - gradPoints.x2,
+                        y2: gradPoints.y2
+                    };
+                } else if (mode === 'X') {
+                    return {
+                        x1: gradPoints.x1,
+                        y1: logicalCanvasCenterY * 2 - gradPoints.y1,
+                        x2: gradPoints.x2,
+                        y2: logicalCanvasCenterY * 2 - gradPoints.y2
+                    };
+                } else if (mode === 'XY') {
+                    return {
+                        x1: logicalCanvasCenterX * 2 - gradPoints.x1,
+                        y1: logicalCanvasCenterY * 2 - gradPoints.y1,
+                        x2: logicalCanvasCenterX * 2 - gradPoints.x2,
+                        y2: logicalCanvasCenterY * 2 - gradPoints.y2
+                    };
+                }
+                return gradPoints;
             }
 
             function startAction(event){ 
+                if (isCanvasLocked()) {
+                    if (event && event.preventDefault) event.preventDefault();
+                    return;
+                }
                 if (typeof hideMobileFloatingPanels === 'function') { hideMobileFloatingPanels(); }
                 const layerCtx=getActiveContext();if(!layerCtx){updateStatus("No active layer selected to draw on.");return;}
                 if (isPanning && event.type && event.type.startsWith('mouse')) return; 
@@ -2369,34 +2558,39 @@
                     const noSym=['fill','eyedropper'].includes(currentTool);
                     const sym=symmetryMode!=='OFF'&&!noSym;
 
-                    if(currentTool==='pixel'){
-                        pixelFilledCells = new Set();
+                    if(currentTool==='pixel' || currentTool==='grideraser'){
+                        pixelFilledCells = new Map();
                         fillPixelCell(layerCtx, worldX, worldY, sym);
                         currentVectorStroke = {
                             layer: getActiveLayer() ? getActiveLayer().name : 'Layer_1',
-                            tool: 'pixel',
-                            shapeType: 'pixel',
-                            color: currentSolidColor,
+                            tool: currentTool,
+                            shapeType: currentTool,
+                            color: currentTool === 'grideraser' ? 'transparent' : currentSolidColor,
+                            colorMode: currentTool === 'grideraser' ? 'solid' : currentColorMode,
+                            gradient: currentTool === 'grideraser' ? null : { start: currentGradient.start, end: currentGradient.end },
                             width: gridSize,
                             symmetryMode: sym ? symmetryMode : 'OFF',
                             points: []
                         };
                         // Add all cells filled during this first click
-                        pixelFilledCells.forEach(key => {
+                        pixelFilledCells.forEach((mType, key) => {
                             const [cx, cy] = key.split(',').map(Number);
-                            currentVectorStroke.points.push({x: cx, y: cy});
+                            currentVectorStroke.points.push({x: cx, y: cy, mirrorType: mType});
                         });
                     }
                     else if(['pen','eraser','line','shape'].includes(currentTool)){
                         if(currentTool==='pen'||currentTool==='eraser'){
                             setupLineDrawing(layerCtx,currentTool==='eraser',null);
-                            drawDot(layerCtx,worldX,worldY,sym);
+                            const gradPoints = currentTool === 'eraser' ? null : { x1: worldX, y1: worldY, x2: worldX + 0.01, y2: worldY };
+                            drawDot(layerCtx,worldX,worldY,sym,gradPoints);
                         }
                         currentVectorStroke = {
                             layer: getActiveLayer() ? getActiveLayer().name : 'Layer_1',
                             tool: currentTool,
                             shapeType: currentShapeType,
-                            color: currentColorMode === 'solid' ? currentSolidColor : '#000000',
+                            color: currentTool === 'eraser' ? 'transparent' : (currentColorMode === 'solid' ? currentSolidColor : '#000000'),
+                            colorMode: currentTool === 'eraser' ? 'solid' : currentColorMode,
+                            gradient: currentTool === 'eraser' ? null : { start: currentGradient.start, end: currentGradient.end },
                             width: currentWidth,
                             symmetryMode: sym ? symmetryMode : 'OFF',
                             points: [{x: worldX, y: worldY}]
@@ -2420,6 +2614,10 @@
             }
 
             function performAction(event){ 
+                if (isCanvasLocked()) {
+                    if (event && event.preventDefault) event.preventDefault();
+                    return;
+                }
                 if(!isDrawing && !isSelecting && !isPanning && !isMovingSelection) return;
                 
                 const clientX = event.clientX;
@@ -2461,21 +2659,22 @@
                     const noSym=['fill','eyedropper'].includes(currentTool);
                     const sym=symmetryMode!=='OFF'&&!noSym;
                     
-                    if(currentTool==='pixel'){
+                    if(currentTool==='pixel' || currentTool==='grideraser'){
                         // Interpolate grid cells along the drag path
                         interpolatePixelCells(layerCtx, lastX, lastY, worldX, worldY, sym);
                         if (currentVectorStroke) {
-                            pixelFilledCells.forEach(key => {
+                            pixelFilledCells.forEach((mType, key) => {
                                 const [cx, cy] = key.split(',').map(Number);
                                 if (!currentVectorStroke.points.some(p => p.x === cx && p.y === cy)) {
-                                    currentVectorStroke.points.push({x: cx, y: cy});
+                                    currentVectorStroke.points.push({x: cx, y: cy, mirrorType: mType});
                                 }
                             });
                         }
                     }
                     else if(currentTool==='pen'||currentTool==='eraser'){
-                        setupLineDrawing(layerCtx,currentTool==='eraser',{x1:lastX,y1:lastY,x2:worldX,y2:worldY});
-                        drawLine(layerCtx,lastX,lastY,worldX,worldY,sym);
+                        const gradPoints = currentTool==='eraser' ? null : {x1: startX, y1: startY, x2: worldX, y2: worldY};
+                        setupLineDrawing(layerCtx,currentTool==='eraser',gradPoints);
+                        drawLine(layerCtx,lastX,lastY,worldX,worldY,sym,gradPoints);
                         if (currentVectorStroke) {
                             currentVectorStroke.points.push({x: worldX, y: worldY});
                         }
@@ -2491,6 +2690,10 @@
             }
 
             function endAction(event){ 
+                if (isCanvasLocked()) {
+                    if (event && event.preventDefault) event.preventDefault();
+                    return;
+                }
                 if (isPanning && event.type && event.type.startsWith('mouse')) { 
                     isPanning = false;
                     updateCursor();
@@ -2564,19 +2767,27 @@
                     if (currentVectorStroke) {
                         if(['pen','eraser','line','shape'].includes(currentTool)){
                             currentVectorStroke.points.push({x: worldX, y: worldY});
-                        } else if (currentTool === 'pixel') {
+                        } else if (currentTool === 'pixel' || currentTool === 'grideraser') {
                             // Final sync of pixel cells for this stroke
-                            pixelFilledCells.forEach(key => {
+                            pixelFilledCells.forEach((mType, key) => {
                                 const [cx, cy] = key.split(',').map(Number);
                                 if (!currentVectorStroke.points.some(p => p.x === cx && p.y === cy)) {
-                                    currentVectorStroke.points.push({x: cx, y: cy});
+                                    currentVectorStroke.points.push({x: cx, y: cy, mirrorType: mType});
                                 }
                             });
-                            pixelFilledCells = new Set();
+                            pixelFilledCells = new Map();
                         }
                         
-                        if (isRecordModeActive && currentTool !== 'eraser') {
+                        if (isRecordModeActive && currentTool !== 'eraser' && currentTool !== 'grideraser') {
                             currentVectorStroke.recorded = true;
+                        }
+                        
+                        if (isRecordModeActive) {
+                            if (currentTool === 'eraser') {
+                                applyEraserToRecordedStrokes(currentVectorStroke);
+                            } else if (currentTool === 'grideraser') {
+                                applyGridEraserToRecordedStrokes(currentVectorStroke);
+                            }
                         }
                         
                         vectorStrokes.push(currentVectorStroke);
@@ -2634,16 +2845,31 @@
                 const cellX = Math.floor(worldX / gs) * gs;
                 const cellY = Math.floor(worldY / gs) * gs;
 
-                const _fillCell = (_ctx, _cx, _cy) => {
+                const _fillCell = (_ctx, _cx, _cy, mirrorType) => {
                     const key = `${_cx},${_cy}`;
                     if (pixelFilledCells.has(key)) return;
-                    pixelFilledCells.add(key);
-                    _ctx.fillStyle = currentSolidColor;
-                    _ctx.globalCompositeOperation = 'source-over';
+                    pixelFilledCells.set(key, mirrorType);
+                    if (currentTool === 'grideraser') {
+                        _ctx.globalCompositeOperation = 'destination-out';
+                        _ctx.fillStyle = 'rgba(0,0,0,1)';
+                    } else {
+                        _ctx.globalCompositeOperation = 'source-over';
+                        if (currentColorMode === 'linear') {
+                            const startCellCX = Math.floor(startX / gs) * gs + gs / 2;
+                            const startCellCY = Math.floor(startY / gs) * gs + gs / 2;
+                            const currentCellCX = Math.floor(worldX / gs) * gs + gs / 2;
+                            const currentCellCY = Math.floor(worldY / gs) * gs + gs / 2;
+                            const gradPoints = { x1: startCellCX, y1: startCellCY, x2: currentCellCX, y2: currentCellCY };
+                            const mirroredGrad = getMirroredGradPoints(gradPoints, mirrorType);
+                            _ctx.fillStyle = getDrawingStyle(_ctx, mirroredGrad.x1, mirroredGrad.y1, mirroredGrad.x2, mirroredGrad.y2);
+                        } else {
+                            _ctx.fillStyle = currentSolidColor;
+                        }
+                    }
                     _ctx.fillRect(_cx * deviceScale, _cy * deviceScale, gs * deviceScale, gs * deviceScale);
                 };
 
-                _fillCell(ctx, cellX, cellY);
+                _fillCell(ctx, cellX, cellY, 'none');
 
                 if (applySymmetry) {
                     const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
@@ -2651,15 +2877,53 @@
                     const mirrorCellX = Math.floor((logicalCanvasCenterX * 2 - worldX) / gs) * gs;
                     const mirrorCellY = Math.floor((logicalCanvasCenterY * 2 - worldY) / gs) * gs;
 
-                    if (symmetryMode === 'Y') _fillCell(ctx, mirrorCellX, cellY);
-                    else if (symmetryMode === 'X') _fillCell(ctx, cellX, mirrorCellY);
+                    if (symmetryMode === 'Y') _fillCell(ctx, mirrorCellX, cellY, 'Y');
+                    else if (symmetryMode === 'X') _fillCell(ctx, cellX, mirrorCellY, 'X');
                     else if (symmetryMode === 'XY') {
-                        _fillCell(ctx, mirrorCellX, cellY);
-                        _fillCell(ctx, cellX, mirrorCellY);
-                        _fillCell(ctx, mirrorCellX, mirrorCellY);
+                        _fillCell(ctx, mirrorCellX, cellY, 'Y');
+                        _fillCell(ctx, cellX, mirrorCellY, 'X');
+                        _fillCell(ctx, mirrorCellX, mirrorCellY, 'XY');
                     }
                 }
 
+                if (layer) ctx.restore();
+            }
+
+            function drawPixelCellReplay(ctx, rp) {
+                const stroke = rp.stroke;
+                const p = rp.point;
+                const gs = stroke.width || gridSize;
+                
+                const layer = layers.find(l => l.context === ctx);
+                if (layer) {
+                    ctx.save();
+                    ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
+                }
+
+                if (stroke.tool === 'grideraser') {
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.fillStyle = 'rgba(0,0,0,1)';
+                } else {
+                    ctx.globalCompositeOperation = 'source-over';
+                    if (stroke.colorMode === 'linear') {
+                        const originalPoints = stroke.points.filter(pt => !pt.mirrorType || pt.mirrorType === 'none');
+                        const startPt = originalPoints[0] || stroke.points[0];
+                        const endPt = originalPoints[originalPoints.length - 1] || stroke.points[stroke.points.length - 1];
+                        
+                        const startX = startPt.x + gs / 2;
+                        const startY = startPt.y + gs / 2;
+                        const endX = endPt.x + gs / 2;
+                        const endY = endPt.y + gs / 2;
+                        
+                        const gradPoints = { x1: startX, y1: startY, x2: endX, y2: endY };
+                        const mirroredGrad = getMirroredGradPoints(gradPoints, p.mirrorType || 'none');
+                        ctx.fillStyle = getDrawingStyle(ctx, mirroredGrad.x1, mirroredGrad.y1, mirroredGrad.x2, mirroredGrad.y2, stroke);
+                    } else {
+                        ctx.fillStyle = stroke.color || currentSolidColor;
+                    }
+                }
+                ctx.fillRect(p.x * deviceScale, p.y * deviceScale, gs * deviceScale, gs * deviceScale);
+                
                 if (layer) ctx.restore();
             }
 
@@ -2681,24 +2945,31 @@
                 while (true) {
                     fillPixelCell(ctx, gx0 * gs + gs / 2, gy0 * gs + gs / 2, applySymmetry);
                     if (gx0 === gx1 && gy0 === gy1) break;
-                    const e2 = 2 * err;
-                    if (e2 > -dy) { err -= dy; gx0 += sx; }
-                    if (e2 < dx) { err += dx; gy0 += sy; }
-                }
-            }
-
-            function drawDot(ctx,worldX,worldY,applySymmetry){ 
+                        function drawDot(ctx,worldX,worldY,applySymmetry,gradPoints,strokeOpts){ 
                 const layer = layers.find(l => l.context === ctx);
                 if (layer) {
                     ctx.save();
                     ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
                 }
-                const _draw=(_ctx, _wx, _wy)=>{
+                const isEraserTool = (strokeOpts ? strokeOpts.tool : currentTool) === 'eraser';
+                const _draw=(_ctx, _wx, _wy, mirrorType)=>{
                     const physX = _wx * deviceScale; 
                     const physY = _wy * deviceScale; 
-                    const physWidth = currentWidth * deviceScale; 
+                    const physWidth = (strokeOpts ? strokeOpts.width : currentWidth) * deviceScale; 
                     _ctx.beginPath();
-                    const style=(currentTool==='pen')?(currentColorMode==='solid'?currentSolidColor:getDrawingStyle(_ctx, _wx, _wy, _wx + 0.01, _wy)): 'rgba(0,0,0,1)'; 
+                    
+                    let style;
+                    if (isEraserTool) {
+                        style = 'rgba(0,0,0,1)';
+                    } else {
+                        const mode = strokeOpts ? strokeOpts.colorMode : currentColorMode;
+                        if (mode === 'linear' && gradPoints) {
+                            const mirroredGrad = getMirroredGradPoints(gradPoints, mirrorType);
+                            style = getDrawingStyle(_ctx, mirroredGrad.x1, mirroredGrad.y1, mirroredGrad.x2, mirroredGrad.y2, strokeOpts);
+                        } else {
+                            style = strokeOpts ? strokeOpts.color : currentSolidColor;
+                        }
+                    }
                     
                     if (physWidth <= 1 * deviceScale) { 
                         _ctx.fillStyle = style;
@@ -2710,51 +2981,63 @@
                     }
                     _ctx.setLineDash([]); 
                 };
-                _draw(ctx,worldX,worldY);
+                _draw(ctx,worldX,worldY,'none');
                 if(applySymmetry){ 
                     const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
                     const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
 
-                    if(symmetryMode==='Y')_draw(ctx, logicalCanvasCenterX * 2 - worldX ,worldY);
-                    else if(symmetryMode==='X')_draw(ctx,worldX, logicalCanvasCenterY * 2 - worldY);
+                    if(symmetryMode==='Y')_draw(ctx, logicalCanvasCenterX * 2 - worldX ,worldY,'Y');
+                    else if(symmetryMode==='X')_draw(ctx,worldX, logicalCanvasCenterY * 2 - worldY,'X');
                     else if(symmetryMode==='XY'){
-                        _draw(ctx,logicalCanvasCenterX * 2 - worldX,worldY);
-                        _draw(ctx,worldX,logicalCanvasCenterY * 2 - worldY);
-                        _draw(ctx,logicalCanvasCenterX * 2 - worldX,logicalCanvasCenterY * 2 - worldY);
+                        _draw(ctx,logicalCanvasCenterX * 2 - worldX,worldY,'Y');
+                        _draw(ctx,worldX,logicalCanvasCenterY * 2 - worldY,'X');
+                        _draw(ctx,logicalCanvasCenterX * 2 - worldX,logicalCanvasCenterY * 2 - worldY,'XY');
                     }
                 }
                 if (layer) ctx.restore();
                 restoreContextAfterDraw(ctx);
             }
-            function drawLine(ctx,worldX1,worldY1,worldX2,worldY2,applySymmetry){ 
+            function drawLine(ctx,worldX1,worldY1,worldX2,worldY2,applySymmetry,gradPoints,strokeOpts){ 
                 const layer = layers.find(l => l.context === ctx);
                 if (layer) {
                     ctx.save();
                     ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
                 }
-                const _draw=(_ctx, _wx1, _wy1, _wx2, _wy2)=>{
-                    if(currentTool !=='eraser' && currentColorMode==='linear' && (_wx1 !== _wx2 || _wy1 !== _wy2)){
-                         _ctx.strokeStyle = getDrawingStyle(_ctx, _wx1, _wy1, _wx2, _wy2);
-                    } else if (currentTool!=='eraser') {
-                         _ctx.strokeStyle = currentSolidColor; 
+                const isEraserTool = (strokeOpts ? strokeOpts.tool : currentTool) === 'eraser';
+                const _draw=(_ctx, _wx1, _wy1, _wx2, _wy2, mirrorType)=>{
+                    if (isEraserTool) {
+                        _ctx.strokeStyle = 'rgba(0,0,0,1)';
+                    } else {
+                        const mode = strokeOpts ? strokeOpts.colorMode : currentColorMode;
+                        if (mode === 'linear' && gradPoints) {
+                            const mirroredGrad = getMirroredGradPoints(gradPoints, mirrorType);
+                            _ctx.strokeStyle = getDrawingStyle(_ctx, mirroredGrad.x1, mirroredGrad.y1, mirroredGrad.x2, mirroredGrad.y2, strokeOpts);
+                        } else {
+                            _ctx.strokeStyle = strokeOpts ? strokeOpts.color : currentSolidColor;
+                        }
                     }
                     _ctx.beginPath();
                     _ctx.moveTo(_wx1 * deviceScale, _wy1 * deviceScale);
                     _ctx.lineTo(_wx2 * deviceScale, _wy2 * deviceScale);
                     _ctx.stroke();
                 };
-                _draw(ctx,worldX1,worldY1,worldX2,worldY2);
+                _draw(ctx,worldX1,worldY1,worldX2,worldY2,'none');
                 if(applySymmetry){
                     const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
                     const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
-                    if(symmetryMode==='Y'){_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2);}
-                    else if(symmetryMode==='X'){_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2);}
-                    else if(symmetryMode==='XY'){_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2);_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2);_draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2);}}
+                    if(symmetryMode==='Y'){_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2,'Y');}
+                    else if(symmetryMode==='X'){_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2,'X');}
+                    else if(symmetryMode==='XY'){
+                        _draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2,'Y');
+                        _draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2,'X');
+                        _draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2,'XY');
+                    }
+                }
                 if (layer) ctx.restore();
                 restoreContextAfterDraw(ctx);
             }
             
-            function drawShape(ctx,worldX1,worldY1,worldX2,worldY2,applySymmetry,gradPoints){ 
+            function drawShape(ctx,worldX1,worldY1,worldX2,worldY2,applySymmetry,gradPoints,strokeOpts){ 
                 const layer = layers.find(l => l.context === ctx);
                 if (layer) {
                     ctx.save();
@@ -2762,14 +3045,14 @@
                 }
                 setupLineDrawing(ctx, false, gradPoints); 
 
-                const _draw=(_ctx,_wx1,_wy1,_wx2,_wy2,_gradP)=>{ 
-                    const drawingStyle=getDrawingStyle(_ctx,_gradP.gradX1,_gradP.gradY1,_gradP.gradX2,_gradP.gradY2); 
+                const _draw=(_ctx,_wx1,_wy1,_wx2,_wy2,_gradP, mirrorType)=>{ 
+                    const drawingStyle=getDrawingStyle(_ctx,_gradP.gradX1,_gradP.gradY1,_gradP.gradX2,_gradP.gradY2,strokeOpts); 
                     
                     _ctx.strokeStyle=drawingStyle;
                     if(fillShapeCheckbox.checked) _ctx.fillStyle=drawingStyle;
                     
                     _ctx.beginPath(); 
-                    let shapeToDraw=currentTool==='line'?'line':currentShapeType;
+                    let shapeToDraw= (strokeOpts ? strokeOpts.tool : currentTool) === 'line' ? 'line' : (strokeOpts ? strokeOpts.shapeType : currentShapeType);
                     
                     const px1 = _wx1 * deviceScale, py1 = _wy1 * deviceScale; 
                     const px2 = _wx2 * deviceScale, py2 = _wy2 * deviceScale;
@@ -2797,27 +3080,30 @@
                         case 'ellipse': const el_cx = px1+(px2-px1)/2; const el_cy = py1+(py2-py1)/2; const el_rx = Math.abs(px2-px1)/2; const el_ry = Math.abs(py2-py1)/2; _ctx.ellipse(el_cx, el_cy, el_rx, el_ry, 0, 0, 2 * Math.PI); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
                         case 'triangle': _ctx.moveTo((px1+px2)/2, py1); _ctx.lineTo(px2, py2); _ctx.lineTo(px1, py2); _ctx.closePath(); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
                         case 'star': const spikes=5,outerR=Math.hypot(px2-px1, py2-py1)/2,innerR=outerR/2.5,rot=Math.PI/2*3;let starCX=px1+(px2-px1)/2,starCY=py1+(py2-py1)/2;_ctx.moveTo(starCX,starCY-outerR*Math.sin(rot));for(let i=0;i<spikes;i++){_ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*i*2)*outerR,starCY+Math.sin(rot+Math.PI/spikes*i*2)*outerR);_ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*(i*2+1))*innerR,starCY+Math.sin(rot+Math.PI/spikes*(i*2+1))*innerR);}_ctx.closePath();if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
-                        case 'polygon': const sides=currentPolygonSides,polyR=Math.hypot(px2-px1,py2-py1)/2;const polyCX=px1+(px2-px1)/2,polyCY=py1+(py2-py1)/2;_ctx.moveTo(polyCX+polyR*Math.cos(0),polyCY+polyR*Math.sin(0));for(let i=1;i<=sides;i++)_ctx.lineTo(polyCX+polyR*Math.cos(i*2*Math.PI/sides),polyCY+polyR*Math.sin(i*2*Math.PI/sides));_ctx.closePath();if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
+                        case 'polygon': const sides=currentPolygonSides,polyR=Math.hypot(px2-px1,py2-py1)/2;const polyCX=px1+(px2-px1)/2,polyCY=poly1+(polyCX-px1)/2;_ctx.moveTo(polyCX+polyR*Math.cos(0),polyCY+polyR*Math.sin(0));for(let i=1;i<=sides;i++)_ctx.lineTo(polyCX+polyR*Math.cos(i*2*Math.PI/sides),polyCY+polyR*Math.sin(i*2*Math.PI/sides));_ctx.closePath();if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
                         case 'rhombus': _ctx.moveTo((px1+px2)/2, py1); _ctx.lineTo(px2, (py1+py2)/2); _ctx.lineTo((px1+px2)/2, py2); _ctx.lineTo(px1, (py1+py2)/2); _ctx.closePath(); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
                     }
                 };
-                _draw(ctx,worldX1,worldY1,worldX2,worldY2,gradPoints); 
+                _draw(ctx,worldX1,worldY1,worldX2,worldY2,gradPoints, 'none'); 
                 if(applySymmetry){ 
                     const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
                     const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
 
-                    const symGrad = (op, wx1, wy1, wx2, wy2, baseGradP) => {
+                    const symGrad = (op, baseGradP) => {
+                         if (!baseGradP) return null;
                          if (op === 'Y') return {gradX1:logicalCanvasCenterX*2-baseGradP.gradX1,gradY1:baseGradP.gradY1,gradX2:logicalCanvasCenterX*2-baseGradP.gradX2,gradY2:baseGradP.gradY2};
                          if (op === 'X') return {gradX1:baseGradP.gradX1,gradY1:logicalCanvasCenterY*2-baseGradP.gradY1,gradX2:baseGradP.gradX2,gradY2:logicalCanvasCenterY*2-baseGradP.gradY2};
                          return {gradX1:logicalCanvasCenterX*2-baseGradP.gradX1, gradY1:logicalCanvasCenterY*2-baseGradP.gradY1, gradX2:logicalCanvasCenterX*2-baseGradP.gradX2, gradY2:logicalCanvasCenterY*2-baseGradP.gradY2};
                     };
 
-                    if(symmetryMode==='Y')_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2, symGrad('Y',0,0,0,0,gradPoints));
-                    else if(symmetryMode==='X')_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2, symGrad('X',0,0,0,0,gradPoints));
+                    if(symmetryMode==='Y')_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2, symGrad('Y',gradPoints), 'Y');
+                    else if(symmetryMode==='X')_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2, symGrad('X',gradPoints), 'X');
                     else if(symmetryMode==='XY'){
-                        _draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2,symGrad('Y',0,0,0,0,gradPoints));
-                        _draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2,symGrad('X',0,0,0,0,gradPoints));
-                        _draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2,symGrad('XY',0,0,0,0,gradPoints));
+                        _draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2,symGrad('Y',gradPoints), 'Y');
+                        _draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2,symGrad('X',gradPoints), 'X');
+                        _draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2,symGrad('XY',gradPoints), 'XY');
+                    }
+                }enterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2,symGrad('XY',0,0,0,0,gradPoints));
                     }
                 }
                 if (layer) ctx.restore();
@@ -3051,7 +3337,7 @@
                 saveHistory();
 
                 const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d', {willReadFrequently: true});
+                const tempCtx = tempCanvas.getContext('2d');
                 tempCanvas.width = layerCtx.canvas.width; 
                 tempCanvas.height = layerCtx.canvas.height;
 
@@ -3170,6 +3456,55 @@
                 return d;
             }
 
+            function generateSvgDefs(strokes) {
+                let defsHtml = '  <defs>\n';
+                let hasDefs = false;
+                
+                strokes.forEach((stroke) => {
+                    const idx = stroke._globalIdx;
+                    if (stroke.colorMode === 'linear' && stroke.gradient && stroke.tool !== 'eraser' && stroke.tool !== 'grideraser') {
+                        hasDefs = true;
+                        
+                        if (stroke.tool === 'pixel') {
+                            const gs = stroke.width || gridSize;
+                            const originalPoints = stroke.points.filter(pt => !pt.mirrorType || pt.mirrorType === 'none');
+                            const startPt = originalPoints[0] || stroke.points[0];
+                            const endPt = originalPoints[originalPoints.length - 1] || stroke.points[stroke.points.length - 1];
+                            
+                            const startX = startPt.x + gs / 2;
+                            const startY = startPt.y + gs / 2;
+                            const endX = endPt.x + gs / 2;
+                            const endY = endPt.y + gs / 2;
+                            
+                            const gradPoints = { x1: startX, y1: startY, x2: endX, y2: endY };
+                            
+                            ['none', 'Y', 'X', 'XY'].forEach(mType => {
+                                const mirrored = getMirroredGradPoints(gradPoints, mType);
+                                defsHtml += `    <linearGradient id="grad_${idx}_${mType}" x1="${mirrored.x1.toFixed(1)}" y1="${mirrored.y1.toFixed(1)}" x2="${mirrored.x2.toFixed(1)}" y2="${mirrored.y2.toFixed(1)}" gradientUnits="userSpaceOnUse">\n`;
+                                defsHtml += `      <stop offset="0%" stop-color="${stroke.gradient.start}" />\n`;
+                                defsHtml += `      <stop offset="100%" stop-color="${stroke.gradient.end}" />\n`;
+                                defsHtml += `    </linearGradient>\n`;
+                            });
+                        } else {
+                            const p0 = stroke.points[0];
+                            const pLast = stroke.points[stroke.points.length - 1] || p0;
+                            const x1 = p0.x;
+                            const y1 = p0.y;
+                            const x2 = pLast.x === p0.x && pLast.y === p0.y ? p0.x + 0.01 : pLast.x;
+                            const y2 = pLast.y;
+                            
+                            defsHtml += `    <linearGradient id="grad_${idx}_none" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" gradientUnits="userSpaceOnUse">\n`;
+                            defsHtml += `      <stop offset="0%" stop-color="${stroke.gradient.start}" />\n`;
+                            defsHtml += `      <stop offset="100%" stop-color="${stroke.gradient.end}" />\n`;
+                            defsHtml += `    </linearGradient>\n`;
+                        }
+                    }
+                });
+                
+                defsHtml += '  </defs>\n';
+                return hasDefs ? defsHtml : '';
+            }
+
             function exportToSVG() {
                 if (vectorStrokes.length === 0) {
                     alert('No vector strokes to export! Draw something with the pen tool first.');
@@ -3180,11 +3515,14 @@
                 
                 // Group strokes by layer
                 const layerGroups = {};
-                vectorStrokes.forEach(stroke => {
+                vectorStrokes.forEach((stroke, idx) => {
+                    stroke._globalIdx = idx; // Inject chronological index
                     const layerName = stroke.layer || 'Layer';
                     if (!layerGroups[layerName]) layerGroups[layerName] = [];
                     layerGroups[layerName].push(stroke);
                 });
+
+                svgContent += generateSvgDefs(vectorStrokes);
                 
                 Object.keys(layerGroups).forEach((layerName, layerIdx) => {
                     let layerSafeName = layerName.replace(/[^a-zA-Z0-9]/g, '_') + '_' + layerIdx;
@@ -3238,19 +3576,29 @@
                         paths.forEach(p => {
                             const tAttr = p.xForm ? ` transform="${p.xForm}"` : '';
                             if (isMask) out += `      <path d="${p.d}"${tAttr} stroke="black" stroke-width="${stroke.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
-                            else out += `      <path class="anim-stroke" d="${p.d}"${tAttr} stroke="${stroke.color}" stroke-width="${stroke.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
+                            else {
+                                const strokeColorStr = stroke.colorMode === 'linear' ? `url(#grad_${stroke._globalIdx}_none)` : stroke.color;
+                                out += `      <path class="anim-stroke" d="${p.d}"${tAttr} stroke="${strokeColorStr}" stroke-width="${stroke.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
+                            }
                         });
                         return out;
                     };
                     
                     // First pass: erasings to create mask
-                    const erasings = layerGroups[layerName].filter(s => s.tool === 'eraser');
+                    const erasings = layerGroups[layerName].filter(s => s.tool === 'eraser' || s.tool === 'grideraser');
                     if (erasings.length > 0) {
                         hasMask = true;
                         svgContent += `    <mask id="${maskId}">\n`;
                         svgContent += `      <rect x="-10%" y="-10%" width="120%" height="120%" fill="white" />\n`;
                         erasings.forEach(stroke => {
-                            svgContent += writeStrokePaths(stroke, true);
+                            if (stroke.tool === 'grideraser') {
+                                const gs = stroke.width || gridSize;
+                                stroke.points.forEach(p => {
+                                    svgContent += `      <rect x="${p.x}" y="${p.y}" width="${gs}" height="${gs}" fill="black" shape-rendering="crispEdges"/>\n`;
+                                });
+                            } else {
+                                svgContent += writeStrokePaths(stroke, true);
+                            }
                         });
                         svgContent += `    </mask>\n`;
                     }
@@ -3260,12 +3608,13 @@
                     
                     // Second pass: normal strokes
                     layerGroups[layerName].forEach(stroke => {
-                        if (stroke.tool === 'eraser') return;
+                        if (stroke.tool === 'eraser' || stroke.tool === 'grideraser') return;
                         if (stroke.tool === 'pixel') {
                             // Render pixel strokes as filled rects
                             const gs = stroke.width || gridSize;
                             stroke.points.forEach(p => {
-                                svgContent += `      <rect x="${p.x}" y="${p.y}" width="${gs}" height="${gs}" fill="${stroke.color}" shape-rendering="crispEdges"/>\n`;
+                                const fillStr = stroke.colorMode === 'linear' ? `url(#grad_${stroke._globalIdx}_${p.mirrorType || 'none'})` : stroke.color;
+                                svgContent += `      <rect x="${p.x}" y="${p.y}" width="${gs}" height="${gs}" fill="${fillStr}" shape-rendering="crispEdges"/>\n`;
                             });
                             // Symmetry mirrors are already baked into the points
                             return;
@@ -3319,25 +3668,54 @@
                             renderPalette();
                         }
                         
-                        layerList.innerHTML = '';
+                        if (layerPanel) layerPanel.innerHTML = '';
                         layers = [];
+                        history = {};
+                        historyStep = {};
                         let loadedCount = 0;
                         
+                        if (!data.layers || data.layers.length === 0) {
+                            addLayer();
+                            return;
+                        }
+
                         data.layers.forEach((lData, index) => {
-                            const l = createLayer(lData.id, lData.name);
+                            const w = lData.logicalWidth || DEFAULT_LOGICAL_WIDTH;
+                            const h = lData.logicalHeight || DEFAULT_LOGICAL_HEIGHT;
+                            const l = createLayer(lData.id, lData.name, w, h);
                             l.visible = lData.visible;
                             l.opacity = lData.opacity !== undefined ? lData.opacity : 1;
                             l.blendMode = lData.blendMode || 'source-over';
+                            l.logicalX = lData.logicalX !== undefined ? lData.logicalX : 0;
+                            l.logicalY = lData.logicalY !== undefined ? lData.logicalY : 0;
                             
                             const img = new Image();
                             img.onload = function() {
                                 l.context.drawImage(img, 0, 0);
+                                
+                                // Initialize history for this layer
+                                const offscreen = document.createElement('canvas');
+                                offscreen.width = l.canvas.width;
+                                offscreen.height = l.canvas.height;
+                                const offscreenCtx = offscreen.getContext('2d');
+                                offscreenCtx.drawImage(l.canvas, 0, 0);
+                                
+                                const currentLayerStrokes = vectorStrokes.filter(vs => vs.layer === l.name);
+                                history[index] = [{
+                                    canvas: offscreen,
+                                    strokes: JSON.parse(JSON.stringify(currentLayerStrokes)),
+                                    logicalX: l.logicalX,
+                                    logicalY: l.logicalY,
+                                    logicalWidth: l.logicalWidth,
+                                    logicalHeight: l.logicalHeight
+                                }];
+                                historyStep[index] = 0;
+
                                 loadedCount++;
                                 if (loadedCount === data.layers.length) {
-                                    renderLayerList();
-                                    selectLayer(layers[0].id);
+                                    renderLayerPanel();
+                                    setActiveLayer(0);
                                     renderComposite();
-                                    saveHistory();
                                     updateStatus("Project loaded successfully.");
                                 }
                             };
@@ -3353,15 +3731,119 @@
                 e.target.value = '';
             }
 
+            function applyEraserToRecordedStrokes(eraserStroke) {
+                if (!eraserStroke || !eraserStroke.points || eraserStroke.points.length === 0) return;
+                const eWidth = eraserStroke.width || currentWidth;
+
+                for (let i = vectorStrokes.length - 1; i >= 0; i--) {
+                    const stroke = vectorStrokes[i];
+                    if (!stroke || !stroke.recorded) continue;
+
+                    if (stroke.tool === 'pixel') {
+                        stroke.points = stroke.points.filter(p => {
+                            const cellSize = stroke.width || gridSize;
+                            const cellCenterX = p.x + cellSize / 2;
+                            const cellCenterY = p.y + cellSize / 2;
+
+                            for (const ep of eraserStroke.points) {
+                                const distSq = (ep.x - cellCenterX) ** 2 + (ep.y - cellCenterY) ** 2;
+                                const thresh = (cellSize + eWidth) / 2;
+                                if (distSq <= thresh * thresh) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        });
+                    } else {
+                        let intersects = false;
+                        for (const p of stroke.points) {
+                            for (const ep of eraserStroke.points) {
+                                const distSq = (p.x - ep.x) ** 2 + (p.y - ep.y) ** 2;
+                                const thresh = (stroke.width + eWidth) / 2;
+                                if (distSq <= thresh * thresh) {
+                                    intersects = true;
+                                    break;
+                                }
+                            }
+                            if (intersects) break;
+                        }
+                        if (intersects) {
+                            stroke.points = [];
+                        }
+                    }
+                }
+                vectorStrokes = vectorStrokes.filter(s => s && (s.points.length > 0 || !s.recorded));
+            }
+
+            function applyGridEraserToRecordedStrokes(gridEraserStroke) {
+                if (!gridEraserStroke || !gridEraserStroke.points || gridEraserStroke.points.length === 0) return;
+                const gs = gridSize;
+
+                for (let i = vectorStrokes.length - 1; i >= 0; i--) {
+                    const stroke = vectorStrokes[i];
+                    if (!stroke || !stroke.recorded) continue;
+
+                    if (stroke.tool === 'pixel') {
+                        stroke.points = stroke.points.filter(p => {
+                            for (const gp of gridEraserStroke.points) {
+                                if (p.x === gp.x && p.y === gp.y) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        });
+                    } else {
+                        let intersects = false;
+                        for (const p of stroke.points) {
+                            for (const gp of gridEraserStroke.points) {
+                                if (p.x >= gp.x && p.x <= gp.x + gs && p.y >= gp.y && p.y <= gp.y + gs) {
+                                    intersects = true;
+                                    break;
+                                }
+                            }
+                            if (intersects) break;
+                        }
+                        if (intersects) {
+                            stroke.points = [];
+                        }
+                    }
+                }
+                vectorStrokes = vectorStrokes.filter(s => s && (s.points.length > 0 || !s.recorded));
+            }
+
             let replayPoints = [];
             let currentReplayFrame = 0;
             
+            function pauseReplayAnimation() {
+                if (!isReplaying || isReplayPaused) return;
+                isReplayPaused = true;
+                if (replayPlayPauseBtn) {
+                    replayPlayPauseBtn.textContent = 'Play';
+                    replayPlayPauseBtn.title = 'Resume Replay';
+                }
+                updateStatus("Replay paused.");
+            }
+
+            function toggleReplayPause() {
+                if (!isReplaying) return;
+                if (isReplayPaused) {
+                    isReplayPaused = false;
+                    if (replayPlayPauseBtn) {
+                        replayPlayPauseBtn.textContent = 'Pause';
+                        replayPlayPauseBtn.title = 'Pause Replay';
+                    }
+                    updateStatus("Replay resumed.");
+                    requestAnimationFrame(playReplayFrame);
+                } else {
+                    pauseReplayAnimation();
+                }
+            }
+
             function startReplayAnimation() {
-                if (vectorStrokes.length === 0 || isReplaying) return;
+                if (isReplaying) return;
                 
-                // Determine if we should only replay recorded strokes
-                const hasRecorded = vectorStrokes.some(stroke => stroke.recorded);
-                const strokesToReplay = hasRecorded ? vectorStrokes.filter(stroke => stroke.recorded) : vectorStrokes;
+                // Strictly only replay strokes drawn while Record Mode was active
+                const strokesToReplay = vectorStrokes.filter(stroke => stroke.recorded);
                 
                 if (strokesToReplay.length === 0) {
                     updateStatus("No drawing process recorded yet. Draw in record mode first!");
@@ -3381,12 +3863,17 @@
                 });
                 
                 isReplaying = true;
+                isReplayPaused = false;
+                if (replayPlayPauseBtn) {
+                    replayPlayPauseBtn.textContent = 'Pause';
+                    replayPlayPauseBtn.title = 'Pause Replay';
+                }
                 currentReplayFrame = 0;
                 replayControls.style.display = 'flex';
                 replayScrubber.value = 0;
                 replayScrubber.max = replayPoints.length - 1;
                 
-                updateStatus(hasRecorded ? "Replaying clean drawing process..." : "Replaying all strokes...");
+                updateStatus("Replaying clean drawing process...");
                 
                 const activeL = getActiveLayer();
                 if (!activeL) { stopReplayAnimation(); return; }
@@ -3399,12 +3886,18 @@
             
             function scrubReplay() {
                 if (!isReplaying) return;
+                pauseReplayAnimation();
                 currentReplayFrame = parseInt(replayScrubber.value);
                 drawReplayUpTo(currentReplayFrame);
             }
             
             function stopReplayAnimation() {
                 isReplaying = false;
+                isReplayPaused = false;
+                if (replayPlayPauseBtn) {
+                    replayPlayPauseBtn.textContent = 'Pause';
+                    replayPlayPauseBtn.title = 'Pause Replay';
+                }
                 replayControls.style.display = 'none';
                 saveHistory(); // restores the actual layer state which we didn't touch
                 renderComposite();
@@ -3429,32 +3922,40 @@
                     if(rp.stroke.shapeType) currentShapeType = rp.stroke.shapeType;
                     
                     if (rp.isFirst) {
-                        if(currentTool === 'pixel') {
-                            // Pixel replay: just fill the grid cell
-                            ctx.fillStyle = rp.stroke.color;
-                            ctx.globalCompositeOperation = 'source-over';
-                            const gs = rp.stroke.width || gridSize;
-                            ctx.fillRect(rp.point.x * deviceScale, rp.point.y * deviceScale, gs * deviceScale, gs * deviceScale);
+                        if(currentTool === 'pixel' || currentTool === 'grideraser') {
+                            drawPixelCellReplay(ctx, rp);
                         } else if(currentTool !== 'shape' && currentTool !== 'line') {
                             setupLineDrawing(ctx, rp.stroke.tool === 'eraser', null);
                             ctx.lineWidth = rp.stroke.width;
-                            ctx.strokeStyle = rp.stroke.color;
-                            ctx.fillStyle = rp.stroke.color;
-                            drawDot(ctx, rp.point.x, rp.point.y, symmetryMode !== 'OFF');
+                            
+                            const p0 = rp.stroke.points[0];
+                            const pLast = rp.stroke.points[rp.stroke.points.length - 1] || p0;
+                            const gradPoints = (rp.stroke.tool === 'eraser') ? null : {
+                                x1: p0.x,
+                                y1: p0.y,
+                                x2: pLast.x === p0.x && pLast.y === p0.y ? p0.x + 0.01 : pLast.x,
+                                y2: pLast.y
+                            };
+                            drawDot(ctx, rp.point.x, rp.point.y, symmetryMode !== 'OFF', gradPoints, rp.stroke);
                         }
                     } else if (lastP && lastP.stroke === rp.stroke) {
-                        if(currentTool === 'pixel') {
-                            ctx.fillStyle = rp.stroke.color;
-                            ctx.globalCompositeOperation = 'source-over';
-                            const gs = rp.stroke.width || gridSize;
-                            ctx.fillRect(rp.point.x * deviceScale, rp.point.y * deviceScale, gs * deviceScale, gs * deviceScale);
+                        if(currentTool === 'pixel' || currentTool === 'grideraser') {
+                            drawPixelCellReplay(ctx, rp);
                         } else if(currentTool === 'shape' || currentTool === 'line') {
                             ctx.lineWidth = rp.stroke.width;
                             ctx.strokeStyle = rp.stroke.color;
                             ctx.fillStyle = rp.stroke.color;
-                            drawShape(ctx, rp.stroke.points[0].x, rp.stroke.points[0].y, rp.point.x, rp.point.y, symmetryMode !== 'OFF', {gradX1: rp.stroke.points[0].x, gradY1: rp.stroke.points[0].y, gradX2: rp.point.x, gradY2: rp.point.y});
+                            drawShape(ctx, rp.stroke.points[0].x, rp.stroke.points[0].y, rp.point.x, rp.point.y, symmetryMode !== 'OFF', {gradX1: rp.stroke.points[0].x, gradY1: rp.stroke.points[0].y, gradX2: rp.point.x, gradY2: rp.point.y}, rp.stroke);
                         } else {
-                            drawLine(ctx, lastP.point.x, lastP.point.y, rp.point.x, rp.point.y, symmetryMode !== 'OFF');
+                            const p0 = rp.stroke.points[0];
+                            const pLast = rp.stroke.points[rp.stroke.points.length - 1] || p0;
+                            const gradPoints = (rp.stroke.tool === 'eraser') ? null : {
+                                x1: p0.x,
+                                y1: p0.y,
+                                x2: pLast.x === p0.x && pLast.y === p0.y ? p0.x + 0.01 : pLast.x,
+                                y2: pLast.y
+                            };
+                            drawLine(ctx, lastP.point.x, lastP.point.y, rp.point.x, rp.point.y, symmetryMode !== 'OFF', gradPoints, rp.stroke);
                         }
                     }
                     lastP = rp;
@@ -3467,7 +3968,7 @@
             }
 
             function playReplayFrame() {
-                if (!isReplaying) return;
+                if (!isReplaying || isReplayPaused) return;
                 if (currentReplayFrame >= replayPoints.length) {
                     stopReplayAnimation();
                     if (mediaRecorder && mediaRecorder.state === 'recording') {
@@ -3491,22 +3992,41 @@
                 if(rp.stroke.shapeType) currentShapeType = rp.stroke.shapeType;
                 
                 if (rp.isFirst) {
-                    if(currentTool !== 'shape' && currentTool !== 'line') {
+                    if (currentTool === 'pixel' || currentTool === 'grideraser') {
+                        drawPixelCellReplay(ctx, rp);
+                    } else if(currentTool !== 'shape' && currentTool !== 'line') {
                         setupLineDrawing(ctx, rp.stroke.tool === 'eraser', null);
                         ctx.lineWidth = rp.stroke.width;
-                        ctx.strokeStyle = rp.stroke.color;
-                        ctx.fillStyle = rp.stroke.color;
-                        drawDot(ctx, rp.point.x, rp.point.y, symmetryMode !== 'OFF');
+                        
+                        const p0 = rp.stroke.points[0];
+                        const pLast = rp.stroke.points[rp.stroke.points.length - 1] || p0;
+                        const gradPoints = (rp.stroke.tool === 'eraser') ? null : {
+                            x1: p0.x,
+                            y1: p0.y,
+                            x2: pLast.x === p0.x && pLast.y === p0.y ? p0.x + 0.01 : pLast.x,
+                            y2: pLast.y
+                        };
+                        drawDot(ctx, rp.point.x, rp.point.y, symmetryMode !== 'OFF', gradPoints, rp.stroke);
                     }
                 } else if (currentReplayFrame > 0 && replayPoints[currentReplayFrame-1].stroke === rp.stroke) {
                     const lastP = replayPoints[currentReplayFrame-1];
-                    if(currentTool === 'shape' || currentTool === 'line') {
+                    if (currentTool === 'pixel' || currentTool === 'grideraser') {
+                        drawPixelCellReplay(ctx, rp);
+                    } else if(currentTool === 'shape' || currentTool === 'line') {
                         ctx.lineWidth = rp.stroke.width;
                         ctx.strokeStyle = rp.stroke.color;
                         ctx.fillStyle = rp.stroke.color;
-                        drawShape(ctx, rp.stroke.points[0].x, rp.stroke.points[0].y, rp.point.x, rp.point.y, symmetryMode !== 'OFF', {gradX1: rp.stroke.points[0].x, gradY1: rp.stroke.points[0].y, gradX2: rp.point.x, gradY2: rp.point.y});
+                        drawShape(ctx, rp.stroke.points[0].x, rp.stroke.points[0].y, rp.point.x, rp.point.y, symmetryMode !== 'OFF', {gradX1: rp.stroke.points[0].x, gradY1: rp.stroke.points[0].y, gradX2: rp.point.x, gradY2: rp.point.y}, rp.stroke);
                     } else {
-                        drawLine(ctx, lastP.point.x, lastP.point.y, rp.point.x, rp.point.y, symmetryMode !== 'OFF');
+                        const p0 = rp.stroke.points[0];
+                        const pLast = rp.stroke.points[rp.stroke.points.length - 1] || p0;
+                        const gradPoints = (rp.stroke.tool === 'eraser') ? null : {
+                            x1: p0.x,
+                            y1: p0.y,
+                            x2: pLast.x === p0.x && pLast.y === p0.y ? p0.x + 0.01 : pLast.x,
+                            y2: pLast.y
+                        };
+                        drawLine(ctx, lastP.point.x, lastP.point.y, rp.point.x, rp.point.y, symmetryMode !== 'OFF', gradPoints, rp.stroke);
                     }
                 }
                 
@@ -3614,6 +4134,8 @@
                     layerGroups[layerName].push(stroke);
                 });
 
+                svgContent += generateSvgDefs(vectorStrokes);
+
                 const tempSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                 const tempPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
                 tempSvg.appendChild(tempPath);
@@ -3685,18 +4207,28 @@
                                 styleContent += `#${id} { stroke-dasharray: ${length}; stroke-dashoffset: ${length}; animation: drawAnim ${strokeDuration}s linear ${stroke._globalIdx * strokeDuration}s forwards; }\n`;
                             }
                             
-                            const color = isMask ? 'black' : stroke.color;
+                            const color = isMask ? 'black' : (stroke.colorMode === 'linear' ? `url(#grad_${stroke._globalIdx}_none)` : stroke.color);
                             out += `      <path id="${id}" d="${p.d}"${tAttr} stroke="${color}" stroke-width="${stroke.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
                         });
                         return out;
                     };
                     
-                    const erasings = layerGroups[layerName].filter(s => s.tool === 'eraser');
+                    const erasings = layerGroups[layerName].filter(s => s.tool === 'eraser' || s.tool === 'grideraser');
                     if (erasings.length > 0) {
                         hasMask = true;
                         pathsContent += `    <mask id="${maskId}">\n`;
                         pathsContent += `      <rect x="-10%" y="-10%" width="120%" height="120%" fill="white" />\n`;
-                        erasings.forEach(stroke => { pathsContent += writeStrokePaths(stroke, true); });
+                        erasings.forEach(stroke => {
+                            if (stroke.tool === 'grideraser') {
+                                const gs = stroke.width || gridSize;
+                                stroke.points.forEach((p, pIdx) => {
+                                    const id = `stroke_${stroke._globalIdx}_rect_erase_${pIdx}`;
+                                    pathsContent += `      <rect id="${id}" x="${p.x}" y="${p.y}" width="${gs}" height="${gs}" fill="black" shape-rendering="crispEdges" />\n`;
+                                });
+                            } else {
+                                pathsContent += writeStrokePaths(stroke, true);
+                            }
+                        });
                         pathsContent += `    </mask>\n`;
                     }
                     
@@ -3704,12 +4236,13 @@
                     pathsContent += `    <g${groupProps}>\n`;
                     
                     layerGroups[layerName].forEach(stroke => {
-                        if (stroke.tool === 'eraser') return;
+                        if (stroke.tool === 'eraser' || stroke.tool === 'grideraser') return;
                         if (stroke.tool === 'pixel') {
                             const gs = stroke.width || gridSize;
                             stroke.points.forEach((p, pIdx) => {
                                 const id = `stroke_${stroke._globalIdx}_rect_${pIdx}`;
-                                let rectStr = `      <rect id="${id}" x="${p.x}" y="${p.y}" width="${gs}" height="${gs}" fill="${stroke.color}" shape-rendering="crispEdges"`;
+                                const fillStr = stroke.colorMode === 'linear' ? `url(#grad_${stroke._globalIdx}_${p.mirrorType || 'none'})` : stroke.color;
+                                let rectStr = `      <rect id="${id}" x="${p.x}" y="${p.y}" width="${gs}" height="${gs}" fill="${fillStr}" shape-rendering="crispEdges"`;
                                 if (isAnimated) {
                                     styleContent += `#${id} { opacity: 0; animation: pixelAppear ${strokeDuration * 0.5}s linear ${stroke._globalIdx * strokeDuration + (pIdx * strokeDuration * 0.5 / (stroke.points.length || 1))}s forwards; }\n`;
                                 }
@@ -3743,10 +4276,15 @@
                 if(idx<0||idx>=layers.length)return;
                 const l=layers[idx];if(!l||!l.canvas)return;
                 try{
-                    const dU=l.canvas.toDataURL();
+                    const offscreen = document.createElement('canvas');
+                    offscreen.width = l.canvas.width;
+                    offscreen.height = l.canvas.height;
+                    const offscreenCtx = offscreen.getContext('2d');
+                    offscreenCtx.drawImage(l.canvas, 0, 0);
+
                     const currentLayerStrokes = vectorStrokes.filter(vs => vs.layer === l.name);
                     const stateObj = { 
-                        dU: dU, 
+                        canvas: offscreen, 
                         strokes: JSON.parse(JSON.stringify(currentLayerStrokes)),
                         logicalX: l.logicalX !== undefined ? l.logicalX : 0,
                         logicalY: l.logicalY !== undefined ? l.logicalY : 0,
@@ -3761,16 +4299,14 @@
                         h.length = s + 1; 
                     }
                     
-                    if (h.length === 0 || (h[h.length-1].dU || h[h.length-1]) !== dU) { 
-                         if(h.length>=MAX_HISTORY_STEPS) {
-                            h.shift(); 
-                         }
-                         h.push(stateObj);
+                    if (h.length >= MAX_HISTORY_STEPS) {
+                        h.shift(); 
                     }
+                    h.push(stateObj);
                     historyStep[idx]=h.length-1; 
                     updateUndoRedoButtonStates();
                 } catch(err){
-                    console.warn(`History save failed for layer ${l.name}: ${err.message}. This might be due to canvas size or security restrictions.`);
+                    console.warn(`History save failed for layer ${l.name}: ${err.message}.`);
                     updateStatus("Could not save history step.");
                 }
             }
@@ -3791,21 +4327,31 @@
                             l.logicalHeight = state.logicalHeight !== undefined ? state.logicalHeight : DEFAULT_LOGICAL_HEIGHT;
                             l.canvas.width = Math.round(l.logicalWidth * deviceScale);
                             l.canvas.height = Math.round(l.logicalHeight * deviceScale);
-                        }
-                        const c=l.context,i=new Image();
-                        i.onload=()=>{
-                            c.clearRect(0,0,l.canvas.width,l.canvas.height);
-                            c.drawImage(i,0,0);
                             
-                            if (state && state.strokes) {
-                                vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                            const c = l.context;
+                            c.clearRect(0, 0, l.canvas.width, l.canvas.height);
+                            
+                            if (state.canvas) {
+                                c.drawImage(state.canvas, 0, 0);
+                                if (state.strokes) {
+                                    vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                                }
+                                renderComposite();
+                                updateStatus(`Undo performed on ${l.name}.`);
+                            } else {
+                                const i = new Image();
+                                i.onload = () => {
+                                    c.drawImage(i, 0, 0);
+                                    if (state.strokes) {
+                                        vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                                    }
+                                    renderComposite();
+                                    updateStatus(`Undo performed on ${l.name}.`);
+                                };
+                                i.onerror = () => { updateStatus("Undo failed: Could not load history image."); };
+                                i.src = state.dU || state;
                             }
-                            
-                            renderComposite();
-                            updateStatus(`Undo performed on ${l.name}.`);
-                        };
-                        i.onerror=()=>{updateStatus("Undo failed: Could not load history image.");};
-                        i.src=state.dU || state;
+                        }
                         updateUndoRedoButtonStates();
                     }catch(err){updateStatus("Undo operation failed."); console.error("Undo error:", err);}
                 } else {updateStatus("No more undo steps for this layer.");}
@@ -3827,21 +4373,31 @@
                             l.logicalHeight = state.logicalHeight !== undefined ? state.logicalHeight : DEFAULT_LOGICAL_HEIGHT;
                             l.canvas.width = Math.round(l.logicalWidth * deviceScale);
                             l.canvas.height = Math.round(l.logicalHeight * deviceScale);
-                        }
-                        const c=l.context,i=new Image();
-                        i.onload=()=>{
-                            c.clearRect(0,0,l.canvas.width,l.canvas.height);
-                            c.drawImage(i,0,0);
                             
-                            if (state && state.strokes) {
-                                vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                            const c = l.context;
+                            c.clearRect(0, 0, l.canvas.width, l.canvas.height);
+                            
+                            if (state.canvas) {
+                                c.drawImage(state.canvas, 0, 0);
+                                if (state.strokes) {
+                                    vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                                }
+                                renderComposite();
+                                updateStatus(`Redo performed on ${l.name}.`);
+                            } else {
+                                const i = new Image();
+                                i.onload = () => {
+                                    c.drawImage(i, 0, 0);
+                                    if (state.strokes) {
+                                        vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                                    }
+                                    renderComposite();
+                                    updateStatus(`Redo performed on ${l.name}.`);
+                                };
+                                i.onerror = () => { updateStatus("Redo failed: Could not load history image."); };
+                                i.src = state.dU || state;
                             }
-                            
-                            renderComposite();
-                            updateStatus(`Redo performed on ${l.name}.`);
-                        };
-                        i.onerror=()=>{updateStatus("Redo failed: Could not load history image.");};
-                        i.src=state.dU || state;
+                        }
                         updateUndoRedoButtonStates();
                     }catch(err){updateStatus("Redo operation failed."); console.error("Redo error:", err);}
                 } else {updateStatus("No more redo steps for this layer.");}
@@ -3853,6 +4409,11 @@
                 const s=historyStep[activeLayerIndex];
                 undoBtn.disabled = s <= 0; 
                 redoBtn.disabled = s >= h.length - 1; 
+                // Sync mobile undo/redo disabled states
+                const mobileUndoBtn = document.getElementById('mobileUndoBtn');
+                const mobileRedoBtn = document.getElementById('mobileRedoBtn');
+                if (mobileUndoBtn) mobileUndoBtn.disabled = undoBtn.disabled;
+                if (mobileRedoBtn) mobileRedoBtn.disabled = redoBtn.disabled;
                 updateMergeButtonState(); 
             }
             
@@ -3891,7 +4452,7 @@
                         // Optionally, re-scale all layer content (complex and slow) or just accept that display fidelity may shift
                         console.warn("Device pixel ratio changed. Layer content might not appear as sharp until further edits or a more complex layer rescaling is implemented.");
                         // Force re-creation of layer contexts might be needed for some browsers if internal scaling factors get mixed up.
-                        // layers.forEach(l => {l.context = l.canvas.getContext('2d', {willReadFrequently: true})}); // this clears content
+                        // layers.forEach(l => {l.context = l.canvas.getContext('2d')}); // this clears content
                     }
 
                     resetView(); // Adjusts pan/zoom for new viewport size, re-renders
