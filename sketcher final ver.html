@@ -2945,6 +2945,11 @@
                 while (true) {
                     fillPixelCell(ctx, gx0 * gs + gs / 2, gy0 * gs + gs / 2, applySymmetry);
                     if (gx0 === gx1 && gy0 === gy1) break;
+                    const e2 = 2 * err;
+                    if (e2 > -dy) { err -= dy; gx0 += sx; }
+                    if (e2 < dx) { err += dx; gy0 += sy; }
+                }
+            }
                         function drawDot(ctx,worldX,worldY,applySymmetry,gradPoints,strokeOpts){ 
                 const layer = layers.find(l => l.context === ctx);
                 if (layer) {
