@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVG STUDIO // EDITOR</title>
+    <meta name="description" content="A high-performance SVG Editor and design suite built for editing, optimizing, and animating clean vector graphics.">
+    <meta property="og:title" content="SVG Studio // Editor">
+    <meta property="og:description" content="A high-performance SVG Editor and design suite for modern vector graphics.">
+    <meta property="og:type" content="website">
 
     <style>
         @font-face {
@@ -14,7 +18,56 @@
             font-display: swap;
             font-style: normal;
         }
-    </style>
+    
+        /* === MOBILE ACCORDION AND BUTTON OVERRIDES === */
+        @media (max-width: 768px) {
+            .templates-dropdown {
+                position: static !important;
+                width: 100% !important;
+                max-height: 300px !important;
+                margin-top: 8px !important;
+                border-left: none !important;
+                border-right: none !important;
+                background: #0E1013 !important;
+            }
+            #mobileDrawerContent .btn-brutal,
+            #mobileDrawerContent a.btn-brutal {
+                width: 100% !important;
+                justify-content: flex-start !important;
+                padding: 10px 14px !important;
+                font-size: 13px !important;
+                border-width: 1px !important;
+                background-color: #181B20 !important;
+                color: #FAF9F6 !important;
+            }
+            #mobileDrawerContent .btn-brutal:hover,
+            #mobileDrawerContent a.btn-brutal:hover {
+                border-color: #FF6B4A !important;
+                color: #FF6B4A !important;
+                background-color: rgba(255, 107, 74, 0.05) !important;
+            }
+            #mobileDrawerContent #templatesWrapper {
+                width: 100% !important;
+            }
+            #mobileDrawerContent #templatesBtn {
+                width: 100% !important;
+                justify-content: flex-start !important;
+                padding: 10px 14px !important;
+                font-size: 13px !important;
+                background-color: #181B20 !important;
+            }
+            #mobileDrawerContent .active.btn-brutal,
+            #mobileDrawerContent .btn-brutal.active,
+            #mobileDrawerContent #selectModeBtn.active {
+                border-color: #FFAE42 !important;
+                color: #0E1013 !important;
+                background-color: #FFAE42 !important;
+            }
+            #mobileDrawerContent #selectModeBtn.active * {
+                color: #0E1013 !important;
+            }
+        }
+</style>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,11 +97,13 @@
                         mono: ['Moon Walk', 'ui-monospace', 'monospace']
                     },
                     colors: {
-                        bg: '#050505',
-                        panel: '#111111',
-                        border: '#333333',
-                        accent: '#E5FF00',
-                        muted: '#666666'
+                        bg: '#0E1013',
+                        panel: '#181B20',
+                        border: '#2C313B',
+                        accent: '#FF6B4A',
+                        muted: '#8E96A5',
+                        gold: '#FFAE42',
+                        warmwhite: '#FAF9F6'
                     }
                 }
             }
@@ -56,6 +111,28 @@
     </script>
 
     <style>
+        /* === HIDE CRT OVERLAYS === */
+        .noise-overlay {
+            display: none !important;
+        }
+        .scan-line {
+            display: none !important;
+        }
+        .crosshair {
+            display: none !important;
+        }
+
+        :root {
+            --accent: #FF6B4A;
+            --accent-hover: #E05435;
+            --gold: #FFAE42;
+            --bg: #0E1013;
+            --panel: #181B20;
+            --border: #2C313B;
+            --muted: #8E96A5;
+            --warm-white: #FAF9F6;
+        }
+
         /* === BRUTALIST SCROLLBAR === */
         ::-webkit-scrollbar {
             width: 6px;
@@ -63,39 +140,39 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: #050505;
+            background: var(--bg);
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #333;
+            background: var(--border);
             border-radius: 0;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #E5FF00;
+            background: var(--accent);
         }
 
         /* === TECH GRID BACKGROUND === */
         .tech-grid-bg {
-            background-color: #0a0a0a;
+            background-color: var(--bg);
             background-image:
-                linear-gradient(rgba(229, 255, 0, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(229, 255, 0, 0.03) 1px, transparent 1px);
+                linear-gradient(rgba(255, 107, 74, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 107, 74, 0.03) 1px, transparent 1px);
             background-size: 40px 40px;
         }
 
         /* === ASSET CARD STYLES === */
         .asset-card {
-            background: #0a0a0a;
-            border: 1px solid #1a1a1a;
+            background: var(--bg);
+            border: 1px solid var(--border);
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform, border-color, box-shadow;
             contain: content;
         }
         .asset-card:hover {
-            border-color: #E5FF00;
-            background: #111;
-            box-shadow: 0 0 20px rgba(229, 255, 0, 0.15);
+            border-color: var(--accent);
+            background: var(--panel);
+            box-shadow: 0 0 20px rgba(255, 107, 74, 0.15);
             transform: translateY(-2px);
             z-index: 10;
         }
@@ -108,7 +185,7 @@
         }
         .asset-card:hover svg {
             transform: scale(1.1);
-            filter: drop-shadow(0 0 4px rgba(229, 255, 0, 0.5));
+            filter: drop-shadow(0 0 4px rgba(255, 107, 74, 0.5));
         }
         .asset-card.selection-active {
             cursor: cell;
@@ -120,13 +197,13 @@
             right: 6px;
             width: 8px;
             height: 8px;
-            border: 1px solid rgba(229, 255, 0, 0.5);
+            border: 1px solid rgba(255, 107, 74, 0.5);
             border-radius: 50%;
         }
         .asset-card.ring-accent::after {
-            background: #E5FF00;
-            border-color: #E5FF00;
-            box-shadow: 0 0 10px #E5FF00;
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent);
         }
         .asset-card:hover .btn-action {
             opacity: 1;
@@ -147,7 +224,7 @@
         .copy-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(229, 255, 0, 0.9);
+            background: rgba(255, 107, 74, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -211,15 +288,15 @@
         #pivotHandle::before, #pivotHandle::after {
             content: '';
             position: absolute;
-            background: #E5FF00;
-            box-shadow: 0 0 8px rgba(229, 255, 0, 0.8);
+            background: var(--accent);
+            box-shadow: 0 0 8px rgba(255, 107, 74, 0.8);
         }
         #pivotHandle::before { width: 100%; height: 1px; }
         #pivotHandle::after { width: 1px; height: 100%; }
         #pivotHandle .pivot-center {
             width: 6px;
             height: 6px;
-            background: #E5FF00;
+            background: var(--accent);
             border-radius: 50%;
             border: 1px solid #000;
             z-index: 2;
@@ -230,12 +307,12 @@
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.8);
-            color: #E5FF00;
+            color: var(--accent);
             font-family: 'Jura', monospace;
             font-size: 8px;
             padding: 2px 4px;
             white-space: nowrap;
-            border: 1px solid #333;
+            border: 1px solid var(--border);
             pointer-events: none;
         }
 
@@ -268,7 +345,7 @@
             left: 0;
             width: 100%;
             height: 1px;
-            background: linear-gradient(90deg, transparent, #E5FF00, transparent);
+            background: linear-gradient(90deg, transparent, #FF6B4A, transparent);
             opacity: 0.15;
             z-index: 5;
             pointer-events: none;
@@ -298,7 +375,7 @@
         .crosshair::after {
             content: '';
             position: absolute;
-            background: #E5FF00;
+            background: #FF6B4A;
         }
 
         .crosshair::before {
@@ -365,12 +442,12 @@
 
         .resizer:hover,
         .resizer.active {
-            background: #E5FF00;
+            background: var(--accent);
         }
 
         .resizer:hover::after,
         .resizer.active::after {
-            background: repeating-linear-gradient(0deg, #E5FF00 0px, #E5FF00 2px, transparent 2px, transparent 5px);
+            background: repeating-linear-gradient(0deg, var(--accent) 0px, var(--accent) 2px, transparent 2px, transparent 5px);
             opacity: 1;
         }
 
@@ -384,8 +461,8 @@
         }
 
         .cm-s-material-darker .CodeMirror-gutters {
-            background: #050505 !important;
-            border-right: 1px solid #333;
+            background: var(--bg) !important;
+            border-right: 1px solid var(--border);
         }
 
         .cm-s-material-darker .CodeMirror-linenumber {
@@ -407,8 +484,8 @@
         /* === TOOLTIP === */
         .tooltip .tooltip-text {
             visibility: hidden;
-            background: #111;
-            color: #E5FF00;
+            background: var(--panel);
+            color: var(--accent);
             text-align: center;
             padding: 4px 10px;
             position: absolute;
@@ -421,7 +498,7 @@
             font-size: 10px;
             white-space: nowrap;
             pointer-events: none;
-            border: 1px solid #333;
+            border: 1px solid var(--border);
             font-family: 'Jura', monospace;
             text-transform: uppercase;
             letter-spacing: 0.08em;
@@ -438,7 +515,7 @@
         }
 
         .ai-output strong {
-            color: #E5FF00;
+            color: #FF6B4A;
             font-weight: 600;
         }
 
@@ -471,20 +548,20 @@
         }
 
         .btn-brutal:hover {
-            border-color: #E5FF00;
-            color: #E5FF00;
-            background: rgba(229, 255, 0, 0.05);
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(255, 107, 74, 0.05);
         }
 
         .btn-brutal.active {
-            border-color: #E5FF00;
-            color: #E5FF00;
-            background: rgba(229, 255, 0, 0.1);
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(255, 107, 74, 0.1);
         }
 
         .btn-accent {
-            background: #E5FF00;
-            color: #050505;
+            background: var(--accent);
+            color: var(--bg);
             border: none;
             padding: 6px 14px;
             font-family: 'Syne', sans-serif;
@@ -497,7 +574,7 @@
         }
 
         .btn-accent:hover {
-            background: #d4ee00;
+            background: var(--gold);
         }
 
         /* === ZOOM CONTROLS === */
@@ -509,8 +586,8 @@
             display: flex;
             align-items: center;
             gap: 2px;
-            background: rgba(5, 5, 5, 0.85);
-            border: 1px solid #333;
+            background: rgba(14, 16, 19, 0.85);
+            border: 1px solid var(--border);
             padding: 2px;
             backdrop-filter: blur(4px);
         }
@@ -527,11 +604,11 @@
         }
 
         .zoom-controls button:hover {
-            color: #E5FF00;
+            color: var(--accent);
         }
 
         .zoom-pct {
-            color: #E5FF00;
+            color: var(--accent);
             font-family: 'Jura', monospace;
             font-size: 11px;
             padding: 0 6px;
@@ -600,12 +677,12 @@
         }
 
         .templates-dropdown .template-item:hover {
-            background: rgba(229, 255, 0, 0.05);
-            color: #E5FF00;
+            background: rgba(255, 107, 74, 0.05);
+            color: #FF6B4A;
         }
 
         .templates-dropdown .template-item .tmpl-icon {
-            color: #E5FF00;
+            color: #FF6B4A;
             font-size: 14px;
             width: 20px;
             text-align: center;
@@ -625,7 +702,7 @@
         /* === ELEMENT SELECTION === */
         .el-selected {
             /* Removed 'outline' because it breaks SVG hardware-accelerated animations in webkit */
-            filter: drop-shadow(0 0 4px #E5FF00) brightness(1.2);
+            filter: drop-shadow(0 0 4px #FF6B4A) brightness(1.2);
             cursor: pointer;
         }
 
@@ -665,7 +742,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.12em;
-            color: #E5FF00;
+            color: #FF6B4A;
             margin: 0;
         }
 
@@ -705,7 +782,7 @@
         }
 
         .ecp-input:focus {
-            border-color: #E5FF00;
+            border-color: #FF6B4A;
         }
 
         .ecp-input[type="range"] {
@@ -725,7 +802,7 @@
             -webkit-appearance: none;
             width: 12px;
             height: 12px;
-            background: #E5FF00;
+            background: #FF6B4A;
             margin-top: -5px;
             cursor: pointer;
         }
@@ -791,9 +868,9 @@
         }
 
         .ecp-btn:hover {
-            border-color: #E5FF00;
-            color: #E5FF00;
-            background: rgba(229, 255, 0, 0.05);
+            border-color: #FF6B4A;
+            color: #FF6B4A;
+            background: rgba(255, 107, 74, 0.05);
         }
 
         .ecp-btn.danger {
@@ -806,8 +883,8 @@
         }
 
         .ecp-btn.accent {
-            border-color: #E5FF00;
-            color: #E5FF00;
+            border-color: #FF6B4A;
+            color: #FF6B4A;
         }
 
         /* === ASSET LIBRARY SCALING FIX === */
@@ -836,7 +913,17 @@
         <div id="intro-content" class="text-center relative flex flex-col items-center">
             <div class="overflow-hidden mb-4">
                 <div id="intro-logo" class="text-white text-5xl font-display font-light tracking-[0.2em] opacity-0">
-                    <span class="font-black text-accent mr-2">■</span>SVG STUDIO
+                    <svg class="w-10 h-10 text-accent inline-block mr-2 align-middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
+    <path d="M12 2v2"></path>
+    <path d="M12 20v2"></path>
+    <path d="M4.93 4.93l1.41 1.41"></path>
+    <path d="M17.66 17.66l1.41 1.41"></path>
+    <path d="M2 12h2"></path>
+    <path d="M20 12h2"></path>
+    <path d="M6.34 17.66l-1.41 1.41"></path>
+    <path d="M19.07 4.93l-1.41 1.41"></path>
+</svg>SVG STUDIO
                 </div>
             </div>
             <div class="w-full max-w-[200px] h-[1px] bg-border relative overflow-hidden">
@@ -854,14 +941,30 @@
     <!-- Global Header -->
     <header
         class="flex justify-between items-center px-4 py-0 bg-bg border-b-2 border-border z-50 shrink-0 h-12 relative">
-        <div class="flex items-center gap-4">
-            <a href="index.html" class="flex items-center gap-2 no-underline">
-                <span class="text-accent text-lg">■</span>
-                <span class="font-display text-sm font-bold tracking-wider text-white uppercase">SVG STUDIO</span>
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="flex items-center gap-1.5 text-muted hover:text-accent border border-border hover:border-accent bg-panel/30 px-2 py-1 transition-colors no-underline group" title="Back to Dashboard">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                </svg>
+                <span class="font-tech text-[10px] font-bold tracking-wider">DASHBOARD</span>
             </a>
-            <span class="text-muted text-xs font-tech uppercase tracking-widest hidden sm:inline">// EDITOR v2.0</span>
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
+                    <path d="M12 2v2"></path>
+                    <path d="M12 20v2"></path>
+                    <path d="M4.93 4.93l1.41 1.41"></path>
+                    <path d="M17.66 17.66l1.41 1.41"></path>
+                    <path d="M2 12h2"></path>
+                    <path d="M20 12h2"></path>
+                    <path d="M6.34 17.66l-1.41 1.41"></path>
+                    <path d="M19.07 4.93l-1.41 1.41"></path>
+                </svg>
+                <span class="font-display text-sm font-bold tracking-wider text-white uppercase hidden md:inline">SVG STUDIO</span>
+            </div>
+            <span class="text-muted text-xs font-tech uppercase tracking-widest hidden lg:inline">// EDITOR v2.0</span>
         </div>
-        <div class="flex gap-2 items-center">
+        <div id="headerActions" class="hidden md:flex gap-2 items-center">
             <div class="relative z-50" id="templatesWrapper">
                 <button id="templatesBtn" class="btn-brutal">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -938,11 +1041,26 @@
                 </svg>
                 Guide
             </button>
-            
+        </div>
+        <!-- Hamburger Menu Button -->
+        <button id="mobileMenuToggle" class="flex md:hidden btn-brutal p-2 border-accent/30 text-accent hover:bg-accent/10" aria-label="Toggle Menu">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+        </button>
     </header>
+    <!-- Mobile View Switcher (Tabs) -->
+    <div id="mobileTabs" class="flex md:hidden w-full bg-panel border-b border-border shrink-0 z-40">
+        <button id="showCodeBtn" class="flex-1 py-3 text-xs font-tech uppercase tracking-wider text-center border-r border-border transition-colors text-accent bg-bg font-bold border-b-2 border-b-accent">
+            Code View
+        </button>
+        <button id="showCanvasBtn" class="flex-1 py-3 text-xs font-tech uppercase tracking-wider text-center transition-colors text-muted hover:text-white">
+            Canvas View
+        </button>
+    </div>
 
     <!-- Main Workspace -->
-    <main class="flex-1 flex flex-row h-[calc(100vh-3.5rem)] relative overflow-hidden">
+    <main class="flex-1 flex flex-row relative overflow-hidden min-h-0">
 
         <!-- Editor Section -->
         <section id="editorSection" class="flex flex-col bg-bg border-r-2 border-border h-full relative min-w-0"
@@ -1105,9 +1223,9 @@
                             </div>
                             <div class="ecp-row mt-1">
                                 <span class="ecp-label">Fill</span>
-                                <input type="color" id="ecpFill2" class="ecp-input" value="#E5FF00">
+                                <input type="color" id="ecpFill2" class="ecp-input" value="#FF6B4A">
                                 <span class="ecp-label" style="min-width:36px;">Stroke</span>
-                                <input type="color" id="ecpStroke2" class="ecp-input" value="#E5FF00">
+                                <input type="color" id="ecpStroke2" class="ecp-input" value="#FF6B4A">
                             </div>
                             <div class="ecp-row mt-1">
                                 <span class="ecp-label">Stroke W</span>
@@ -1513,9 +1631,9 @@
                                 <div class="flex-1">
                                     <label class="block text-[10px] text-muted mb-1.5 uppercase tracking-wider font-tech">Stroke Color</label>
                                     <div class="flex gap-1.5 items-center bg-bg border border-border p-1">
-                                        <input type="color" id="animStrokeColor" value="#E5FF00" 
+                                        <input type="color" id="animStrokeColor" value="#FF6B4A" 
                                             class="w-5 h-5 bg-transparent border-0 cursor-pointer">
-                                        <input type="text" id="animStrokeColorHex" value="#E5FF00" 
+                                        <input type="text" id="animStrokeColorHex" value="#FF6B4A" 
                                             class="bg-transparent border-0 text-[10px] text-gray-300 w-full outline-none font-mono">
                                     </div>
                                 </div>
@@ -1706,13 +1824,13 @@
                             <span class="ecp-label">Opacity</span>
                             <input type="range" id="ecpOpacity" class="ecp-input" min="0" max="1" step="0.05" value="1">
                             <span id="ecpOpacityVal"
-                                style="font-family:'Jura',monospace;font-size:10px;color:#E5FF00;min-width:28px;text-align:right;">1.0</span>
+                                style="font-family:'Jura',monospace;font-size:10px;color:#FF6B4A;min-width:28px;text-align:right;">1.0</span>
                         </div>
                         <div class="ecp-row">
                             <span class="ecp-label">Fill</span>
-                            <input type="color" id="ecpFill" class="ecp-input" value="#E5FF00">
+                            <input type="color" id="ecpFill" class="ecp-input" value="#FF6B4A">
                             <span class="ecp-label" style="min-width:36px;">Stroke</span>
-                            <input type="color" id="ecpStroke" class="ecp-input" value="#E5FF00">
+                            <input type="color" id="ecpStroke" class="ecp-input" value="#FF6B4A">
                         </div>
                         <div class="ecp-row">
                             <span class="ecp-label">Stroke W</span>
@@ -1739,7 +1857,7 @@
 
                         <!-- Gradient Editor (Hidden by default) -->
                         <div id="ecpGradientSection" style="display: none;">
-                            <div class="ecp-section-title" style="margin-top: 8px;">Gradient Editor <span id="gradTypeBadge" style="float:right; color:#E5FF00; font-size:8px;">LINEAR</span></div>
+                            <div class="ecp-section-title" style="margin-top: 8px;">Gradient Editor <span id="gradTypeBadge" style="float:right; color:#FF6B4A; font-size:8px;">LINEAR</span></div>
                             <div id="gradientStopsContainer" style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
                                 <!-- Stops injected here -->
                             </div>
@@ -1974,7 +2092,7 @@
                         <h4 class="text-accent font-tech uppercase tracking-widest text-xs mb-2">01 // TYPOGRAPHY & AESTHETIC</h4>
                         <ul class="list-disc list-inside space-y-1 text-[11px] text-muted">
                             <li><strong class="text-accent">Moon Walk:</strong> custom font integration for all technical readouts.</li>
-                            <li><strong class="text-accent">Obsidian Palette:</strong> High-contrast Obsidian (#050505) and Theme Lime (#E5FF00).</li>
+                            <li><strong class="text-accent">Obsidian Palette:</strong> High-contrast Obsidian (#050505) and Theme Lime (#FF6B4A).</li>
                             <li><strong class="text-accent">Brutalist Design:</strong> 0px border radii, sharp geometry, and tactical labels.</li>
                         </ul>
                     </section>
@@ -2093,17 +2211,17 @@
         const defaultSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
   <defs>
     <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#E5FF00" stop-opacity="0.6" />
-      <stop offset="100%" stop-color="#E5FF00" stop-opacity="0" />
+      <stop offset="0%" stop-color="#FF6B4A" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#FF6B4A" stop-opacity="0" />
     </radialGradient>
   </defs>
   <circle cx="100" cy="100" r="40" fill="url(#glow)">
     <animate attributeName="r" values="30;45;30" dur="2s" repeatCount="indefinite" />
   </circle>
-  <circle cx="100" cy="100" r="10" fill="#E5FF00">
+  <circle cx="100" cy="100" r="10" fill="#FF6B4A">
     <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite" />
   </circle>
-  <g stroke="#E5FF00" stroke-width="1.5" fill="none" opacity="0.4">
+  <g stroke="#FF6B4A" stroke-width="1.5" fill="none" opacity="0.4">
     <ellipse cx="100" cy="100" rx="70" ry="20">
       <animateTransform attributeName="transform" type="rotate" from="0 100 100" to="360 100 100" dur="6s" repeatCount="indefinite" />
     </ellipse>
@@ -2545,7 +2663,7 @@
 
             targetBtn.classList.add('text-accent', 'bg-accent/10');
             targetBtn.classList.remove('text-muted');
-            targetBtn.style.border = '1px solid rgba(229,255,0,0.3)';
+            targetBtn.style.border = '1px solid rgba(255, 107, 74,0.3)';
 
             scale = 1; panX = 0; panY = 0; updateTransform();
         }
@@ -2908,7 +3026,7 @@
         }
 
 
-        function applyCustomAnimation(type, _duration, easing, direction, _delay, iteration, origin, intensity, _stagger, staggerFrom, strokeColor = '#E5FF00', strokeWidth = '2', strokeOpacity = '1', isLive = false, triggerMode = 'loop', holdDuration = 0, randomize = false, axisLock = 'none', timeScale = 1) {
+        function applyCustomAnimation(type, _duration, easing, direction, _delay, iteration, origin, intensity, _stagger, staggerFrom, strokeColor = '#FF6B4A', strokeWidth = '2', strokeOpacity = '1', isLive = false, triggerMode = 'loop', holdDuration = 0, randomize = false, axisLock = 'none', timeScale = 1) {
             
             // Adjust parameters globally by timeScale
             const duration = parseFloat(_duration) / parseFloat(timeScale);
@@ -3258,11 +3376,11 @@
                 const rOff = 3 * intensity;
                 const bOff = -3 * intensity;
                 batchedStyles += `\n@keyframes anim-rgbSplit { 
-                    0% { filter: drop-shadow(${rOff}px 0 rgba(255,0,0,0.8)) drop-shadow(${bOff}px 0 rgba(0,255,255,0.8)); transform: translate(0,0); }
-                    25% { filter: drop-shadow(${-rOff/2}px 0 rgba(255,0,0,0.8)) drop-shadow(${bOff*2}px 0 rgba(0,255,255,0.8)); transform: translate(-1px, 1px); }
-                    50% { filter: drop-shadow(${rOff*2}px 0 rgba(255,0,255,0.8)) drop-shadow(${bOff/2}px 0 rgba(0,255,0,0.8)); transform: translate(1px, -1px); }
-                    75% { filter: drop-shadow(${-rOff}px 0 rgba(255,255,0,0.8)) drop-shadow(${bOff}px 0 rgba(0,0,255,0.8)); transform: translate(0, 1px); }
-                    100% { filter: drop-shadow(${rOff}px 1px rgba(255,0,0,0.8)) drop-shadow(${bOff}px 0 rgba(0,255,255,0.8)); transform: translate(0,0); }
+                    0% { filter: drop-shadow(${rOff}px 0 rgba(255,107,74,0.8)) drop-shadow(${bOff}px 0 rgba(255,174,66,0.8)); transform: translate(0,0); }
+                    25% { filter: drop-shadow(${-rOff/2}px 0 rgba(255,107,74,0.8)) drop-shadow(${bOff*2}px 0 rgba(255,174,66,0.8)); transform: translate(-1px, 1px); }
+                    50% { filter: drop-shadow(${rOff*2}px 0 rgba(255,107,74,0.8)) drop-shadow(${bOff/2}px 0 rgba(255,138,0,0.8)); transform: translate(1px, -1px); }
+                    75% { filter: drop-shadow(${-rOff}px 0 rgba(255,174,66,0.8)) drop-shadow(${bOff}px 0 rgba(255,138,0,0.8)); transform: translate(0, 1px); }
+                    100% { filter: drop-shadow(${rOff}px 1px rgba(255,107,74,0.8)) drop-shadow(${bOff}px 0 rgba(255,174,66,0.8)); transform: translate(0,0); }
                 }`;
                 batchedStyles += `\n.anim-rgb-split { animation: anim-rgbSplit ${animProps}; }\n`;
                 applyClassToTargets('anim-rgb-split');
@@ -3742,10 +3860,10 @@
                 
                 defs.innerHTML += `
                     <linearGradient id="spectrumGrad" x1="0%" y1="0%" x2="400%" y2="0%" spreadMethod="repeat">
-                        <stop offset="0%" stop-color="#ff0000" /><stop offset="5%" stop-color="#ffff00" />
-                        <stop offset="10%" stop-color="#00ff00" /><stop offset="15%" stop-color="#00ffff" />
-                        <stop offset="20%" stop-color="#0000ff" /><stop offset="25%" stop-color="#ff00ff" />
-                        <stop offset="30%" stop-color="#ff0000" />
+                        <stop offset="0%" stop-color="#ff6b4a" /><stop offset="5%" stop-color="#ffae42" />
+                        <stop offset="10%" stop-color="#faf9f6" /><stop offset="15%" stop-color="#ffae42" />
+                        <stop offset="20%" stop-color="#ff6b4a" /><stop offset="25%" stop-color="#ffae42" />
+                        <stop offset="30%" stop-color="#ff6b4a" />
                         <animateTransform attributeName="gradientTransform" type="translate" values="0,0;-2,0" dur="${duration}s" repeatCount="indefinite" />
                     </linearGradient>
                     <mask id="spectrumMask" maskUnits="objectBoundingBox">
@@ -3777,7 +3895,7 @@
                     <feDisplacementMap in="SourceGraphic" in2="noise" scale="${20 * intensity}" result="displaced"/>
                     <feGaussianBlur in="displaced" stdDeviation="${3 * intensity}" result="blur"/>
                     <feColorMatrix in="blur" type="hueRotate" values="0" result="glow">
-                        <animate attributeName="values" from="0" to="360" dur="${duration * 2}s" repeatCount="indefinite"/>
+                        <animate attributeName="values" values="-30;30;-30" dur="${duration * 2}s" repeatCount="indefinite"/>
                     </feColorMatrix>
                     <feMerge>
                         <feMergeNode in="glow"/>
@@ -3823,7 +3941,7 @@
                 batchedStyles += `\n.anim-dialup { animation: dialupReveal ${duration}s steps(5, end) forwards; }\n`;
                 applyClassToTargets('anim-dialup');
             } else if (type === 'magnetic') {
-                if (!batchedStyles.includes('@keyframes magneticTilt')) batchedStyles += `\n@keyframes magneticTilt { 0% { transform: perspective(400px) rotateX(10deg) rotateY(-20deg) scale(0.9); } 50% { transform: perspective(400px) rotateX(-10deg) rotateY(20deg) scale(1.1); filter: drop-shadow(-20px 20px 0px rgba(229, 255, 0, 0.2)); } 100% { transform: perspective(400px) rotateX(10deg) rotateY(-20deg) scale(0.9); } }`;
+                if (!batchedStyles.includes('@keyframes magneticTilt')) batchedStyles += `\n@keyframes magneticTilt { 0% { transform: perspective(400px) rotateX(10deg) rotateY(-20deg) scale(0.9); } 50% { transform: perspective(400px) rotateX(-10deg) rotateY(20deg) scale(1.1); filter: drop-shadow(-20px 20px 0px rgba(255, 107, 74, 0.2)); } 100% { transform: perspective(400px) rotateX(10deg) rotateY(-20deg) scale(0.9); } }`;
                 batchedStyles += `\n.anim-magnetic { animation: magneticTilt ${animProps}; transform-style: preserve-3d; }\n`;
                 applyClassToTargets('anim-magnetic');
             } else if (type === 'fluid-gradient') {
@@ -3859,8 +3977,8 @@
                     const filter = doc.createElementNS("http://www.w3.org/2000/svg", "filter");
                     filter.setAttribute("id", "echoFilter");
                     filter.innerHTML = `
-                        <feDropShadow dx="-10" dy="0" stdDeviation="2" flood-color="#ff0055" flood-opacity="${0.5 * strokeOpacity}"/>
-                        <feDropShadow dx="-20" dy="0" stdDeviation="4" flood-color="#00ffff" flood-opacity="${0.3 * strokeOpacity}"/>
+                        <feDropShadow dx="-10" dy="0" stdDeviation="2" flood-color="#ff6b4a" flood-opacity="${0.5 * strokeOpacity}"/>
+                        <feDropShadow dx="-20" dy="0" stdDeviation="4" flood-color="#ffae42" flood-opacity="${0.3 * strokeOpacity}"/>
                         <feDropShadow dx="-30" dy="0" stdDeviation="6" flood-color="${strokeColor}" flood-opacity="${0.2 * strokeOpacity}"/>
                     `;
                     svg.insertBefore(filter, svg.firstChild);
@@ -4027,7 +4145,7 @@
                 if (!svg.querySelector('#prismaticFilter')) {
                     const filter = doc.createElementNS("http://www.w3.org/2000/svg", "filter");
                     filter.setAttribute("id", "prismaticFilter");
-                    filter.innerHTML = `<feDropShadow dx="0" dy="0" stdDeviation="${10 * scale}" flood-color="#ff00ff"><animate attributeName="flood-color" values="#ff00ff;#00ffff;#e5ff00;#ff00ff" dur="${duration}s" repeatCount="indefinite"/><animate attributeName="stdDeviation" values="${10 * scale};${30 * scale};${10 * scale}" dur="${duration}s" repeatCount="indefinite"/></feDropShadow>`;
+                    filter.innerHTML = `<feDropShadow dx="0" dy="0" stdDeviation="${10 * scale}" flood-color="#ff00ff"><animate attributeName="flood-color" values="#ff00ff;#00ffff;#FF6B4A;#ff00ff" dur="${duration}s" repeatCount="indefinite"/><animate attributeName="stdDeviation" values="${10 * scale};${30 * scale};${10 * scale}" dur="${duration}s" repeatCount="indefinite"/></feDropShadow>`;
                     svg.insertBefore(filter, svg.firstChild);
                 }
                 applyClassToTargets('', el => el.setAttribute('filter', 'url(#prismaticFilter)'));
@@ -4054,8 +4172,8 @@
                     defs.innerHTML += `
                         <radialGradient id="vortexGrad" cx="50%" cy="50%" r="50%">
                             <stop offset="0%" stop-color="${strokeColor}" stop-opacity="${strokeOpacity}" />
-                            <stop offset="50%" stop-color="#00FFFF" stop-opacity="${0.6 * strokeOpacity}" />
-                            <stop offset="100%" stop-color="#FF00FF" stop-opacity="0" />
+                            <stop offset="50%" stop-color="#ffae42" stop-opacity="${0.6 * strokeOpacity}" />
+                            <stop offset="100%" stop-color="#ff6b4a" stop-opacity="0" />
                         </radialGradient>
                     `;
                 }
@@ -4998,22 +5116,22 @@
 
         // ── Templates Library ──
         const svgTemplates = [
-            { name: 'CIRCLE', icon: '◯', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="#E5FF00" opacity="0.8"/></svg>' },
-            { name: 'RECTANGLE', icon: '▭', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="20" y="40" width="160" height="120" fill="#E5FF00" opacity="0.8"/></svg>' },
-            { name: 'LINE ART', icon: '╱', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><line x1="20" y1="180" x2="180" y2="20" stroke="#E5FF00" stroke-width="3"/><line x1="20" y1="20" x2="180" y2="180" stroke="#E5FF00" stroke-width="3" opacity="0.4"/></svg>' },
-            { name: 'STAR', icon: '★', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><polygon points="100,10 127,80 200,80 140,125 160,195 100,155 40,195 60,125 0,80 73,80" fill="#E5FF00" opacity="0.8"/></svg>' },
-            { name: 'GRADIENT', icon: '▓', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#E5FF00"/><stop offset="100%" stop-color="#050505"/></linearGradient></defs><rect width="200" height="200" fill="url(#g1)"/></svg>' },
-            { name: 'TEXT', icon: 'A', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><text x="100" y="115" text-anchor="middle" font-family="sans-serif" font-size="48" font-weight="bold" fill="#E5FF00">SVG</text></svg>' },
-            { name: 'PATTERN', icon: '⊞', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><pattern id="p1" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#E5FF00" opacity="0.3"/></pattern></defs><rect width="200" height="200" fill="url(#p1)"/></svg>' },
-            { name: 'WAVE', icon: '〰', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M0,100 C25,60 75,60 100,100 C125,140 175,140 200,100" stroke="#E5FF00" stroke-width="3" fill="none"/><path d="M0,120 C25,80 75,80 100,120 C125,160 175,160 200,120" stroke="#E5FF00" stroke-width="2" fill="none" opacity="0.4"/></svg>' },
-            { name: 'Y2K TEXT', icon: 'T', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><text x="200" y="120" text-anchor="middle" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="64" font-weight="900" fill="none" stroke="#E5FF00" stroke-width="2" letter-spacing="4px" class="anim-glitch" filter="url(#textGlitchFilter)">SYSTEM READY</text></svg>' },
-            { name: 'CIRCULAR BADGE', icon: '*', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><defs><path id="badgePath" d="M 150, 150 m -100, 0 a 100,100 0 1,1 200,0 a 100,100 0 1,1 -200,0"/></defs><text font-family="Impact, sans-serif" font-size="24" font-weight="bold" fill="#E5FF00" letter-spacing="6px" class="anim-text-3d"><textPath href="#badgePath" startOffset="50%" text-anchor="middle">* OPTIMAL PERFORMANCE * MAXIMUM OVERDRIVE *</textPath></text></svg>' },
-            { name: 'MATRIX TERMINAL', icon: '>', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect x="10" y="10" width="380" height="180" fill="#050505" stroke="#00FF41" stroke-width="2"/><text x="40" y="60" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="20" fill="#00FF41" class="anim-typewriter" style="animation-duration:3s;">> INITIATING PROTOCOL...</text><text x="40" y="100" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="20" fill="#00FF41" class="anim-typewriter" style="animation-duration:4s; animation-delay:1s; opacity:0; animation-fill-mode:forwards;">> BYPASSING SECURITY...</text><text x="40" y="140" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="20" fill="#E5FF00" class="anim-typewriter" style="animation-duration:2s; animation-delay:3s; opacity:0; animation-fill-mode:forwards; font-weight:bold;">> ACCESS GRANTED_</text></svg>' },
-            { name: 'WAVY BANNER', icon: '~', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200"><defs><path id="bannerWave" d="M 50, 100 Q 150, 50 250, 100 T 450, 100"/></defs><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="36" font-style="italic" fill="#E5FF00" class="anim-text-wave"><textPath href="#bannerWave" startOffset="50%" text-anchor="middle">FUTURE BOUND // NO LIMITS</textPath></text></svg>' },
-            { name: '3D CYLINDER TEXT', icon: '◖', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><path id="cylinderPath" d="M 50,200 A 150,50 0 1,1 350,200 A 150,50 0 1,1 50,200"/></defs><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="32" font-weight="900" fill="none" stroke="#E5FF00" stroke-width="2" letter-spacing="8px" class="anim-text-3d" style="animation-duration:10s; transform-origin: 200px 200px;"><textPath href="#cylinderPath" startOffset="50%" text-anchor="middle">VIRTUAL REALITY • CYBERSPACE • METAVERSE •</textPath></text></svg>' },
-            { name: 'SYSTEM BREACH', icon: '⌨', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect x="5" y="5" width="390" height="190" fill="#050505" stroke="#E5FF00" stroke-width="2"/><rect x="5" y="5" width="390" height="25" fill="#1A1A1A"/><text x="15" y="22" font-family="monospace" font-size="12" fill="#E5FF00" font-weight="bold">TERMINAL // SECURITY_BYPASS</text><text x="20" y="65" font-family="monospace" font-size="14" fill="#E5FF00" class="anim-typewriter" style="animation-duration:4s;">> INITIATING BRUTE FORCE...</text><text x="20" y="95" font-family="monospace" font-size="14" fill="#E5FF00" class="anim-typewriter" style="animation-duration:5s; animation-delay:1.5s; opacity:0; animation-fill-mode:forwards;">> PACKET INJECTION SUCCESSFUL</text><text x="20" y="125" font-family="monospace" font-size="14" fill="#FF6600" class="anim-typewriter" style="animation-duration:2s; animation-delay:4s; opacity:0; animation-fill-mode:forwards; font-weight:bold;">> [CRITICAL] SYSTEM OVERRIDE</text></svg>' },
-            { name: 'ARCHIVE BADGE', icon: '❂', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><defs><path id="badgePathInternal" d="M 150, 150 m -80, 0 a 80,80 0 1,1 160,0 a 80,80 0 1,1 -160,0"/></defs><circle cx="150" cy="150" r="140" fill="none" stroke="#E5FF00" stroke-width="1" stroke-dasharray="4 4" opacity="0.3"/><circle cx="150" cy="150" r="120" fill="none" stroke="#E5FF00" stroke-width="4" stroke-dasharray="60 20" class="motion-spin" style="animation-duration:20s"/><circle cx="150" cy="150" r="100" fill="none" stroke="#E5FF00" stroke-width="2" stroke-dasharray="10 10" class="motion-spin" style="animation-duration:15s; animation-direction:reverse"/><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="14" fill="#E5FF00" letter-spacing="4px"><textPath href="#badgePathInternal" startOffset="50%" text-anchor="middle">RESTRICTED DATA // ARCHIVE ACCESS</textPath></text><polygon points="150,110 170,140 150,170 130,140" fill="#E5FF00" class="motion-pulse"/></svg>' },
-            { name: 'GRID SCANNER', icon: '⌗', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="scanGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#E5FF00" stop-opacity="0"/><stop offset="50%" stop-color="#E5FF00" stop-opacity="0.2"/><stop offset="100%" stop-color="#E5FF00" stop-opacity="0"/></linearGradient></defs><rect width="400" height="300" fill="#050505"/><path d="M0 0 H400 M0 50 H400 M0 100 H400 M0 150 H400 M0 200 H400 M0 250 H400 M0 300 H400 M0 0 V300 M50 0 V300 M100 0 V300 M150 0 V300 M200 0 V300 M250 0 V300 M300 0 V300 M350 0 V300 M400 0 V300" stroke="#E5FF00" stroke-width="0.5" opacity="0.1"/><rect width="400" height="60" fill="url(#scanGrad)" class="motion-bounce" style="animation-duration:4s; transform-origin: center"/><text x="10" y="290" font-family="monospace" font-size="10" fill="#E5FF00" opacity="0.5">X: 102.44 // Y: 559.12 // SEQ: 00192</text></svg>' }
+            { name: 'CIRCLE', icon: '◯', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="#FF6B4A" opacity="0.8"/></svg>' },
+            { name: 'RECTANGLE', icon: '▭', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="20" y="40" width="160" height="120" fill="#FF6B4A" opacity="0.8"/></svg>' },
+            { name: 'LINE ART', icon: '╱', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><line x1="20" y1="180" x2="180" y2="20" stroke="#FF6B4A" stroke-width="3"/><line x1="20" y1="20" x2="180" y2="180" stroke="#FF6B4A" stroke-width="3" opacity="0.4"/></svg>' },
+            { name: 'STAR', icon: '★', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><polygon points="100,10 127,80 200,80 140,125 160,195 100,155 40,195 60,125 0,80 73,80" fill="#FF6B4A" opacity="0.8"/></svg>' },
+            { name: 'GRADIENT', icon: '▓', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#FF6B4A"/><stop offset="100%" stop-color="#050505"/></linearGradient></defs><rect width="200" height="200" fill="url(#g1)"/></svg>' },
+            { name: 'TEXT', icon: 'A', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><text x="100" y="115" text-anchor="middle" font-family="sans-serif" font-size="48" font-weight="bold" fill="#FF6B4A">SVG</text></svg>' },
+            { name: 'PATTERN', icon: '⊞', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><pattern id="p1" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#FF6B4A" opacity="0.3"/></pattern></defs><rect width="200" height="200" fill="url(#p1)"/></svg>' },
+            { name: 'WAVE', icon: '〰', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M0,100 C25,60 75,60 100,100 C125,140 175,140 200,100" stroke="#FF6B4A" stroke-width="3" fill="none"/><path d="M0,120 C25,80 75,80 100,120 C125,160 175,160 200,120" stroke="#FF6B4A" stroke-width="2" fill="none" opacity="0.4"/></svg>' },
+            { name: 'Y2K TEXT', icon: 'T', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><text x="200" y="120" text-anchor="middle" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="64" font-weight="900" fill="none" stroke="#FF6B4A" stroke-width="2" letter-spacing="4px" class="anim-glitch" filter="url(#textGlitchFilter)">SYSTEM READY</text></svg>' },
+            { name: 'CIRCULAR BADGE', icon: '*', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><defs><path id="badgePath" d="M 150, 150 m -100, 0 a 100,100 0 1,1 200,0 a 100,100 0 1,1 -200,0"/></defs><text font-family="Impact, sans-serif" font-size="24" font-weight="bold" fill="#FF6B4A" letter-spacing="6px" class="anim-text-3d"><textPath href="#badgePath" startOffset="50%" text-anchor="middle">* OPTIMAL PERFORMANCE * MAXIMUM OVERDRIVE *</textPath></text></svg>' },
+            { name: 'MATRIX TERMINAL', icon: '>', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect x="10" y="10" width="380" height="180" fill="#050505" stroke="#00FF41" stroke-width="2"/><text x="40" y="60" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="20" fill="#00FF41" class="anim-typewriter" style="animation-duration:3s;">> INITIATING PROTOCOL...</text><text x="40" y="100" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="20" fill="#00FF41" class="anim-typewriter" style="animation-duration:4s; animation-delay:1s; opacity:0; animation-fill-mode:forwards;">> BYPASSING SECURITY...</text><text x="40" y="140" font-family="&quot;Courier New&quot;, Courier, monospace" font-size="20" fill="#FF6B4A" class="anim-typewriter" style="animation-duration:2s; animation-delay:3s; opacity:0; animation-fill-mode:forwards; font-weight:bold;">> ACCESS GRANTED_</text></svg>' },
+            { name: 'WAVY BANNER', icon: '~', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 200"><defs><path id="bannerWave" d="M 50, 100 Q 150, 50 250, 100 T 450, 100"/></defs><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="36" font-style="italic" fill="#FF6B4A" class="anim-text-wave"><textPath href="#bannerWave" startOffset="50%" text-anchor="middle">FUTURE BOUND // NO LIMITS</textPath></text></svg>' },
+            { name: '3D CYLINDER TEXT', icon: '◖', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><defs><path id="cylinderPath" d="M 50,200 A 150,50 0 1,1 350,200 A 150,50 0 1,1 50,200"/></defs><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="32" font-weight="900" fill="none" stroke="#FF6B4A" stroke-width="2" letter-spacing="8px" class="anim-text-3d" style="animation-duration:10s; transform-origin: 200px 200px;"><textPath href="#cylinderPath" startOffset="50%" text-anchor="middle">VIRTUAL REALITY • CYBERSPACE • METAVERSE •</textPath></text></svg>' },
+            { name: 'SYSTEM BREACH', icon: '⌨', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect x="5" y="5" width="390" height="190" fill="#050505" stroke="#FF6B4A" stroke-width="2"/><rect x="5" y="5" width="390" height="25" fill="#1A1A1A"/><text x="15" y="22" font-family="monospace" font-size="12" fill="#FF6B4A" font-weight="bold">TERMINAL // SECURITY_BYPASS</text><text x="20" y="65" font-family="monospace" font-size="14" fill="#FF6B4A" class="anim-typewriter" style="animation-duration:4s;">> INITIATING BRUTE FORCE...</text><text x="20" y="95" font-family="monospace" font-size="14" fill="#FF6B4A" class="anim-typewriter" style="animation-duration:5s; animation-delay:1.5s; opacity:0; animation-fill-mode:forwards;">> PACKET INJECTION SUCCESSFUL</text><text x="20" y="125" font-family="monospace" font-size="14" fill="#FF6600" class="anim-typewriter" style="animation-duration:2s; animation-delay:4s; opacity:0; animation-fill-mode:forwards; font-weight:bold;">> [CRITICAL] SYSTEM OVERRIDE</text></svg>' },
+            { name: 'ARCHIVE BADGE', icon: '❂', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"><defs><path id="badgePathInternal" d="M 150, 150 m -80, 0 a 80,80 0 1,1 160,0 a 80,80 0 1,1 -160,0"/></defs><circle cx="150" cy="150" r="140" fill="none" stroke="#FF6B4A" stroke-width="1" stroke-dasharray="4 4" opacity="0.3"/><circle cx="150" cy="150" r="120" fill="none" stroke="#FF6B4A" stroke-width="4" stroke-dasharray="60 20" class="motion-spin" style="animation-duration:20s"/><circle cx="150" cy="150" r="100" fill="none" stroke="#FF6B4A" stroke-width="2" stroke-dasharray="10 10" class="motion-spin" style="animation-duration:15s; animation-direction:reverse"/><text font-family="&quot;Arial Black&quot;, sans-serif" font-size="14" fill="#FF6B4A" letter-spacing="4px"><textPath href="#badgePathInternal" startOffset="50%" text-anchor="middle">RESTRICTED DATA // ARCHIVE ACCESS</textPath></text><polygon points="150,110 170,140 150,170 130,140" fill="#FF6B4A" class="motion-pulse"/></svg>' },
+            { name: 'GRID SCANNER', icon: '⌗', code: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><defs><linearGradient id="scanGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#FF6B4A" stop-opacity="0"/><stop offset="50%" stop-color="#FF6B4A" stop-opacity="0.2"/><stop offset="100%" stop-color="#FF6B4A" stop-opacity="0"/></linearGradient></defs><rect width="400" height="300" fill="#050505"/><path d="M0 0 H400 M0 50 H400 M0 100 H400 M0 150 H400 M0 200 H400 M0 250 H400 M0 300 H400 M0 0 V300 M50 0 V300 M100 0 V300 M150 0 V300 M200 0 V300 M250 0 V300 M300 0 V300 M350 0 V300 M400 0 V300" stroke="#FF6B4A" stroke-width="0.5" opacity="0.1"/><rect width="400" height="60" fill="url(#scanGrad)" class="motion-bounce" style="animation-duration:4s; transform-origin: center"/><text x="10" y="290" font-family="monospace" font-size="10" fill="#FF6B4A" opacity="0.5">X: 102.44 // Y: 559.12 // SEQ: 00192</text></svg>' }
 
         ];
 
@@ -5090,247 +5208,247 @@
             {
                 "cat": "y2k",
                 "name": "4-Point Star",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M50 10 C50 40 60 50 90 50 C60 50 50 60 50 90 C50 60 40 50 10 50 C40 50 50 40 50 10 Z\" fill=\"#E5FF00\" opacity=\"0.2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M50 10 C50 40 60 50 90 50 C60 50 50 60 50 90 C50 60 40 50 10 50 C40 50 50 40 50 10 Z\" fill=\"#FF6B4A\" opacity=\"0.2\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "8-Point Star",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M50 5 L55 40 L90 45 L55 50 L50 85 L45 50 L10 45 L45 40 Z\"/><path d=\"M50 20 L65 35 L80 20 L65 50 L80 80 L65 65 L50 80 L35 65 L20 80 L35 50 L20 20 L35 35 Z\" opacity=\"0.5\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M50 5 L55 40 L90 45 L55 50 L50 85 L45 50 L10 45 L45 40 Z\"/><path d=\"M50 20 L65 35 L80 20 L65 50 L80 80 L65 65 L50 80 L35 65 L20 80 L35 50 L20 20 L35 35 Z\" opacity=\"0.5\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Hollow Star",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"3\"><path d=\"M50 10 L58 42 L90 50 L58 58 L50 90 L42 58 L10 50 L42 42 Z\"/><path d=\"M50 25 L54 46 L75 50 L54 54 L50 75 L46 54 L25 50 L46 46 Z\" stroke-width=\"1\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"3\"><path d=\"M50 10 L58 42 L90 50 L58 58 L50 90 L42 58 L10 50 L42 42 Z\"/><path d=\"M50 25 L54 46 L75 50 L54 54 L50 75 L46 54 L25 50 L46 46 Z\" stroke-width=\"1\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Spike Ring",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"30\"/><path d=\"M50 5 L50 20 M95 50 L80 50 M50 95 L50 80 M5 50 L20 50 M80 20 L70 30 M20 80 L30 70 M20 20 L30 30 M80 80 L70 70\" stroke-width=\"4\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"30\"/><path d=\"M50 5 L50 20 M95 50 L80 50 M50 95 L50 80 M5 50 L20 50 M80 20 L70 30 M20 80 L30 70 M20 20 L30 30 M80 80 L70 70\" stroke-width=\"4\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Y2K Sparkle",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M50 0 C50 40 60 50 100 50 C60 50 50 60 50 100 C50 60 40 50 0 50 C40 50 50 40 50 0 Z\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M50 0 C50 40 60 50 100 50 C60 50 50 60 50 100 C50 60 40 50 0 50 C40 50 50 40 50 0 Z\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Chrome Drop",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M50 10 C80 50 80 80 50 90 C20 80 20 50 50 10 Z\"/><circle cx=\"60\" cy=\"65\" r=\"5\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M50 10 C80 50 80 80 50 90 C20 80 20 50 50 10 Z\"/><circle cx=\"60\" cy=\"65\" r=\"5\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Tribal Flame",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M50 90 C20 70 30 30 50 10 C60 40 80 60 50 90 Z\"/><path d=\"M50 80 C35 65 40 40 50 25 C55 45 65 55 50 80 Z\" fill=\"#050505\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M50 90 C20 70 30 30 50 10 C60 40 80 60 50 90 Z\"/><path d=\"M50 80 C35 65 40 40 50 25 C55 45 65 55 50 80 Z\" fill=\"#050505\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Tribal Wing",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M10 50 Q40 20 90 10 Q60 40 80 60 Q50 50 50 90 Q30 60 10 50 Z\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M10 50 Q40 20 90 10 Q60 40 80 60 Q50 50 50 90 Q30 60 10 50 Z\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Symmetrical Tribal",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M50 10 Q70 40 90 50 Q70 60 50 90 Q30 60 10 50 Q30 40 50 10 Z M50 30 Q60 45 70 50 Q60 55 50 70 Q40 55 30 50 Q40 45 50 30 Z\" fill-rule=\"evenodd\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M50 10 Q70 40 90 50 Q70 60 50 90 Q30 60 10 50 Q30 40 50 10 Z M50 30 Q60 45 70 50 Q60 55 50 70 Q40 55 30 50 Q40 45 50 30 Z\" fill-rule=\"evenodd\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Orbiting Ellipses",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"1.5\"><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(30 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(-30 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(90 50 50)\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"1.5\"><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(30 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(-30 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(90 50 50)\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Targeting HUD",
-                "code": "<svg xmlnhtt.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1.5\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"8 4\" opacity=\"0.6\"/><circle cx=\"50\" cy=\"50\" r=\"30\" /><path d=\"M50 0 V20 M50 80 V100 M0 50 H20 M80 50 H100\" stroke-width=\"3\"/><circle cx=\"50\" cy=\"50\" r=\"3\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlnhtt.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1.5\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"8 4\" opacity=\"0.6\"/><circle cx=\"50\" cy=\"50\" r=\"30\" /><path d=\"M50 0 V20 M50 80 V100 M0 50 H20 M80 50 H100\" stroke-width=\"3\"/><circle cx=\"50\" cy=\"50\" r=\"3\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Sniper Scope",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><circle cx=\"50\" cy=\"50\" r=\"25\"/><line x1=\"0\" y1=\"50\" x2=\"100\" y2=\"50\" opacity=\"0.5\"/><line x1=\"50\" y1=\"0\" x2=\"50\" y2=\"100\" opacity=\"0.5\"/><rect x=\"45\" y=\"45\" width=\"10\" height=\"10\" stroke-width=\"2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><circle cx=\"50\" cy=\"50\" r=\"25\"/><line x1=\"0\" y1=\"50\" x2=\"100\" y2=\"50\" opacity=\"0.5\"/><line x1=\"50\" y1=\"0\" x2=\"50\" y2=\"100\" opacity=\"0.5\"/><rect x=\"45\" y=\"45\" width=\"10\" height=\"10\" stroke-width=\"2\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Radar Sweep",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-width=\"1\" stroke-dasharray=\"2 2\" /><path d=\"M50 50 L90 10\" stroke-width=\"2\" opacity=\"0.8\"/><circle cx=\"50\" cy=\"50\" r=\"10\" fill=\"#E5FF00\" opacity=\"0.3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-width=\"1\" stroke-dasharray=\"2 2\" /><path d=\"M50 50 L90 10\" stroke-width=\"2\" opacity=\"0.8\"/><circle cx=\"50\" cy=\"50\" r=\"10\" fill=\"#FF6B4A\" opacity=\"0.3\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Hexagon Grid",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><polygon points=\"50,15 80,30 80,70 50,85 20,70 20,30\"/><polygon points=\"50,30 65,40 65,60 50,70 35,60 35,40\" stroke-dasharray=\"2 2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><polygon points=\"50,15 80,30 80,70 50,85 20,70 20,30\"/><polygon points=\"50,30 65,40 65,60 50,70 35,60 35,40\" stroke-dasharray=\"2 2\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Cyber Eye",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><path d=\"M10 50 Q50 10 90 50 Q50 90 10 50 Z\"/><circle cx=\"50\" cy=\"50\" r=\"15\"/><circle cx=\"50\" cy=\"50\" r=\"5\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><path d=\"M10 50 Q50 10 90 50 Q50 90 10 50 Z\"/><circle cx=\"50\" cy=\"50\" r=\"15\"/><circle cx=\"50\" cy=\"50\" r=\"5\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Data Nodes",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><circle cx=\"20\" cy=\"30\" r=\"5\"/><circle cx=\"80\" cy=\"40\" r=\"5\"/><circle cx=\"40\" cy=\"80\" r=\"5\"/><circle cx=\"60\" cy=\"20\" r=\"5\"/><polyline points=\"20,30 60,20 80,40 40,80 20,30\" stroke-dasharray=\"4 2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><circle cx=\"20\" cy=\"30\" r=\"5\"/><circle cx=\"80\" cy=\"40\" r=\"5\"/><circle cx=\"40\" cy=\"80\" r=\"5\"/><circle cx=\"60\" cy=\"20\" r=\"5\"/><polyline points=\"20,30 60,20 80,40 40,80 20,30\" stroke-dasharray=\"4 2\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Circuit Trace",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><path d=\"M10 90 L30 90 L50 70 L50 30 L70 10 L90 10\"/><circle cx=\"10\" cy=\"90\" r=\"3\" fill=\"#E5FF00\"/><circle cx=\"90\" cy=\"10\" r=\"3\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><path d=\"M10 90 L30 90 L50 70 L50 30 L70 10 L90 10\"/><circle cx=\"10\" cy=\"90\" r=\"3\" fill=\"#FF6B4A\"/><circle cx=\"90\" cy=\"10\" r=\"3\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Tech Triangle",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><polygon points=\"50,15 90,80 10,80\"/><polygon points=\"50,30 75,70 25,70\" stroke-dasharray=\"3 3\"/><line x1=\"50\" y1=\"15\" x2=\"50\" y2=\"30\"/><line x1=\"90\" y1=\"80\" x2=\"75\" y2=\"70\"/><line x1=\"10\" y1=\"80\" x2=\"25\" y2=\"70\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><polygon points=\"50,15 90,80 10,80\"/><polygon points=\"50,30 75,70 25,70\" stroke-dasharray=\"3 3\"/><line x1=\"50\" y1=\"15\" x2=\"50\" y2=\"30\"/><line x1=\"90\" y1=\"80\" x2=\"75\" y2=\"70\"/><line x1=\"10\" y1=\"80\" x2=\"25\" y2=\"70\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Digital Sun",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"20\"/><path d=\"M50 10 L50 25 M50 75 L50 90 M10 50 L25 50 M75 50 L90 50 M20 20 L32 32 M78 78 L68 68 M80 20 L68 32 M20 80 L32 68\" stroke-dasharray=\"1 3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"20\"/><path d=\"M50 10 L50 25 M50 75 L50 90 M10 50 L25 50 M75 50 L90 50 M20 20 L32 32 M78 78 L68 68 M80 20 L68 32 M20 80 L32 68\" stroke-dasharray=\"1 3\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Core Processor",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><rect x=\"30\" y=\"30\" width=\"40\" height=\"40\"/><rect x=\"40\" y=\"40\" width=\"20\" height=\"20\" fill=\"#E5FF00\" opacity=\"0.3\"/><line x1=\"10\" y1=\"50\" x2=\"30\" y2=\"50\"/><line x1=\"70\" y1=\"50\" x2=\"90\" y2=\"50\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"30\"/><line x1=\"50\" y1=\"70\" x2=\"50\" y2=\"90\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><rect x=\"30\" y=\"30\" width=\"40\" height=\"40\"/><rect x=\"40\" y=\"40\" width=\"20\" height=\"20\" fill=\"#FF6B4A\" opacity=\"0.3\"/><line x1=\"10\" y1=\"50\" x2=\"30\" y2=\"50\"/><line x1=\"70\" y1=\"50\" x2=\"90\" y2=\"50\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"30\"/><line x1=\"50\" y1=\"70\" x2=\"50\" y2=\"90\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Tech Barcode",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 50\" fill=\"#E5FF00\"><rect x=\"10\" y=\"10\" width=\"4\" height=\"30\" /><rect x=\"18\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"24\" y=\"10\" width=\"8\" height=\"30\" /><rect x=\"36\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"42\" y=\"10\" width=\"6\" height=\"30\" /><rect x=\"52\" y=\"10\" width=\"4\" height=\"30\" /><rect x=\"60\" y=\"10\" width=\"12\" height=\"30\" /><rect x=\"76\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"82\" y=\"10\" width=\"8\" height=\"30\" /></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 50\" fill=\"#FF6B4A\"><rect x=\"10\" y=\"10\" width=\"4\" height=\"30\" /><rect x=\"18\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"24\" y=\"10\" width=\"8\" height=\"30\" /><rect x=\"36\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"42\" y=\"10\" width=\"6\" height=\"30\" /><rect x=\"52\" y=\"10\" width=\"4\" height=\"30\" /><rect x=\"60\" y=\"10\" width=\"12\" height=\"30\" /><rect x=\"76\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"82\" y=\"10\" width=\"8\" height=\"30\" /></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Loading Ring 1",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"4\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"60 190\" stroke-linecap=\"round\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0 50 50\" to=\"360 50 50\" dur=\"1s\" repeatCount=\"indefinite\"/></circle><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-opacity=\"0.2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"4\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"60 190\" stroke-linecap=\"round\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0 50 50\" to=\"360 50 50\" dur=\"1s\" repeatCount=\"indefinite\"/></circle><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-opacity=\"0.2\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Loading Ring 2",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"3\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"10 10\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"360 50 50\" to=\"0 50 50\" dur=\"4s\" repeatCount=\"indefinite\"/></circle><circle cx=\"50\" cy=\"50\" r=\"30\" stroke-dasharray=\"50 100\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0 50 50\" to=\"360 50 50\" dur=\"2s\" repeatCount=\"indefinite\"/></circle></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"3\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"10 10\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"360 50 50\" to=\"0 50 50\" dur=\"4s\" repeatCount=\"indefinite\"/></circle><circle cx=\"50\" cy=\"50\" r=\"30\" stroke-dasharray=\"50 100\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0 50 50\" to=\"360 50 50\" dur=\"2s\" repeatCount=\"indefinite\"/></circle></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Battery Status",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><rect x=\"20\" y=\"30\" width=\"50\" height=\"40\" rx=\"3\"/><path d=\"M70 40 L75 40 Q80 40 80 45 L80 55 Q80 60 75 60 L70 60\"/><rect x=\"25\" y=\"35\" width=\"10\" height=\"30\" fill=\"#E5FF00\"/><rect x=\"40\" y=\"35\" width=\"10\" height=\"30\" fill=\"#E5FF00\"/><rect x=\"55\" y=\"35\" width=\"10\" height=\"30\" fill=\"#E5FF00\" opacity=\"0.3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><rect x=\"20\" y=\"30\" width=\"50\" height=\"40\" rx=\"3\"/><path d=\"M70 40 L75 40 Q80 40 80 45 L80 55 Q80 60 75 60 L70 60\"/><rect x=\"25\" y=\"35\" width=\"10\" height=\"30\" fill=\"#FF6B4A\"/><rect x=\"40\" y=\"35\" width=\"10\" height=\"30\" fill=\"#FF6B4A\"/><rect x=\"55\" y=\"35\" width=\"10\" height=\"30\" fill=\"#FF6B4A\" opacity=\"0.3\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Warning Sign",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"3\"><polygon points=\"50,15 90,85 10,85\"/><line x1=\"50\" y1=\"40\" x2=\"50\" y2=\"65\"/><circle cx=\"50\" cy=\"75\" r=\"2\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"3\"><polygon points=\"50,15 90,85 10,85\"/><line x1=\"50\" y1=\"40\" x2=\"50\" y2=\"65\"/><circle cx=\"50\" cy=\"75\" r=\"2\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Signal Bars",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><rect x=\"20\" y=\"70\" width=\"10\" height=\"15\"/><rect x=\"40\" y=\"50\" width=\"10\" height=\"35\"/><rect x=\"60\" y=\"30\" width=\"10\" height=\"55\"/><rect x=\"80\" y=\"10\" width=\"10\" height=\"75\" opacity=\"0.3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><rect x=\"20\" y=\"70\" width=\"10\" height=\"15\"/><rect x=\"40\" y=\"50\" width=\"10\" height=\"35\"/><rect x=\"60\" y=\"30\" width=\"10\" height=\"55\"/><rect x=\"80\" y=\"10\" width=\"10\" height=\"75\" opacity=\"0.3\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Audio Wave",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"4\" stroke-linecap=\"round\"><line x1=\"20\" y1=\"40\" x2=\"20\" y2=\"60\"/><line x1=\"35\" y1=\"20\" x2=\"35\" y2=\"80\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"90\"/><line x1=\"65\" y1=\"30\" x2=\"65\" y2=\"70\"/><line x1=\"80\" y1=\"45\" x2=\"80\" y2=\"55\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"4\" stroke-linecap=\"round\"><line x1=\"20\" y1=\"40\" x2=\"20\" y2=\"60\"/><line x1=\"35\" y1=\"20\" x2=\"35\" y2=\"80\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"90\"/><line x1=\"65\" y1=\"30\" x2=\"65\" y2=\"70\"/><line x1=\"80\" y1=\"45\" x2=\"80\" y2=\"55\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Crosshair Box",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><rect x=\"30\" y=\"30\" width=\"40\" height=\"40\"/><path d=\"M10 20 L20 20 L20 10 M80 10 L80 20 L90 20 M90 80 L80 80 L80 90 M20 90 L20 80 L10 80\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><rect x=\"30\" y=\"30\" width=\"40\" height=\"40\"/><path d=\"M10 20 L20 20 L20 10 M80 10 L80 20 L90 20 M90 80 L80 80 L80 90 M20 90 L20 80 L10 80\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Grid Overlay",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"0.5\" opacity=\"0.5\"><path d=\"M0 20 H100 M0 40 H100 M0 60 H100 M0 80 H100 M20 0 V100 M40 0 V100 M60 0 V100 M80 0 V100\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"0.5\" opacity=\"0.5\"><path d=\"M0 20 H100 M0 40 H100 M0 60 H100 M0 80 H100 M20 0 V100 M40 0 V100 M60 0 V100 M80 0 V100\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Glitch Blocks",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><rect x=\"10\" y=\"20\" width=\"30\" height=\"10\"/><rect x=\"60\" y=\"30\" width=\"20\" height=\"5\"/><rect x=\"25\" y=\"60\" width=\"45\" height=\"15\" opacity=\"0.6\"/><rect x=\"15\" y=\"80\" width=\"15\" height=\"8\"/><rect x=\"70\" y=\"70\" width=\"25\" height=\"12\" opacity=\"0.3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><rect x=\"10\" y=\"20\" width=\"30\" height=\"10\"/><rect x=\"60\" y=\"30\" width=\"20\" height=\"5\"/><rect x=\"25\" y=\"60\" width=\"45\" height=\"15\" opacity=\"0.6\"/><rect x=\"15\" y=\"80\" width=\"15\" height=\"8\"/><rect x=\"70\" y=\"70\" width=\"25\" height=\"12\" opacity=\"0.3\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Wireframe Box",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" stroke-width=\"1\" fill=\"none\"><path d=\"M20,30 L80,30 L80,90 L20,90 Z\" opacity=\"0.5\"/><path d=\"M30,20 L90,20 L90,80 L30,80 Z\"/><path d=\"M20,30 L30,20 M80,30 L90,20 M80,90 L90,80 M20,90 L30,80\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" stroke-width=\"1\" fill=\"none\"><path d=\"M20,30 L80,30 L80,90 L20,90 Z\" opacity=\"0.5\"/><path d=\"M30,20 L90,20 L90,80 L30,80 Z\"/><path d=\"M20,30 L30,20 M80,30 L90,20 M80,90 L90,80 M20,90 L30,80\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Wireframe Globe",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"40\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\"/><ellipse cx=\"50\" cy=\"50\" rx=\"15\" ry=\"40\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"40\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\"/><ellipse cx=\"50\" cy=\"50\" rx=\"15\" ry=\"40\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Liquid Blob",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z\"><animate attributeName=\"d\" values=\"M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z; M 50 20 C 75 10 95 50 80 75 C 65 100 35 90 15 70 C -5 50 25 30 50 20 Z; M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z\" dur=\"4s\" repeatCount=\"indefinite\"/></path></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z\"><animate attributeName=\"d\" values=\"M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z; M 50 20 C 75 10 95 50 80 75 C 65 100 35 90 15 70 C -5 50 25 30 50 20 Z; M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z\" dur=\"4s\" repeatCount=\"indefinite\"/></path></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Topographic Lines",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><path d=\"M10 20 Q30 40 50 20 T90 20\"/><path d=\"M10 40 Q30 60 50 40 T90 40\"/><path d=\"M10 60 Q30 80 50 60 T90 60\"/><path d=\"M10 80 Q30 100 50 80 T90 80\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><path d=\"M10 20 Q30 40 50 20 T90 20\"/><path d=\"M10 40 Q30 60 50 40 T90 40\"/><path d=\"M10 60 Q30 80 50 60 T90 60\"/><path d=\"M10 80 Q30 100 50 80 T90 80\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Metatron Cube",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"30\"/><circle cx=\"50\" cy=\"20\" r=\"10\"/><circle cx=\"24\" cy=\"35\" r=\"10\"/><circle cx=\"24\" cy=\"65\" r=\"10\"/><circle cx=\"50\" cy=\"80\" r=\"10\"/><circle cx=\"76\" cy=\"65\" r=\"10\"/><circle cx=\"76\" cy=\"35\" r=\"10\"/><line x1=\"50\" y1=\"20\" x2=\"24\" y2=\"35\"/><line x1=\"24\" y1=\"35\" x2=\"24\" y2=\"65\"/><line x1=\"24\" y1=\"65\" x2=\"50\" y2=\"80\"/><line x1=\"50\" y1=\"80\" x2=\"76\" y2=\"65\"/><line x1=\"76\" y1=\"65\" x2=\"76\" y2=\"35\"/><line x1=\"76\" y1=\"35\" x2=\"50\" y2=\"20\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"30\"/><circle cx=\"50\" cy=\"20\" r=\"10\"/><circle cx=\"24\" cy=\"35\" r=\"10\"/><circle cx=\"24\" cy=\"65\" r=\"10\"/><circle cx=\"50\" cy=\"80\" r=\"10\"/><circle cx=\"76\" cy=\"65\" r=\"10\"/><circle cx=\"76\" cy=\"35\" r=\"10\"/><line x1=\"50\" y1=\"20\" x2=\"24\" y2=\"35\"/><line x1=\"24\" y1=\"35\" x2=\"24\" y2=\"65\"/><line x1=\"24\" y1=\"65\" x2=\"50\" y2=\"80\"/><line x1=\"50\" y1=\"80\" x2=\"76\" y2=\"65\"/><line x1=\"76\" y1=\"65\" x2=\"76\" y2=\"35\"/><line x1=\"76\" y1=\"35\" x2=\"50\" y2=\"20\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Geometric Pattern",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"1.5\"><rect x=\"25\" y=\"25\" width=\"50\" height=\"50\" transform=\"rotate(45 50 50)\"/><rect x=\"35\" y=\"35\" width=\"30\" height=\"30\" transform=\"rotate(45 50 50)\"/><rect x=\"45\" y=\"45\" width=\"10\" height=\"10\" transform=\"rotate(45 50 50)\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"1.5\"><rect x=\"25\" y=\"25\" width=\"50\" height=\"50\" transform=\"rotate(45 50 50)\"/><rect x=\"35\" y=\"35\" width=\"30\" height=\"30\" transform=\"rotate(45 50 50)\"/><rect x=\"45\" y=\"45\" width=\"10\" height=\"10\" transform=\"rotate(45 50 50)\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Vortex",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"1.5\"><path d=\"M50 50 L50 10 A40 40 0 0 1 90 50 A40 40 0 0 1 50 90 A40 40 0 0 1 10 50 A40 40 0 0 1 50 15 A35 35 0 0 1 85 50 A35 35 0 0 1 50 85 A35 35 0 0 1 15 50 A35 35 0 0 1 50 20\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"1.5\"><path d=\"M50 50 L50 10 A40 40 0 0 1 90 50 A40 40 0 0 1 50 90 A40 40 0 0 1 10 50 A40 40 0 0 1 50 15 A35 35 0 0 1 85 50 A35 35 0 0 1 50 85 A35 35 0 0 1 15 50 A35 35 0 0 1 50 20\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Optical Illusion",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><polygon points=\"50,10 90,50 50,90 10,50\" opacity=\"0.2\"/><polygon points=\"50,20 80,50 50,80 20,50\" opacity=\"0.4\"/><polygon points=\"50,30 70,50 50,70 30,50\" opacity=\"0.6\"/><polygon points=\"50,40 60,50 50,60 40,50\" opacity=\"0.8\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><polygon points=\"50,10 90,50 50,90 10,50\" opacity=\"0.2\"/><polygon points=\"50,20 80,50 50,80 20,50\" opacity=\"0.4\"/><polygon points=\"50,30 70,50 50,70 30,50\" opacity=\"0.6\"/><polygon points=\"50,40 60,50 50,60 40,50\" opacity=\"0.8\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "DNA Helix",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M30 10 Q70 30 30 50 Q70 70 30 90\"/><path d=\"M70 10 Q30 30 70 50 Q30 70 70 90\" stroke-dasharray=\"2 2\"/><line x1=\"38\" y1=\"20\" x2=\"62\" y2=\"20\"/><line x1=\"50\" y1=\"30\" x2=\"50\" y2=\"30\"/><line x1=\"38\" y1=\"40\" x2=\"62\" y2=\"40\"/><line x1=\"38\" y1=\"60\" x2=\"62\" y2=\"60\"/><line x1=\"38\" y1=\"80\" x2=\"62\" y2=\"80\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M30 10 Q70 30 30 50 Q70 70 30 90\"/><path d=\"M70 10 Q30 30 70 50 Q30 70 70 90\" stroke-dasharray=\"2 2\"/><line x1=\"38\" y1=\"20\" x2=\"62\" y2=\"20\"/><line x1=\"50\" y1=\"30\" x2=\"50\" y2=\"30\"/><line x1=\"38\" y1=\"40\" x2=\"62\" y2=\"40\"/><line x1=\"38\" y1=\"60\" x2=\"62\" y2=\"60\"/><line x1=\"38\" y1=\"80\" x2=\"62\" y2=\"80\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Tribal Sun",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M50 15 L55 35 L75 25 L60 45 L80 50 L60 55 L75 75 L55 65 L50 85 L45 65 L25 75 L40 55 L20 50 L40 45 L25 25 L45 35 Z\"/><circle cx=\"50\" cy=\"50\" r=\"10\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M50 15 L55 35 L75 25 L60 45 L80 50 L60 55 L75 75 L55 65 L50 85 L45 65 L25 75 L40 55 L20 50 L40 45 L25 25 L45 35 Z\"/><circle cx=\"50\" cy=\"50\" r=\"10\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"3\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Acid Smiley",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"4\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"#E5FF00\" fill-opacity=\"0.2\"/><path d=\"M30 40 Q35 30 40 40 M60 40 Q65 30 70 40\" stroke-linecap=\"round\"/><path d=\"M30 60 Q50 80 70 60 L70 65 Q50 85 30 65 Z\" fill=\"#E5FF00\" stroke=\"none\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"4\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"#FF6B4A\" fill-opacity=\"0.2\"/><path d=\"M30 40 Q35 30 40 40 M60 40 Q65 30 70 40\" stroke-linecap=\"round\"/><path d=\"M30 60 Q50 80 70 60 L70 65 Q50 85 30 65 Z\" fill=\"#FF6B4A\" stroke=\"none\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Fractal Branch",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M50 100 L50 60 L30 30 M50 60 L70 30 M30 30 L20 10 M30 30 L40 10 M70 30 L60 10 M70 30 L80 10\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M50 100 L50 60 L30 30 M50 60 L70 30 M30 30 L20 10 M30 30 L40 10 M70 30 L60 10 M70 30 L80 10\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Retro Window",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 60\" stroke=\"#E5FF00\" fill=\"#050505\" stroke-width=\"2\"><rect x=\"5\" y=\"5\" width=\"90\" height=\"50\"/><rect x=\"5\" y=\"5\" width=\"90\" height=\"12\" fill=\"#E5FF00\"/><circle cx=\"85\" cy=\"11\" r=\"3\" fill=\"#050505\" stroke=\"none\"/><circle cx=\"75\" cy=\"11\" r=\"3\" fill=\"#050505\" stroke=\"none\"/><circle cx=\"65\" cy=\"11\" r=\"3\" fill=\"#050505\" stroke=\"none\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 60\" stroke=\"#FF6B4A\" fill=\"#050505\" stroke-width=\"2\"><rect x=\"5\" y=\"5\" width=\"90\" height=\"50\"/><rect x=\"5\" y=\"5\" width=\"90\" height=\"12\" fill=\"#FF6B4A\"/><circle cx=\"85\" cy=\"11\" r=\"3\" fill=\"#050505\" stroke=\"none\"/><circle cx=\"75\" cy=\"11\" r=\"3\" fill=\"#050505\" stroke=\"none\"/><circle cx=\"65\" cy=\"11\" r=\"3\" fill=\"#050505\" stroke=\"none\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "CD-ROM Outline",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><circle cx=\"50\" cy=\"50\" r=\"15\"/><circle cx=\"50\" cy=\"50\" r=\"5\" fill=\"#E5FF00\"/><path d=\"M50 5 L50 15 M50 85 L50 95 M5 50 L15 50 M85 50 L95 50\" stroke-width=\"1\" opacity=\"0.5\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><circle cx=\"50\" cy=\"50\" r=\"15\"/><circle cx=\"50\" cy=\"50\" r=\"5\" fill=\"#FF6B4A\"/><path d=\"M50 5 L50 15 M50 85 L50 95 M5 50 L15 50 M85 50 L95 50\" stroke-width=\"1\" opacity=\"0.5\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Barcode Scanner",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><rect x=\"10\" y=\"30\" width=\"3\" height=\"40\"/><rect x=\"18\" y=\"30\" width=\"8\" height=\"40\"/><rect x=\"30\" y=\"30\" width=\"2\" height=\"40\"/><rect x=\"35\" y=\"30\" width=\"6\" height=\"40\"/><rect x=\"45\" y=\"30\" width=\"12\" height=\"40\"/><rect x=\"60\" y=\"30\" width=\"4\" height=\"40\"/><rect x=\"70\" y=\"30\" width=\"2\" height=\"40\"/><rect x=\"75\" y=\"30\" width=\"8\" height=\"40\"/><rect x=\"86\" y=\"30\" width=\"4\" height=\"40\"/><line x1=\"0\" y1=\"50\" x2=\"100\" y2=\"50\" stroke=\"#ff0055\" stroke-width=\"1\" opacity=\"0.8\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><rect x=\"10\" y=\"30\" width=\"3\" height=\"40\"/><rect x=\"18\" y=\"30\" width=\"8\" height=\"40\"/><rect x=\"30\" y=\"30\" width=\"2\" height=\"40\"/><rect x=\"35\" y=\"30\" width=\"6\" height=\"40\"/><rect x=\"45\" y=\"30\" width=\"12\" height=\"40\"/><rect x=\"60\" y=\"30\" width=\"4\" height=\"40\"/><rect x=\"70\" y=\"30\" width=\"2\" height=\"40\"/><rect x=\"75\" y=\"30\" width=\"8\" height=\"40\"/><rect x=\"86\" y=\"30\" width=\"4\" height=\"40\"/><line x1=\"0\" y1=\"50\" x2=\"100\" y2=\"50\" stroke=\"#ff0055\" stroke-width=\"1\" opacity=\"0.8\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Thorn Heart",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"3\" stroke-linecap=\"square\"><path d=\"M50 80 L20 50 Q10 40 20 25 Q30 10 50 30 Q70 10 80 25 Q90 40 50 80 Z\"/><path d=\"M20 50 L10 60 M20 25 L10 15 M80 25 L90 15 M80 50 L90 60\" stroke-width=\"2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"3\" stroke-linecap=\"square\"><path d=\"M50 80 L20 50 Q10 40 20 25 Q30 10 50 30 Q70 10 80 25 Q90 40 50 80 Z\"/><path d=\"M20 50 L10 60 M20 25 L10 15 M80 25 L90 15 M80 50 L90 60\" stroke-width=\"2\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Wireframe Torus",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\"/><ellipse cx=\"50\" cy=\"50\" rx=\"20\" ry=\"7\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\" transform=\"rotate(30 50 50)\" opacity=\"0.6\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\" transform=\"rotate(60 50 50)\" opacity=\"0.3\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\" transform=\"rotate(90 50 50)\" opacity=\"0.1\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\"/><ellipse cx=\"50\" cy=\"50\" rx=\"20\" ry=\"7\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\" transform=\"rotate(30 50 50)\" opacity=\"0.6\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\" transform=\"rotate(60 50 50)\" opacity=\"0.3\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\" transform=\"rotate(90 50 50)\" opacity=\"0.1\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Warning Tape",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 40\" fill=\"#E5FF00\"><rect width=\"200\" height=\"40\" fill=\"#050505\" stroke=\"#E5FF00\" stroke-width=\"2\"/><polygon points=\"0,0 20,0 10,40 -10,40\"/><polygon points=\"30,0 50,0 40,40 20,40\"/><polygon points=\"60,0 80,0 70,40 50,40\"/><polygon points=\"90,0 110,0 100,40 80,40\"/><polygon points=\"120,0 140,0 130,40 110,40\"/><polygon points=\"150,0 170,0 160,40 140,40\"/><polygon points=\"180,0 200,0 190,40 170,40\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 40\" fill=\"#FF6B4A\"><rect width=\"200\" height=\"40\" fill=\"#050505\" stroke=\"#FF6B4A\" stroke-width=\"2\"/><polygon points=\"0,0 20,0 10,40 -10,40\"/><polygon points=\"30,0 50,0 40,40 20,40\"/><polygon points=\"60,0 80,0 70,40 50,40\"/><polygon points=\"90,0 110,0 100,40 80,40\"/><polygon points=\"120,0 140,0 130,40 110,40\"/><polygon points=\"150,0 170,0 160,40 140,40\"/><polygon points=\"180,0 200,0 190,40 170,40\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Halftone Dot Grid",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><circle cx=\"20\" cy=\"20\" r=\"2\"/><circle cx=\"40\" cy=\"20\" r=\"3\"/><circle cx=\"60\" cy=\"20\" r=\"4\"/><circle cx=\"80\" cy=\"20\" r=\"5\"/><circle cx=\"20\" cy=\"40\" r=\"3\"/><circle cx=\"40\" cy=\"40\" r=\"4\"/><circle cx=\"60\" cy=\"40\" r=\"5\"/><circle cx=\"80\" cy=\"40\" r=\"6\"/><circle cx=\"20\" cy=\"60\" r=\"4\"/><circle cx=\"40\" cy=\"60\" r=\"5\"/><circle cx=\"60\" cy=\"60\" r=\"6\"/><circle cx=\"80\" cy=\"60\" r=\"7\"/><circle cx=\"20\" cy=\"80\" r=\"5\"/><circle cx=\"40\" cy=\"80\" r=\"6\"/><circle cx=\"60\" cy=\"80\" r=\"7\"/><circle cx=\"80\" cy=\"80\" r=\"8\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><circle cx=\"20\" cy=\"20\" r=\"2\"/><circle cx=\"40\" cy=\"20\" r=\"3\"/><circle cx=\"60\" cy=\"20\" r=\"4\"/><circle cx=\"80\" cy=\"20\" r=\"5\"/><circle cx=\"20\" cy=\"40\" r=\"3\"/><circle cx=\"40\" cy=\"40\" r=\"4\"/><circle cx=\"60\" cy=\"40\" r=\"5\"/><circle cx=\"80\" cy=\"40\" r=\"6\"/><circle cx=\"20\" cy=\"60\" r=\"4\"/><circle cx=\"40\" cy=\"60\" r=\"5\"/><circle cx=\"60\" cy=\"60\" r=\"6\"/><circle cx=\"80\" cy=\"60\" r=\"7\"/><circle cx=\"20\" cy=\"80\" r=\"5\"/><circle cx=\"40\" cy=\"80\" r=\"6\"/><circle cx=\"60\" cy=\"80\" r=\"7\"/><circle cx=\"80\" cy=\"80\" r=\"8\"/></svg>"
             },
             {
                 "cat": "text",
@@ -5340,177 +5458,177 @@
             {
                 "cat": "text",
                 "name": "Y2K OUTLINE",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 50\"><text x=\"10\" y=\"40\" font-family=\"sans-serif\" font-size=\"32\" font-weight=\"900\" stroke=\"#E5FF00\" stroke-width=\"2\" fill=\"none\">Y2K</text><text x=\"13\" y=\"37\" font-family=\"sans-serif\" font-size=\"32\" font-weight=\"900\" fill=\"#E5FF00\" opacity=\"0.4\">Y2K</text></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 50\"><text x=\"10\" y=\"40\" font-family=\"sans-serif\" font-size=\"32\" font-weight=\"900\" stroke=\"#FF6B4A\" stroke-width=\"2\" fill=\"none\">Y2K</text><text x=\"13\" y=\"37\" font-family=\"sans-serif\" font-size=\"32\" font-weight=\"900\" fill=\"#FF6B4A\" opacity=\"0.4\">Y2K</text></svg>"
             },
             {
                 "cat": "text",
                 "name": "SYS.req",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 150 50\"><text x=\"10\" y=\"30\" font-family=\"monospace\" font-size=\"18\" fill=\"#E5FF00\" tracking=\"2.5\">SYS_REQ_</text><rect x=\"90\" y=\"15\" width=\"10\" height=\"18\" fill=\"#E5FF00\"><animate attributeName=\"opacity\" values=\"1;0;1\" dur=\"0.5s\" repeatCount=\"indefinite\"/></rect></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 150 50\"><text x=\"10\" y=\"30\" font-family=\"monospace\" font-size=\"18\" fill=\"#FF6B4A\" tracking=\"2.5\">SYS_REQ_</text><rect x=\"90\" y=\"15\" width=\"10\" height=\"18\" fill=\"#FF6B4A\"><animate attributeName=\"opacity\" values=\"1;0;1\" dur=\"0.5s\" repeatCount=\"indefinite\"/></rect></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Chrome Crown",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 80\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M10 60 L25 20 L40 45 L50 10 L60 45 L75 20 L90 60 Z\"/><path d=\"M15 60 L30 28 L42 48 L50 18 L58 48 L70 28 L85 60\" stroke-width=\"1\" opacity=\"0.4\"/><line x1=\"10\" y1=\"60\" x2=\"90\" y2=\"60\" stroke-width=\"3\"/><circle cx=\"25\" cy=\"20\" r=\"4\" fill=\"#E5FF00\"/><circle cx=\"50\" cy=\"10\" r=\"4\" fill=\"#E5FF00\"/><circle cx=\"75\" cy=\"20\" r=\"4\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 80\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M10 60 L25 20 L40 45 L50 10 L60 45 L75 20 L90 60 Z\"/><path d=\"M15 60 L30 28 L42 48 L50 18 L58 48 L70 28 L85 60\" stroke-width=\"1\" opacity=\"0.4\"/><line x1=\"10\" y1=\"60\" x2=\"90\" y2=\"60\" stroke-width=\"3\"/><circle cx=\"25\" cy=\"20\" r=\"4\" fill=\"#FF6B4A\"/><circle cx=\"50\" cy=\"10\" r=\"4\" fill=\"#FF6B4A\"/><circle cx=\"75\" cy=\"20\" r=\"4\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Barbed Wire",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 40\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M0 20 C10 20 15 10 25 20 S35 30 50 20 S65 10 75 20 S85 30 100 20 S115 10 125 20 S135 30 150 20 S165 10 175 20 S185 30 200 20\"/><path d=\"M20 20 L15 12 M20 20 L25 12 M45 20 L40 28 M45 20 L50 28 M70 20 L65 12 M70 20 L75 12 M95 20 L90 28 M95 20 L100 28 M120 20 L115 12 M120 20 L125 12 M145 20 L140 28 M145 20 L150 28 M170 20 L165 12 M170 20 L175 12\" stroke-width=\"2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 40\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M0 20 C10 20 15 10 25 20 S35 30 50 20 S65 10 75 20 S85 30 100 20 S115 10 125 20 S135 30 150 20 S165 10 175 20 S185 30 200 20\"/><path d=\"M20 20 L15 12 M20 20 L25 12 M45 20 L40 28 M45 20 L50 28 M70 20 L65 12 M70 20 L75 12 M95 20 L90 28 M95 20 L100 28 M120 20 L115 12 M120 20 L125 12 M145 20 L140 28 M145 20 L150 28 M170 20 L165 12 M170 20 L175 12\" stroke-width=\"2\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Y2K Butterfly",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M50 50 Q20 10 10 30 Q0 50 30 60 Q10 70 20 90 Q30 100 50 70\" fill=\"#E5FF00\" fill-opacity=\"0.15\"/><path d=\"M50 50 Q80 10 90 30 Q100 50 70 60 Q90 70 80 90 Q70 100 50 70\" fill=\"#E5FF00\" fill-opacity=\"0.15\"/><line x1=\"50\" y1=\"30\" x2=\"40\" y2=\"10\" stroke-width=\"1\"/><line x1=\"50\" y1=\"30\" x2=\"60\" y2=\"10\" stroke-width=\"1\"/><circle cx=\"40\" cy=\"10\" r=\"2\" fill=\"#E5FF00\"/><circle cx=\"60\" cy=\"10\" r=\"2\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M50 50 Q20 10 10 30 Q0 50 30 60 Q10 70 20 90 Q30 100 50 70\" fill=\"#FF6B4A\" fill-opacity=\"0.15\"/><path d=\"M50 50 Q80 10 90 30 Q100 50 70 60 Q90 70 80 90 Q70 100 50 70\" fill=\"#FF6B4A\" fill-opacity=\"0.15\"/><line x1=\"50\" y1=\"30\" x2=\"40\" y2=\"10\" stroke-width=\"1\"/><line x1=\"50\" y1=\"30\" x2=\"60\" y2=\"10\" stroke-width=\"1\"/><circle cx=\"40\" cy=\"10\" r=\"2\" fill=\"#FF6B4A\"/><circle cx=\"60\" cy=\"10\" r=\"2\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Rave Arrow",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><polygon points=\"50,5 95,50 70,50 70,95 30,95 30,50 5,50\"/><polygon points=\"50,20 80,50 65,50 65,85 35,85 35,50 20,50\" fill=\"#050505\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><polygon points=\"50,5 95,50 70,50 70,95 30,95 30,50 5,50\"/><polygon points=\"50,20 80,50 65,50 65,85 35,85 35,50 20,50\" fill=\"#050505\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Starburst",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><polygon points=\"50,0 56,38 100,50 56,62 50,100 44,62 0,50 44,38\" opacity=\"0.3\"/><polygon points=\"50,10 54,42 90,50 54,58 50,90 46,58 10,50 46,42\" opacity=\"0.6\"/><polygon points=\"50,20 53,45 80,50 53,55 50,80 47,55 20,50 47,45\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><polygon points=\"50,0 56,38 100,50 56,62 50,100 44,62 0,50 44,38\" opacity=\"0.3\"/><polygon points=\"50,10 54,42 90,50 54,58 50,90 46,58 10,50 46,42\" opacity=\"0.6\"/><polygon points=\"50,20 53,45 80,50 53,55 50,80 47,55 20,50 47,45\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Cyber Rose",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"1.5\"><circle cx=\"50\" cy=\"40\" r=\"8\"/><path d=\"M50 32 Q70 25 65 45 Q60 55 50 48\"/><path d=\"M50 32 Q30 25 35 45 Q40 55 50 48\"/><path d=\"M42 45 Q25 40 30 60 Q35 70 50 55\"/><path d=\"M58 45 Q75 40 70 60 Q65 70 50 55\"/><path d=\"M50 55 L50 90\"/><path d=\"M50 70 Q40 65 35 70\"/><path d=\"M50 75 Q60 70 65 75\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"1.5\"><circle cx=\"50\" cy=\"40\" r=\"8\"/><path d=\"M50 32 Q70 25 65 45 Q60 55 50 48\"/><path d=\"M50 32 Q30 25 35 45 Q40 55 50 48\"/><path d=\"M42 45 Q25 40 30 60 Q35 70 50 55\"/><path d=\"M58 45 Q75 40 70 60 Q65 70 50 55\"/><path d=\"M50 55 L50 90\"/><path d=\"M50 70 Q40 65 35 70\"/><path d=\"M50 75 Q60 70 65 75\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Matrix Rain",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\" font-family=\"monospace\" font-size=\"10\"><text x=\"10\" y=\"15\" opacity=\"0.3\">01</text><text x=\"30\" y=\"25\" opacity=\"0.7\">10</text><text x=\"50\" y=\"10\" opacity=\"0.5\">11</text><text x=\"70\" y=\"35\" opacity=\"0.9\">00</text><text x=\"90\" y=\"20\" opacity=\"0.4\">01</text><text x=\"20\" y=\"55\" opacity=\"0.8\">10</text><text x=\"40\" y=\"45\" opacity=\"0.6\">01</text><text x=\"60\" y=\"65\" opacity=\"1.0\">11</text><text x=\"80\" y=\"50\" opacity=\"0.5\">00</text><text x=\"10\" y=\"80\" opacity=\"0.7\">01</text><text x=\"50\" y=\"90\" opacity=\"0.3\">10</text><text x=\"80\" y=\"85\" opacity=\"0.6\">11</text></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\" font-family=\"monospace\" font-size=\"10\"><text x=\"10\" y=\"15\" opacity=\"0.3\">01</text><text x=\"30\" y=\"25\" opacity=\"0.7\">10</text><text x=\"50\" y=\"10\" opacity=\"0.5\">11</text><text x=\"70\" y=\"35\" opacity=\"0.9\">00</text><text x=\"90\" y=\"20\" opacity=\"0.4\">01</text><text x=\"20\" y=\"55\" opacity=\"0.8\">10</text><text x=\"40\" y=\"45\" opacity=\"0.6\">01</text><text x=\"60\" y=\"65\" opacity=\"1.0\">11</text><text x=\"80\" y=\"50\" opacity=\"0.5\">00</text><text x=\"10\" y=\"80\" opacity=\"0.7\">01</text><text x=\"50\" y=\"90\" opacity=\"0.3\">10</text><text x=\"80\" y=\"85\" opacity=\"0.6\">11</text></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Firewall Shield",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M50 10 L85 25 L85 55 Q85 80 50 95 Q15 80 15 55 L15 25 Z\"/><path d=\"M50 20 L75 32 L75 55 Q75 73 50 85 Q25 73 25 55 L25 32 Z\" stroke-dasharray=\"4 3\"/><path d=\"M40 50 L48 58 L65 41\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M50 10 L85 25 L85 55 Q85 80 50 95 Q15 80 15 55 L15 25 Z\"/><path d=\"M50 20 L75 32 L75 55 Q75 73 50 85 Q25 73 25 55 L25 32 Z\" stroke-dasharray=\"4 3\"/><path d=\"M40 50 L48 58 L65 41\" stroke-width=\"4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Biometric Scan",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M30 50 Q30 30 50 30 Q70 30 70 50 Q70 70 50 70\"/><path d=\"M35 50 Q35 35 50 35 Q65 35 65 50\" stroke-dasharray=\"3 2\"/><path d=\"M40 65 Q40 40 50 40 Q60 40 60 55\" stroke-width=\"2\"/><rect x=\"15\" y=\"15\" width=\"15\" height=\"15\" fill=\"none\" stroke-width=\"2\" rx=\"2\"/><rect x=\"70\" y=\"15\" width=\"15\" height=\"15\" fill=\"none\" stroke-width=\"2\" rx=\"2\"/><rect x=\"15\" y=\"70\" width=\"15\" height=\"15\" fill=\"none\" stroke-width=\"2\" rx=\"2\"/><rect x=\"70\" y=\"70\" width=\"15\" height=\"15\" fill=\"none\" stroke-width=\"2\" rx=\"2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M30 50 Q30 30 50 30 Q70 30 70 50 Q70 70 50 70\"/><path d=\"M35 50 Q35 35 50 35 Q65 35 65 50\" stroke-dasharray=\"3 2\"/><path d=\"M40 65 Q40 40 50 40 Q60 40 60 55\" stroke-width=\"2\"/><rect x=\"15\" y=\"15\" width=\"15\" height=\"15\" fill=\"none\" stroke-width=\"2\" rx=\"2\"/><rect x=\"70\" y=\"15\" width=\"15\" height=\"15\" fill=\"none\" stroke-width=\"2\" rx=\"2\"/><rect x=\"15\" y=\"70\" width=\"15\" height=\"15\" fill=\"none\" stroke-width=\"2\" rx=\"2\"/><rect x=\"70\" y=\"70\" width=\"15\" height=\"15\" fill=\"none\" stroke-width=\"2\" rx=\"2\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Neural Network",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"0.8\"><circle cx=\"20\" cy=\"25\" r=\"5\" fill=\"#E5FF00\" opacity=\"0.5\"/><circle cx=\"20\" cy=\"50\" r=\"5\" fill=\"#E5FF00\" opacity=\"0.5\"/><circle cx=\"20\" cy=\"75\" r=\"5\" fill=\"#E5FF00\" opacity=\"0.5\"/><circle cx=\"50\" cy=\"30\" r=\"5\" fill=\"#E5FF00\" opacity=\"0.7\"/><circle cx=\"50\" cy=\"70\" r=\"5\" fill=\"#E5FF00\" opacity=\"0.7\"/><circle cx=\"80\" cy=\"50\" r=\"6\" fill=\"#E5FF00\"/><line x1=\"25\" y1=\"25\" x2=\"45\" y2=\"30\"/><line x1=\"25\" y1=\"25\" x2=\"45\" y2=\"70\"/><line x1=\"25\" y1=\"50\" x2=\"45\" y2=\"30\"/><line x1=\"25\" y1=\"50\" x2=\"45\" y2=\"70\"/><line x1=\"25\" y1=\"75\" x2=\"45\" y2=\"30\"/><line x1=\"25\" y1=\"75\" x2=\"45\" y2=\"70\"/><line x1=\"55\" y1=\"30\" x2=\"74\" y2=\"50\"/><line x1=\"55\" y1=\"70\" x2=\"74\" y2=\"50\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"0.8\"><circle cx=\"20\" cy=\"25\" r=\"5\" fill=\"#FF6B4A\" opacity=\"0.5\"/><circle cx=\"20\" cy=\"50\" r=\"5\" fill=\"#FF6B4A\" opacity=\"0.5\"/><circle cx=\"20\" cy=\"75\" r=\"5\" fill=\"#FF6B4A\" opacity=\"0.5\"/><circle cx=\"50\" cy=\"30\" r=\"5\" fill=\"#FF6B4A\" opacity=\"0.7\"/><circle cx=\"50\" cy=\"70\" r=\"5\" fill=\"#FF6B4A\" opacity=\"0.7\"/><circle cx=\"80\" cy=\"50\" r=\"6\" fill=\"#FF6B4A\"/><line x1=\"25\" y1=\"25\" x2=\"45\" y2=\"30\"/><line x1=\"25\" y1=\"25\" x2=\"45\" y2=\"70\"/><line x1=\"25\" y1=\"50\" x2=\"45\" y2=\"30\"/><line x1=\"25\" y1=\"50\" x2=\"45\" y2=\"70\"/><line x1=\"25\" y1=\"75\" x2=\"45\" y2=\"30\"/><line x1=\"25\" y1=\"75\" x2=\"45\" y2=\"70\"/><line x1=\"55\" y1=\"30\" x2=\"74\" y2=\"50\"/><line x1=\"55\" y1=\"70\" x2=\"74\" y2=\"50\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Satellite Dish",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><path d=\"M20 80 Q20 30 70 20\"/><path d=\"M25 75 Q25 40 60 30\" stroke-dasharray=\"3 3\" stroke-width=\"1\"/><line x1=\"40\" y1=\"60\" x2=\"75\" y2=\"25\" stroke-width=\"2\"/><circle cx=\"75\" cy=\"25\" r=\"5\"/><circle cx=\"75\" cy=\"25\" r=\"2\" fill=\"#E5FF00\"/><circle cx=\"40\" cy=\"60\" r=\"3\" fill=\"#E5FF00\"/><line x1=\"40\" y1=\"60\" x2=\"30\" y2=\"90\" stroke-width=\"3\"/><line x1=\"30\" y1=\"90\" x2=\"50\" y2=\"90\" stroke-width=\"3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><path d=\"M20 80 Q20 30 70 20\"/><path d=\"M25 75 Q25 40 60 30\" stroke-dasharray=\"3 3\" stroke-width=\"1\"/><line x1=\"40\" y1=\"60\" x2=\"75\" y2=\"25\" stroke-width=\"2\"/><circle cx=\"75\" cy=\"25\" r=\"5\"/><circle cx=\"75\" cy=\"25\" r=\"2\" fill=\"#FF6B4A\"/><circle cx=\"40\" cy=\"60\" r=\"3\" fill=\"#FF6B4A\"/><line x1=\"40\" y1=\"60\" x2=\"30\" y2=\"90\" stroke-width=\"3\"/><line x1=\"30\" y1=\"90\" x2=\"50\" y2=\"90\" stroke-width=\"3\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Volume Meter",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 80 100\" fill=\"#E5FF00\"><rect x=\"5\" y=\"70\" width=\"8\" height=\"20\"/><rect x=\"18\" y=\"55\" width=\"8\" height=\"35\"/><rect x=\"31\" y=\"40\" width=\"8\" height=\"50\"/><rect x=\"44\" y=\"25\" width=\"8\" height=\"65\"/><rect x=\"57\" y=\"10\" width=\"8\" height=\"80\" opacity=\"0.5\"/><rect x=\"70\" y=\"5\" width=\"8\" height=\"85\" opacity=\"0.3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 80 100\" fill=\"#FF6B4A\"><rect x=\"5\" y=\"70\" width=\"8\" height=\"20\"/><rect x=\"18\" y=\"55\" width=\"8\" height=\"35\"/><rect x=\"31\" y=\"40\" width=\"8\" height=\"50\"/><rect x=\"44\" y=\"25\" width=\"8\" height=\"65\"/><rect x=\"57\" y=\"10\" width=\"8\" height=\"80\" opacity=\"0.5\"/><rect x=\"70\" y=\"5\" width=\"8\" height=\"85\" opacity=\"0.3\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Progress Ring",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke-width=\"6\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"#333\"/><circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"#E5FF00\" stroke-dasharray=\"188 64\" stroke-linecap=\"round\" transform=\"rotate(-90 50 50)\"/><text x=\"50\" y=\"55\" text-anchor=\"middle\" fill=\"#E5FF00\" font-family=\"monospace\" font-size=\"16\" stroke=\"none\">75%</text></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke-width=\"6\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"#333\"/><circle cx=\"50\" cy=\"50\" r=\"40\" stroke=\"#FF6B4A\" stroke-dasharray=\"188 64\" stroke-linecap=\"round\" transform=\"rotate(-90 50 50)\"/><text x=\"50\" y=\"55\" text-anchor=\"middle\" fill=\"#FF6B4A\" font-family=\"monospace\" font-size=\"16\" stroke=\"none\">75%</text></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Power Button",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"4\"><path d=\"M30 25 A30 30 0 1 0 70 25\" stroke-linecap=\"round\"/><line x1=\"50\" y1=\"15\" x2=\"50\" y2=\"45\" stroke-linecap=\"round\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"4\"><path d=\"M30 25 A30 30 0 1 0 70 25\" stroke-linecap=\"round\"/><line x1=\"50\" y1=\"15\" x2=\"50\" y2=\"45\" stroke-linecap=\"round\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Music Note",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 80 100\" fill=\"#E5FF00\" stroke=\"#E5FF00\" stroke-width=\"2\"><ellipse cx=\"25\" cy=\"80\" rx=\"15\" ry=\"10\"/><line x1=\"40\" y1=\"80\" x2=\"40\" y2=\"15\" stroke-width=\"3\"/><path d=\"M40 15 Q60 10 70 25 Q75 35 60 35 L40 30\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 80 100\" fill=\"#FF6B4A\" stroke=\"#FF6B4A\" stroke-width=\"2\"><ellipse cx=\"25\" cy=\"80\" rx=\"15\" ry=\"10\"/><line x1=\"40\" y1=\"80\" x2=\"40\" y2=\"15\" stroke-width=\"3\"/><path d=\"M40 15 Q60 10 70 25 Q75 35 60 35 L40 30\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Cursor Arrow",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 80 100\" fill=\"#E5FF00\" stroke=\"#050505\" stroke-width=\"2\"><path d=\"M15 10 L15 80 L30 65 L50 90 L60 85 L40 60 L60 55 Z\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 80 100\" fill=\"#FF6B4A\" stroke=\"#050505\" stroke-width=\"2\"><path d=\"M15 10 L15 80 L30 65 L50 90 L60 85 L40 60 L60 55 Z\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Toggle Switch",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 60\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"3\"><rect x=\"10\" y=\"10\" width=\"100\" height=\"40\" rx=\"20\" fill=\"#E5FF00\" fill-opacity=\"0.15\"/><circle cx=\"80\" cy=\"30\" r=\"15\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 60\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"3\"><rect x=\"10\" y=\"10\" width=\"100\" height=\"40\" rx=\"20\" fill=\"#FF6B4A\" fill-opacity=\"0.15\"/><circle cx=\"80\" cy=\"30\" r=\"15\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Sacred Geometry",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"40\"/><circle cx=\"50\" cy=\"50\" r=\"28\"/><circle cx=\"50\" cy=\"50\" r=\"16\"/><polygon points=\"50,10 93,75 7,75\" opacity=\"0.6\"/><polygon points=\"50,90 7,25 93,25\" opacity=\"0.6\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"40\"/><circle cx=\"50\" cy=\"50\" r=\"28\"/><circle cx=\"50\" cy=\"50\" r=\"16\"/><polygon points=\"50,10 93,75 7,75\" opacity=\"0.6\"/><polygon points=\"50,90 7,25 93,25\" opacity=\"0.6\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Wave Function",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 80\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M0 40 Q25 10 50 40 T100 40 T150 40 T200 40\" opacity=\"0.3\"/><path d=\"M0 40 Q25 0 50 40 T100 40 T150 40 T200 40\" opacity=\"0.6\"/><path d=\"M0 40 Q25 -10 50 40 T100 40 T150 40 T200 40\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 80\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\" stroke-linecap=\"round\"><path d=\"M0 40 Q25 10 50 40 T100 40 T150 40 T200 40\" opacity=\"0.3\"/><path d=\"M0 40 Q25 0 50 40 T100 40 T150 40 T200 40\" opacity=\"0.6\"/><path d=\"M0 40 Q25 -10 50 40 T100 40 T150 40 T200 40\"/></svg>"
             },
             {
                 "cat": "text",
                 "name": "LOADING_BAR",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 50\"><rect x=\"10\" y=\"25\" width=\"180\" height=\"12\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"1\" rx=\"2\"/><rect x=\"12\" y=\"27\" width=\"0\" height=\"8\" fill=\"#E5FF00\" rx=\"1\"><animate attributeName=\"width\" values=\"0;120;120;0\" dur=\"2s\" repeatCount=\"indefinite\"/></rect><text x=\"10\" y=\"18\" font-family=\"monospace\" font-size=\"11\" fill=\"#E5FF00\">LOADING...</text><text x=\"140\" y=\"18\" font-family=\"monospace\" font-size=\"11\" fill=\"#E5FF00\" opacity=\"0.6\"><animate attributeName=\"opacity\" values=\"0.6;1;0.6\" dur=\"1s\" repeatCount=\"indefinite\"/>67%</text></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 50\"><rect x=\"10\" y=\"25\" width=\"180\" height=\"12\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"1\" rx=\"2\"/><rect x=\"12\" y=\"27\" width=\"0\" height=\"8\" fill=\"#FF6B4A\" rx=\"1\"><animate attributeName=\"width\" values=\"0;120;120;0\" dur=\"2s\" repeatCount=\"indefinite\"/></rect><text x=\"10\" y=\"18\" font-family=\"monospace\" font-size=\"11\" fill=\"#FF6B4A\">LOADING...</text><text x=\"140\" y=\"18\" font-family=\"monospace\" font-size=\"11\" fill=\"#FF6B4A\" opacity=\"0.6\"><animate attributeName=\"opacity\" values=\"0.6;1;0.6\" dur=\"1s\" repeatCount=\"indefinite\"/>67%</text></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Mobius Strip",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M20,50 C20,20 80,20 80,50 C80,80 20,80 20,50\" stroke-width=\"2\"/><path d=\"M30,50 C30,30 70,30 70,50 C70,70 30,70 30,50\" stroke-width=\"1\" opacity=\"0.6\"/><path d=\"M40,50 C40,40 60,40 60,50 C60,60 40,60 40,50\" stroke-width=\"0.5\" opacity=\"0.3\"/><line x1=\"20\" y1=\"50\" x2=\"80\" y2=\"50\" stroke-dasharray=\"2 4\" opacity=\"0.5\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M20,50 C20,20 80,20 80,50 C80,80 20,80 20,50\" stroke-width=\"2\"/><path d=\"M30,50 C30,30 70,30 70,50 C70,70 30,70 30,50\" stroke-width=\"1\" opacity=\"0.6\"/><path d=\"M40,50 C40,40 60,40 60,50 C60,60 40,60 40,50\" stroke-width=\"0.5\" opacity=\"0.3\"/><line x1=\"20\" y1=\"50\" x2=\"80\" y2=\"50\" stroke-dasharray=\"2 4\" opacity=\"0.5\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Geometric Cube",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1.5\" stroke-linejoin=\"round\"><polygon points=\"50,15 85,35 85,75 50,95 15,75 15,35\"/><polyline points=\"15,35 50,55 85,35\"/><line x1=\"50\" y1=\"55\" x2=\"50\" y2=\"95\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1.5\" stroke-linejoin=\"round\"><polygon points=\"50,15 85,35 85,75 50,95 15,75 15,35\"/><polyline points=\"15,35 50,55 85,35\"/><line x1=\"50\" y1=\"55\" x2=\"50\" y2=\"95\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Hyper-Sphere",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><circle cx=\"50\" cy=\"50\" r=\"35\"/><circle cx=\"50\" cy=\"50\" r=\"25\"/><circle cx=\"50\" cy=\"50\" r=\"15\"/><ellipse cx=\"50\" cy=\"50\" rx=\"45\" ry=\"10\" transform=\"rotate(45 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"45\" ry=\"10\" transform=\"rotate(-45 50 50)\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><circle cx=\"50\" cy=\"50\" r=\"35\"/><circle cx=\"50\" cy=\"50\" r=\"25\"/><circle cx=\"50\" cy=\"50\" r=\"15\"/><ellipse cx=\"50\" cy=\"50\" rx=\"45\" ry=\"10\" transform=\"rotate(45 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"45\" ry=\"10\" transform=\"rotate(-45 50 50)\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Chrome Ribbon",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M10,80 C30,40 70,90 90,20\" stroke-width=\"4\" stroke-linecap=\"round\"/><path d=\"M10,75 C30,35 70,85 90,15\" stroke-width=\"1\" opacity=\"0.5\"/><path d=\"M10,85 C30,45 70,95 90,25\" stroke-width=\"1\" opacity=\"0.2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M10,80 C30,40 70,90 90,20\" stroke-width=\"4\" stroke-linecap=\"round\"/><path d=\"M10,75 C30,35 70,85 90,15\" stroke-width=\"1\" opacity=\"0.5\"/><path d=\"M10,85 C30,45 70,95 90,25\" stroke-width=\"1\" opacity=\"0.2\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Pixel Heart",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><rect x=\"30\" y=\"20\" width=\"10\" height=\"10\"/><rect x=\"60\" y=\"20\" width=\"10\" height=\"10\"/><rect x=\"20\" y=\"30\" width=\"20\" height=\"10\"/><rect x=\"60\" y=\"30\" width=\"20\" height=\"10\"/><rect x=\"10\" y=\"40\" width=\"80\" height=\"20\"/><rect x=\"20\" y=\"60\" width=\"60\" height=\"10\"/><rect x=\"30\" y=\"70\" width=\"40\" height=\"10\"/><rect x=\"40\" y=\"80\" width=\"20\" height=\"10\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><rect x=\"30\" y=\"20\" width=\"10\" height=\"10\"/><rect x=\"60\" y=\"20\" width=\"10\" height=\"10\"/><rect x=\"20\" y=\"30\" width=\"20\" height=\"10\"/><rect x=\"60\" y=\"30\" width=\"20\" height=\"10\"/><rect x=\"10\" y=\"40\" width=\"80\" height=\"20\"/><rect x=\"20\" y=\"60\" width=\"60\" height=\"10\"/><rect x=\"30\" y=\"70\" width=\"40\" height=\"10\"/><rect x=\"40\" y=\"80\" width=\"20\" height=\"10\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Pixel Skull",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><rect x=\"30\" y=\"20\" width=\"40\" height=\"10\"/><rect x=\"20\" y=\"30\" width=\"60\" height=\"30\"/><rect x=\"30\" y=\"60\" width=\"40\" height=\"10\"/><rect x=\"40\" y=\"70\" width=\"20\" height=\"10\"/><rect x=\"35\" y=\"40\" width=\"10\" height=\"10\" fill=\"#050505\"/><rect x=\"55\" y=\"40\" width=\"10\" height=\"10\" fill=\"#050505\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><rect x=\"30\" y=\"20\" width=\"40\" height=\"10\"/><rect x=\"20\" y=\"30\" width=\"60\" height=\"30\"/><rect x=\"30\" y=\"60\" width=\"40\" height=\"10\"/><rect x=\"40\" y=\"70\" width=\"20\" height=\"10\"/><rect x=\"35\" y=\"40\" width=\"10\" height=\"10\" fill=\"#050505\"/><rect x=\"55\" y=\"40\" width=\"10\" height=\"10\" fill=\"#050505\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Floppy Disk",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"3\"><polygon points=\"20,10 70,10 80,20 80,90 20,90\"/><rect x=\"35\" y=\"10\" width=\"30\" height=\"25\"/><rect x=\"30\" y=\"55\" width=\"40\" height=\"35\"/><rect x=\"40\" y=\"65\" width=\"20\" height=\"2\" fill=\"#E5FF00\" stroke=\"none\"/><rect x=\"40\" y=\"75\" width=\"20\" height=\"2\" fill=\"#E5FF00\" stroke=\"none\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"3\"><polygon points=\"20,10 70,10 80,20 80,90 20,90\"/><rect x=\"35\" y=\"10\" width=\"30\" height=\"25\"/><rect x=\"30\" y=\"55\" width=\"40\" height=\"35\"/><rect x=\"40\" y=\"65\" width=\"20\" height=\"2\" fill=\"#FF6B4A\" stroke=\"none\"/><rect x=\"40\" y=\"75\" width=\"20\" height=\"2\" fill=\"#FF6B4A\" stroke=\"none\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Volume Control",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"35\"/><circle cx=\"50\" cy=\"50\" r=\"20\" stroke-dasharray=\"2 4\"/><line x1=\"25\" y1=\"75\" x2=\"15\" y2=\"85\"/><circle cx=\"25\" cy=\"75\" r=\"4\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"35\"/><circle cx=\"50\" cy=\"50\" r=\"20\" stroke-dasharray=\"2 4\"/><line x1=\"25\" y1=\"75\" x2=\"15\" y2=\"85\"/><circle cx=\"25\" cy=\"75\" r=\"4\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Glassmorphic Card",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"#050505\" fill-opacity=\"0.5\" stroke-width=\"1\"><rect x=\"10\" y=\"20\" width=\"80\" height=\"60\" rx=\"8\"/><line x1=\"15\" y1=\"35\" x2=\"85\" y2=\"35\" opacity=\"0.5\"/><circle cx=\"25\" cy=\"27\" r=\"2\" fill=\"#E5FF00\"/><circle cx=\"32\" cy=\"27\" r=\"2\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"#050505\" fill-opacity=\"0.5\" stroke-width=\"1\"><rect x=\"10\" y=\"20\" width=\"80\" height=\"60\" rx=\"8\"/><line x1=\"15\" y1=\"35\" x2=\"85\" y2=\"35\" opacity=\"0.5\"/><circle cx=\"25\" cy=\"27\" r=\"2\" fill=\"#FF6B4A\"/><circle cx=\"32\" cy=\"27\" r=\"2\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Play/Pause HUD",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><polygon points=\"40,35 70,50 40,65\" fill=\"#E5FF00\"/><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"5 10\" opacity=\"0.5\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><polygon points=\"40,35 70,50 40,65\" fill=\"#FF6B4A\"/><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"5 10\" opacity=\"0.5\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Chrome Prism",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\" stroke-linejoin=\"round\"><polygon points=\"50,10 90,40 50,90 10,40\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"90\"/><line x1=\"10\" y1=\"40\" x2=\"90\" y2=\"40\"/><polygon points=\"50,30 70,45 50,70 30,45\" fill=\"#E5FF00\" fill-opacity=\"0.2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\" stroke-linejoin=\"round\"><polygon points=\"50,10 90,40 50,90 10,40\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"90\"/><line x1=\"10\" y1=\"40\" x2=\"90\" y2=\"40\"/><polygon points=\"50,30 70,45 50,70 30,45\" fill=\"#FF6B4A\" fill-opacity=\"0.2\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Aesthetic Sparkle",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><polygon points=\"50,0 55,45 100,50 55,55 50,100 45,55 0,50 45,45\"/><polygon points=\"25,25 28,35 38,38 28,41 25,51 22,41 12,38 22,35\" opacity=\"0.6\"/><polygon points=\"75,75 78,85 88,88 78,91 75,101 72,91 62,88 72,85\" opacity=\"0.6\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><polygon points=\"50,0 55,45 100,50 55,55 50,100 45,55 0,50 45,45\"/><polygon points=\"25,25 28,35 38,38 28,41 25,51 22,41 12,38 22,35\" opacity=\"0.6\"/><polygon points=\"75,75 78,85 88,88 78,91 75,101 72,91 62,88 72,85\" opacity=\"0.6\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Abstract Topology",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\" fill-opacity=\"0.1\" stroke=\"#E5FF00\" stroke-width=\"1\"><path d=\"M 10 50 C 30 10, 70 10, 90 50 C 70 90, 30 90, 10 50 Z\"/><path d=\"M 20 50 C 40 25, 60 25, 80 50 C 60 75, 40 75, 20 50 Z\"/><path d=\"M 30 50 C 45 40, 55 40, 70 50 C 55 60, 45 60, 30 50 Z\"/><circle cx=\"50\" cy=\"50\" r=\"5\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\" fill-opacity=\"0.1\" stroke=\"#FF6B4A\" stroke-width=\"1\"><path d=\"M 10 50 C 30 10, 70 10, 90 50 C 70 90, 30 90, 10 50 Z\"/><path d=\"M 20 50 C 40 25, 60 25, 80 50 C 60 75, 40 75, 20 50 Z\"/><path d=\"M 30 50 C 45 40, 55 40, 70 50 C 55 60, 45 60, 30 50 Z\"/><circle cx=\"50\" cy=\"50\" r=\"5\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "name": "3D Modelling 819 Svg File",
@@ -6445,202 +6563,202 @@
             {
                 "cat": "y2k",
                 "name": "4-Point Star",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M50 10 C50 40 60 50 90 50 C60 50 50 60 50 90 C50 60 40 50 10 50 C40 50 50 40 50 10 Z\" fill=\"#E5FF00\" opacity=\"0.2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M50 10 C50 40 60 50 90 50 C60 50 50 60 50 90 C50 60 40 50 10 50 C40 50 50 40 50 10 Z\" fill=\"#FF6B4A\" opacity=\"0.2\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "8-Point Star",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M50 5 L55 40 L90 45 L55 50 L50 85 L45 50 L10 45 L45 40 Z\"/><path d=\"M50 20 L65 35 L80 20 L65 50 L80 80 L65 65 L50 80 L35 65 L20 80 L35 50 L20 20 L35 35 Z\" opacity=\"0.5\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M50 5 L55 40 L90 45 L55 50 L50 85 L45 50 L10 45 L45 40 Z\"/><path d=\"M50 20 L65 35 L80 20 L65 50 L80 80 L65 65 L50 80 L35 65 L20 80 L35 50 L20 20 L35 35 Z\" opacity=\"0.5\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Hollow Star",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"3\"><path d=\"M50 10 L58 42 L90 50 L58 58 L50 90 L42 58 L10 50 L42 42 Z\"/><path d=\"M50 25 L54 46 L75 50 L54 54 L50 75 L46 54 L25 50 L46 46 Z\" stroke-width=\"1\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"3\"><path d=\"M50 10 L58 42 L90 50 L58 58 L50 90 L42 58 L10 50 L42 42 Z\"/><path d=\"M50 25 L54 46 L75 50 L54 54 L50 75 L46 54 L25 50 L46 46 Z\" stroke-width=\"1\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Spike Ring",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"30\"/><path d=\"M50 5 L50 20 M95 50 L80 50 M50 95 L50 80 M5 50 L20 50 M80 20 L70 30 M20 80 L30 70 M20 20 L30 30 M80 80 L70 70\" stroke-width=\"4\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"30\"/><path d=\"M50 5 L50 20 M95 50 L80 50 M50 95 L50 80 M5 50 L20 50 M80 20 L70 30 M20 80 L30 70 M20 20 L30 30 M80 80 L70 70\" stroke-width=\"4\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Y2K Sparkle",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M50 0 C50 40 60 50 100 50 C60 50 50 60 50 100 C50 60 40 50 0 50 C40 50 50 40 50 0 Z\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M50 0 C50 40 60 50 100 50 C60 50 50 60 50 100 C50 60 40 50 0 50 C40 50 50 40 50 0 Z\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Chrome Drop",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M50 10 C80 50 80 80 50 90 C20 80 20 50 50 10 Z\"/><circle cx=\"60\" cy=\"65\" r=\"5\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M50 10 C80 50 80 80 50 90 C20 80 20 50 50 10 Z\"/><circle cx=\"60\" cy=\"65\" r=\"5\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Tribal Flame",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M50 90 C20 70 30 30 50 10 C60 40 80 60 50 90 Z\"/><path d=\"M50 80 C35 65 40 40 50 25 C55 45 65 55 50 80 Z\" fill=\"#050505\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M50 90 C20 70 30 30 50 10 C60 40 80 60 50 90 Z\"/><path d=\"M50 80 C35 65 40 40 50 25 C55 45 65 55 50 80 Z\" fill=\"#050505\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Tribal Wing",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M10 50 Q40 20 90 10 Q60 40 80 60 Q50 50 50 90 Q30 60 10 50 Z\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M10 50 Q40 20 90 10 Q60 40 80 60 Q50 50 50 90 Q30 60 10 50 Z\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Symmetrical Tribal",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><path d=\"M50 10 Q70 40 90 50 Q70 60 50 90 Q30 60 10 50 Q30 40 50 10 Z M50 30 Q60 45 70 50 Q60 55 50 70 Q40 55 30 50 Q40 45 50 30 Z\" fill-rule=\"evenodd\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><path d=\"M50 10 Q70 40 90 50 Q70 60 50 90 Q30 60 10 50 Q30 40 50 10 Z M50 30 Q60 45 70 50 Q60 55 50 70 Q40 55 30 50 Q40 45 50 30 Z\" fill-rule=\"evenodd\"/></svg>"
             },
             {
                 "cat": "y2k",
                 "name": "Orbiting Ellipses",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"1.5\"><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(30 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(-30 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(90 50 50)\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"1.5\"><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(30 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(-30 50 50)\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"10\" transform=\"rotate(90 50 50)\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Targeting HUD",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1.5\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"8 4\" opacity=\"0.6\"/><circle cx=\"50\" cy=\"50\" r=\"30\" /><path d=\"M50 0 V20 M50 80 V100 M0 50 H20 M80 50 H100\" stroke-width=\"3\"/><circle cx=\"50\" cy=\"50\" r=\"3\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1.5\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"8 4\" opacity=\"0.6\"/><circle cx=\"50\" cy=\"50\" r=\"30\" /><path d=\"M50 0 V20 M50 80 V100 M0 50 H20 M80 50 H100\" stroke-width=\"3\"/><circle cx=\"50\" cy=\"50\" r=\"3\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Sniper Scope",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><circle cx=\"50\" cy=\"50\" r=\"25\"/><line x1=\"0\" y1=\"50\" x2=\"100\" y2=\"50\" opacity=\"0.5\"/><line x1=\"50\" y1=\"0\" x2=\"50\" y2=\"100\" opacity=\"0.5\"/><rect x=\"45\" y=\"45\" width=\"10\" height=\"10\" stroke-width=\"2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"45\"/><circle cx=\"50\" cy=\"50\" r=\"25\"/><line x1=\"0\" y1=\"50\" x2=\"100\" y2=\"50\" opacity=\"0.5\"/><line x1=\"50\" y1=\"0\" x2=\"50\" y2=\"100\" opacity=\"0.5\"/><rect x=\"45\" y=\"45\" width=\"10\" height=\"10\" stroke-width=\"2\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Radar Sweep",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-width=\"1\" stroke-dasharray=\"2 2\" /><path d=\"M50 50 L90 10\" stroke-width=\"2\" opacity=\"0.8\"/><circle cx=\"50\" cy=\"50\" r=\"10\" fill=\"#E5FF00\" opacity=\"0.3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-width=\"1\" stroke-dasharray=\"2 2\" /><path d=\"M50 50 L90 10\" stroke-width=\"2\" opacity=\"0.8\"/><circle cx=\"50\" cy=\"50\" r=\"10\" fill=\"#FF6B4A\" opacity=\"0.3\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Hexagon Grid",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><polygon points=\"50,15 80,30 80,70 50,85 20,70 20,30\"/><polygon points=\"50,30 65,40 65,60 50,70 35,60 35,40\" stroke-dasharray=\"2 2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><polygon points=\"50,15 80,30 80,70 50,85 20,70 20,30\"/><polygon points=\"50,30 65,40 65,60 50,70 35,60 35,40\" stroke-dasharray=\"2 2\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Cyber Eye",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><path d=\"M10 50 Q50 10 90 50 Q50 90 10 50 Z\"/><circle cx=\"50\" cy=\"50\" r=\"15\"/><circle cx=\"50\" cy=\"50\" r=\"5\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><path d=\"M10 50 Q50 10 90 50 Q50 90 10 50 Z\"/><circle cx=\"50\" cy=\"50\" r=\"15\"/><circle cx=\"50\" cy=\"50\" r=\"5\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Data Nodes",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><circle cx=\"20\" cy=\"30\" r=\"5\"/><circle cx=\"80\" cy=\"40\" r=\"5\"/><circle cx=\"40\" cy=\"80\" r=\"5\"/><circle cx=\"60\" cy=\"20\" r=\"5\"/><polyline points=\"20,30 60,20 80,40 40,80 20,30\" stroke-dasharray=\"4 2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><circle cx=\"20\" cy=\"30\" r=\"5\"/><circle cx=\"80\" cy=\"40\" r=\"5\"/><circle cx=\"40\" cy=\"80\" r=\"5\"/><circle cx=\"60\" cy=\"20\" r=\"5\"/><polyline points=\"20,30 60,20 80,40 40,80 20,30\" stroke-dasharray=\"4 2\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Circuit Trace",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><path d=\"M10 90 L30 90 L50 70 L50 30 L70 10 L90 10\"/><circle cx=\"10\" cy=\"90\" r=\"3\" fill=\"#E5FF00\"/><circle cx=\"90\" cy=\"10\" r=\"3\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><path d=\"M10 90 L30 90 L50 70 L50 30 L70 10 L90 10\"/><circle cx=\"10\" cy=\"90\" r=\"3\" fill=\"#FF6B4A\"/><circle cx=\"90\" cy=\"10\" r=\"3\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Tech Triangle",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><polygon points=\"50,15 90,80 10,80\"/><polygon points=\"50,30 75,70 25,70\" stroke-dasharray=\"3 3\"/><line x1=\"50\" y1=\"15\" x2=\"50\" y2=\"30\"/><line x1=\"90\" y1=\"80\" x2=\"75\" y2=\"70\"/><line x1=\"10\" y1=\"80\" x2=\"25\" y2=\"70\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><polygon points=\"50,15 90,80 10,80\"/><polygon points=\"50,30 75,70 25,70\" stroke-dasharray=\"3 3\"/><line x1=\"50\" y1=\"15\" x2=\"50\" y2=\"30\"/><line x1=\"90\" y1=\"80\" x2=\"75\" y2=\"70\"/><line x1=\"10\" y1=\"80\" x2=\"25\" y2=\"70\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Digital Sun",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"20\"/><path d=\"M50 10 L50 25 M50 75 L50 90 M10 50 L25 50 M75 50 L90 50 M20 20 L32 32 M78 78 L68 68 M80 20 L68 32 M20 80 L32 68\" stroke-dasharray=\"1 3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><circle cx=\"50\" cy=\"50\" r=\"20\"/><path d=\"M50 10 L50 25 M50 75 L50 90 M10 50 L25 50 M75 50 L90 50 M20 20 L32 32 M78 78 L68 68 M80 20 L68 32 M20 80 L32 68\" stroke-dasharray=\"1 3\"/></svg>"
             },
             {
                 "cat": "cyber",
                 "name": "Core Processor",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><rect x=\"30\" y=\"30\" width=\"40\" height=\"40\"/><rect x=\"40\" y=\"40\" width=\"20\" height=\"20\" fill=\"#E5FF00\" opacity=\"0.3\"/><line x1=\"10\" y1=\"50\" x2=\"30\" y2=\"50\"/><line x1=\"70\" y1=\"50\" x2=\"90\" y2=\"50\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"30\"/><line x1=\"50\" y1=\"70\" x2=\"50\" y2=\"90\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><rect x=\"30\" y=\"30\" width=\"40\" height=\"40\"/><rect x=\"40\" y=\"40\" width=\"20\" height=\"20\" fill=\"#FF6B4A\" opacity=\"0.3\"/><line x1=\"10\" y1=\"50\" x2=\"30\" y2=\"50\"/><line x1=\"70\" y1=\"50\" x2=\"90\" y2=\"50\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"30\"/><line x1=\"50\" y1=\"70\" x2=\"50\" y2=\"90\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Tech Barcode",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 50\" fill=\"#E5FF00\"><rect x=\"10\" y=\"10\" width=\"4\" height=\"30\" /><rect x=\"18\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"24\" y=\"10\" width=\"8\" height=\"30\" /><rect x=\"36\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"42\" y=\"10\" width=\"6\" height=\"30\" /><rect x=\"52\" y=\"10\" width=\"4\" height=\"30\" /><rect x=\"60\" y=\"10\" width=\"12\" height=\"30\" /><rect x=\"76\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"82\" y=\"10\" width=\"8\" height=\"30\" /></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 50\" fill=\"#FF6B4A\"><rect x=\"10\" y=\"10\" width=\"4\" height=\"30\" /><rect x=\"18\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"24\" y=\"10\" width=\"8\" height=\"30\" /><rect x=\"36\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"42\" y=\"10\" width=\"6\" height=\"30\" /><rect x=\"52\" y=\"10\" width=\"4\" height=\"30\" /><rect x=\"60\" y=\"10\" width=\"12\" height=\"30\" /><rect x=\"76\" y=\"10\" width=\"2\" height=\"30\" /><rect x=\"82\" y=\"10\" width=\"8\" height=\"30\" /></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Loading Ring 1",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"4\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"60 190\" stroke-linecap=\"round\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0 50 50\" to=\"360 50 50\" dur=\"1s\" repeatCount=\"indefinite\"/></circle><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-opacity=\"0.2\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"4\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"60 190\" stroke-linecap=\"round\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0 50 50\" to=\"360 50 50\" dur=\"1s\" repeatCount=\"indefinite\"/></circle><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-opacity=\"0.2\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Loading Ring 2",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"3\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"10 10\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"360 50 50\" to=\"0 50 50\" dur=\"4s\" repeatCount=\"indefinite\"/></circle><circle cx=\"50\" cy=\"50\" r=\"30\" stroke-dasharray=\"50 100\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0 50 50\" to=\"360 50 50\" dur=\"2s\" repeatCount=\"indefinite\"/></circle></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"3\"><circle cx=\"50\" cy=\"50\" r=\"40\" stroke-dasharray=\"10 10\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"360 50 50\" to=\"0 50 50\" dur=\"4s\" repeatCount=\"indefinite\"/></circle><circle cx=\"50\" cy=\"50\" r=\"30\" stroke-dasharray=\"50 100\"><animateTransform attributeName=\"transform\" type=\"rotate\" from=\"0 50 50\" to=\"360 50 50\" dur=\"2s\" repeatCount=\"indefinite\"/></circle></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Battery Status",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><rect x=\"20\" y=\"30\" width=\"50\" height=\"40\" rx=\"3\"/><path d=\"M70 40 L75 40 Q80 40 80 45 L80 55 Q80 60 75 60 L70 60\"/><rect x=\"25\" y=\"35\" width=\"10\" height=\"30\" fill=\"#E5FF00\"/><rect x=\"40\" y=\"35\" width=\"10\" height=\"30\" fill=\"#E5FF00\"/><rect x=\"55\" y=\"35\" width=\"10\" height=\"30\" fill=\"#E5FF00\" opacity=\"0.3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><rect x=\"20\" y=\"30\" width=\"50\" height=\"40\" rx=\"3\"/><path d=\"M70 40 L75 40 Q80 40 80 45 L80 55 Q80 60 75 60 L70 60\"/><rect x=\"25\" y=\"35\" width=\"10\" height=\"30\" fill=\"#FF6B4A\"/><rect x=\"40\" y=\"35\" width=\"10\" height=\"30\" fill=\"#FF6B4A\"/><rect x=\"55\" y=\"35\" width=\"10\" height=\"30\" fill=\"#FF6B4A\" opacity=\"0.3\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Warning Sign",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"3\"><polygon points=\"50,15 90,85 10,85\"/><line x1=\"50\" y1=\"40\" x2=\"50\" y2=\"65\"/><circle cx=\"50\" cy=\"75\" r=\"2\" fill=\"#E5FF00\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"3\"><polygon points=\"50,15 90,85 10,85\"/><line x1=\"50\" y1=\"40\" x2=\"50\" y2=\"65\"/><circle cx=\"50\" cy=\"75\" r=\"2\" fill=\"#FF6B4A\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Signal Bars",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><rect x=\"20\" y=\"70\" width=\"10\" height=\"15\"/><rect x=\"40\" y=\"50\" width=\"10\" height=\"35\"/><rect x=\"60\" y=\"30\" width=\"10\" height=\"55\"/><rect x=\"80\" y=\"10\" width=\"10\" height=\"75\" opacity=\"0.3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><rect x=\"20\" y=\"70\" width=\"10\" height=\"15\"/><rect x=\"40\" y=\"50\" width=\"10\" height=\"35\"/><rect x=\"60\" y=\"30\" width=\"10\" height=\"55\"/><rect x=\"80\" y=\"10\" width=\"10\" height=\"75\" opacity=\"0.3\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Audio Wave",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"4\" stroke-linecap=\"round\"><line x1=\"20\" y1=\"40\" x2=\"20\" y2=\"60\"/><line x1=\"35\" y1=\"20\" x2=\"35\" y2=\"80\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"90\"/><line x1=\"65\" y1=\"30\" x2=\"65\" y2=\"70\"/><line x1=\"80\" y1=\"45\" x2=\"80\" y2=\"55\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"4\" stroke-linecap=\"round\"><line x1=\"20\" y1=\"40\" x2=\"20\" y2=\"60\"/><line x1=\"35\" y1=\"20\" x2=\"35\" y2=\"80\"/><line x1=\"50\" y1=\"10\" x2=\"50\" y2=\"90\"/><line x1=\"65\" y1=\"30\" x2=\"65\" y2=\"70\"/><line x1=\"80\" y1=\"45\" x2=\"80\" y2=\"55\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Crosshair Box",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"2\"><rect x=\"30\" y=\"30\" width=\"40\" height=\"40\"/><path d=\"M10 20 L20 20 L20 10 M80 10 L80 20 L90 20 M90 80 L80 80 L80 90 M20 90 L20 80 L10 80\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"2\"><rect x=\"30\" y=\"30\" width=\"40\" height=\"40\"/><path d=\"M10 20 L20 20 L20 10 M80 10 L80 20 L90 20 M90 80 L80 80 L80 90 M20 90 L20 80 L10 80\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Grid Overlay",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"0.5\" opacity=\"0.5\"><path d=\"M0 20 H100 M0 40 H100 M0 60 H100 M0 80 H100 M20 0 V100 M40 0 V100 M60 0 V100 M80 0 V100\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"0.5\" opacity=\"0.5\"><path d=\"M0 20 H100 M0 40 H100 M0 60 H100 M0 80 H100 M20 0 V100 M40 0 V100 M60 0 V100 M80 0 V100\"/></svg>"
             },
             {
                 "cat": "ui",
                 "name": "Glitch Blocks",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><rect x=\"10\" y=\"20\" width=\"30\" height=\"10\"/><rect x=\"60\" y=\"30\" width=\"20\" height=\"5\"/><rect x=\"25\" y=\"60\" width=\"45\" height=\"15\" opacity=\"0.6\"/><rect x=\"15\" y=\"80\" width=\"15\" height=\"8\"/><rect x=\"70\" y=\"70\" width=\"25\" height=\"12\" opacity=\"0.3\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><rect x=\"10\" y=\"20\" width=\"30\" height=\"10\"/><rect x=\"60\" y=\"30\" width=\"20\" height=\"5\"/><rect x=\"25\" y=\"60\" width=\"45\" height=\"15\" opacity=\"0.6\"/><rect x=\"15\" y=\"80\" width=\"15\" height=\"8\"/><rect x=\"70\" y=\"70\" width=\"25\" height=\"12\" opacity=\"0.3\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Wireframe Box",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" stroke-width=\"1\" fill=\"none\"><path d=\"M20,30 L80,30 L80,90 L20,90 Z\" opacity=\"0.5\"/><path d=\"M30,20 L90,20 L90,80 L30,80 Z\"/><path d=\"M20,30 L30,20 M80,30 L90,20 M80,90 L90,80 M20,90 L30,80\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" stroke-width=\"1\" fill=\"none\"><path d=\"M20,30 L80,30 L80,90 L20,90 Z\" opacity=\"0.5\"/><path d=\"M30,20 L90,20 L90,80 L30,80 Z\"/><path d=\"M20,30 L30,20 M80,30 L90,20 M80,90 L90,80 M20,90 L30,80\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Wireframe Globe",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"40\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\"/><ellipse cx=\"50\" cy=\"50\" rx=\"15\" ry=\"40\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"40\"/><ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"15\"/><ellipse cx=\"50\" cy=\"50\" rx=\"15\" ry=\"40\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Liquid Blob",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z\"><animate attributeName=\"d\" values=\"M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z; M 50 20 C 75 10 95 50 80 75 C 65 100 35 90 15 70 C -5 50 25 30 50 20 Z; M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z\" dur=\"4s\" repeatCount=\"indefinite\"/></path></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z\"><animate attributeName=\"d\" values=\"M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z; M 50 20 C 75 10 95 50 80 75 C 65 100 35 90 15 70 C -5 50 25 30 50 20 Z; M 50 15 C 80 15 90 40 85 65 C 80 90 50 95 25 80 C 0 65 20 15 50 15 Z\" dur=\"4s\" repeatCount=\"indefinite\"/></path></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Topographic Lines",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><path d=\"M10 20 Q30 40 50 20 T90 20\"/><path d=\"M10 40 Q30 60 50 40 T90 40\"/><path d=\"M10 60 Q30 80 50 60 T90 60\"/><path d=\"M10 80 Q30 100 50 80 T90 80\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><path d=\"M10 20 Q30 40 50 20 T90 20\"/><path d=\"M10 40 Q30 60 50 40 T90 40\"/><path d=\"M10 60 Q30 80 50 60 T90 60\"/><path d=\"M10 80 Q30 100 50 80 T90 80\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Metatron Cube",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"30\"/><circle cx=\"50\" cy=\"20\" r=\"10\"/><circle cx=\"24\" cy=\"35\" r=\"10\"/><circle cx=\"24\" cy=\"65\" r=\"10\"/><circle cx=\"50\" cy=\"80\" r=\"10\"/><circle cx=\"76\" cy=\"65\" r=\"10\"/><circle cx=\"76\" cy=\"35\" r=\"10\"/><line x1=\"50\" y1=\"20\" x2=\"24\" y2=\"35\"/><line x1=\"24\" y1=\"35\" x2=\"24\" y2=\"65\"/><line x1=\"24\" y1=\"65\" x2=\"50\" y2=\"80\"/><line x1=\"50\" y1=\"80\" x2=\"76\" y2=\"65\"/><line x1=\"76\" y1=\"65\" x2=\"76\" y2=\"35\"/><line x1=\"76\" y1=\"35\" x2=\"50\" y2=\"20\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1\"><circle cx=\"50\" cy=\"50\" r=\"30\"/><circle cx=\"50\" cy=\"20\" r=\"10\"/><circle cx=\"24\" cy=\"35\" r=\"10\"/><circle cx=\"24\" cy=\"65\" r=\"10\"/><circle cx=\"50\" cy=\"80\" r=\"10\"/><circle cx=\"76\" cy=\"65\" r=\"10\"/><circle cx=\"76\" cy=\"35\" r=\"10\"/><line x1=\"50\" y1=\"20\" x2=\"24\" y2=\"35\"/><line x1=\"24\" y1=\"35\" x2=\"24\" y2=\"65\"/><line x1=\"24\" y1=\"65\" x2=\"50\" y2=\"80\"/><line x1=\"50\" y1=\"80\" x2=\"76\" y2=\"65\"/><line x1=\"76\" y1=\"65\" x2=\"76\" y2=\"35\"/><line x1=\"76\" y1=\"35\" x2=\"50\" y2=\"20\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Geometric Pattern",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"1.5\"><rect x=\"25\" y=\"25\" width=\"50\" height=\"50\" transform=\"rotate(45 50 50)\"/><rect x=\"35\" y=\"35\" width=\"30\" height=\"30\" transform=\"rotate(45 50 50)\"/><rect x=\"45\" y=\"45\" width=\"10\" height=\"10\" transform=\"rotate(45 50 50)\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"1.5\"><rect x=\"25\" y=\"25\" width=\"50\" height=\"50\" transform=\"rotate(45 50 50)\"/><rect x=\"35\" y=\"35\" width=\"30\" height=\"30\" transform=\"rotate(45 50 50)\"/><rect x=\"45\" y=\"45\" width=\"10\" height=\"10\" transform=\"rotate(45 50 50)\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Vortex",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"1.5\"><path d=\"M50 50 L50 10 A40 40 0 0 1 90 50 A40 40 0 0 1 50 90 A40 40 0 0 1 10 50 A40 40 0 0 1 50 15 A35 35 0 0 1 85 50 A35 35 0 0 1 50 85 A35 35 0 0 1 15 50 A35 35 0 0 1 50 20\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"1.5\"><path d=\"M50 50 L50 10 A40 40 0 0 1 90 50 A40 40 0 0 1 50 90 A40 40 0 0 1 10 50 A40 40 0 0 1 50 15 A35 35 0 0 1 85 50 A35 35 0 0 1 50 85 A35 35 0 0 1 15 50 A35 35 0 0 1 50 20\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Optical Illusion",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#E5FF00\"><polygon points=\"50,10 90,50 50,90 10,50\" opacity=\"0.2\"/><polygon points=\"50,20 80,50 50,80 20,50\" opacity=\"0.4\"/><polygon points=\"50,30 70,50 50,70 30,50\" opacity=\"0.6\"/><polygon points=\"50,40 60,50 50,60 40,50\" opacity=\"0.8\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"#FF6B4A\"><polygon points=\"50,10 90,50 50,90 10,50\" opacity=\"0.2\"/><polygon points=\"50,20 80,50 50,80 20,50\" opacity=\"0.4\"/><polygon points=\"50,30 70,50 50,70 30,50\" opacity=\"0.6\"/><polygon points=\"50,40 60,50 50,60 40,50\" opacity=\"0.8\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "DNA Helix",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#E5FF00\" stroke-width=\"2\"><path d=\"M30 10 Q70 30 30 50 Q70 70 30 90\"/><path d=\"M70 10 Q30 30 70 50 Q30 70 70 90\" stroke-dasharray=\"2 2\"/><line x1=\"38\" y1=\"20\" x2=\"62\" y2=\"20\"/><line x1=\"50\" y1=\"30\" x2=\"50\" y2=\"30\"/><line x1=\"38\" y1=\"40\" x2=\"62\" y2=\"40\"/><line x1=\"38\" y1=\"60\" x2=\"62\" y2=\"60\"/><line x1=\"38\" y1=\"80\" x2=\"62\" y2=\"80\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" fill=\"none\" stroke=\"#FF6B4A\" stroke-width=\"2\"><path d=\"M30 10 Q70 30 30 50 Q70 70 30 90\"/><path d=\"M70 10 Q30 30 70 50 Q30 70 70 90\" stroke-dasharray=\"2 2\"/><line x1=\"38\" y1=\"20\" x2=\"62\" y2=\"20\"/><line x1=\"50\" y1=\"30\" x2=\"50\" y2=\"30\"/><line x1=\"38\" y1=\"40\" x2=\"62\" y2=\"40\"/><line x1=\"38\" y1=\"60\" x2=\"62\" y2=\"60\"/><line x1=\"38\" y1=\"80\" x2=\"62\" y2=\"80\"/></svg>"
             },
             {
                 "cat": "abstract",
                 "name": "Fractal Branch",
-                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#E5FF00\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M50 100 L50 60 L30 30 M50 60 L70 30 M30 30 L20 10 M30 30 L40 10 M70 30 L60 10 M70 30 L80 10\"/></svg>"
+                "code": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" stroke=\"#FF6B4A\" fill=\"none\" stroke-width=\"1.5\"><path d=\"M50 100 L50 60 L30 30 M50 60 L70 30 M30 30 L20 10 M30 30 L40 10 M70 30 L60 10 M70 30 L80 10\"/></svg>"
             },
 
         ];
@@ -7342,7 +7460,7 @@
             const safeStroke = stroke || firstEl.getAttribute('stroke') || '';
 
             ecpFill.value = safeFill && safeFill !== 'none' && safeFill.startsWith('#') ? normalizeToHex(safeFill) : (safeFill.startsWith('url') ? '#555555' : '#000000');
-            ecpStroke.value = safeStroke && safeStroke !== 'none' && safeStroke.startsWith('#') ? normalizeToHex(safeStroke) : (safeStroke.startsWith('url') ? '#555555' : '#E5FF00');
+            ecpStroke.value = safeStroke && safeStroke !== 'none' && safeStroke.startsWith('#') ? normalizeToHex(safeStroke) : (safeStroke.startsWith('url') ? '#555555' : '#FF6B4A');
             ecpStrokeWidth.value = sw !== null ? (sw || '1') : '';
             if (sw === null) ecpStrokeWidth.placeholder = 'MIX'; else ecpStrokeWidth.placeholder = '';
 
@@ -7669,7 +7787,7 @@
             if (!activeGradientRef) return;
             const newStop = document.createElementNS("http://www.w3.org/2000/svg", "stop");
             newStop.setAttribute("offset", "100%");
-            newStop.setAttribute("stop-color", "#E5FF00");
+            newStop.setAttribute("stop-color", "#FF6B4A");
             activeGradientRef.appendChild(newStop);
             updateEditorFromPreview();
             renderGradientStops(activeGradientRef, document.getElementById('gradientStopsContainer'));
@@ -7728,7 +7846,7 @@
                 const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                 line.setAttribute('x1', points[0].x); line.setAttribute('y1', points[0].y);
                 line.setAttribute('x2', points[1].x); line.setAttribute('y2', points[1].y);
-                line.setAttribute('stroke', '#E5FF00'); line.setAttribute('stroke-dasharray', '2 2');
+                line.setAttribute('stroke', '#FF6B4A'); line.setAttribute('stroke-dasharray', '2 2');
                 overlay.appendChild(line);
 
                 points.forEach(p => {
@@ -7736,7 +7854,7 @@
                     circle.setAttribute('cx', p.x);
                     circle.setAttribute('cy', p.y);
                     circle.setAttribute('r', 4);
-                    circle.setAttribute('fill', '#E5FF00');
+                    circle.setAttribute('fill', '#FF6B4A');
                     circle.style.cursor = 'move';
                     circle.style.pointerEvents = 'auto';
                     circle.classList.add('grad-handle');
@@ -7952,7 +8070,7 @@
 
                     const div = document.createElement('div');
                     div.className = 'ecp-anim-item';
-                    div.innerHTML = `<span style="color:#00ffff">${prop}:</span> <span style="font-size:8px;">${val}</span><button title="Remove">✕</button>`;
+                    div.innerHTML = `<span style="color:var(--accent)">${prop}:</span> <span style="font-size:8px;">${val}</span><button title="Remove">✕</button>`;
                     div.querySelector('button').addEventListener('click', () => {
                         selectedElements.forEach(sel => sel.removeAttribute(attr.name));
                         updateEditorFromPreview();
@@ -8201,7 +8319,7 @@
             isBindingPath = true;
             pathBindTarget = selectedElements[0];
             ecpBindPathBtn.textContent = 'Select a Path...';
-            ecpBindPathBtn.style.backgroundColor = 'rgba(229, 255, 0, 0.2)';
+            ecpBindPathBtn.style.backgroundColor = 'rgba(255, 107, 74, 0.2)';
             svgPreviewContainer.style.cursor = 'crosshair';
             showToast('Click a path on the canvas to bind motion');
         });
@@ -8286,7 +8404,7 @@
                 circle.setAttribute('cx', p.x);
                 circle.setAttribute('cy', p.y);
                 circle.setAttribute('r', 2);
-                circle.setAttribute('fill', p.type.length > 1 ? '#00E5FF' : '#E5FF00'); // Light blue for controls
+                circle.setAttribute('fill', p.type.length > 1 ? '#00E5FF' : '#FF6B4A'); // Light blue for controls
                 circle.setAttribute('stroke', '#000');
                 circle.setAttribute('stroke-width', 0.5);
                 circle.style.cursor = 'move';
@@ -8786,8 +8904,8 @@
         let marqueeBox = document.createElement('div');
         marqueeBox.className = 'marquee-box';
         marqueeBox.style.position = 'absolute';
-        marqueeBox.style.border = '1px dashed #E5FF00';
-        marqueeBox.style.backgroundColor = 'rgba(229, 255, 0, 0.1)';
+        marqueeBox.style.border = '1px dashed #FF6B4A';
+        marqueeBox.style.backgroundColor = 'rgba(255, 107, 74, 0.1)';
         marqueeBox.style.pointerEvents = 'none';
         marqueeBox.style.zIndex = '100';
         marqueeBox.style.display = 'none';
@@ -9151,7 +9269,7 @@
             const safeStroke = stroke || firstEl.getAttribute('stroke') || '';
 
             ecpFill2.value = safeFill && safeFill !== 'none' && safeFill.startsWith('#') ? normalizeToHex(safeFill) : '#000000';
-            ecpStroke2.value = safeStroke && safeStroke !== 'none' && safeStroke.startsWith('#') ? normalizeToHex(safeStroke) : '#E5FF00';
+            ecpStroke2.value = safeStroke && safeStroke !== 'none' && safeStroke.startsWith('#') ? normalizeToHex(safeStroke) : '#FF6B4A';
             ecpStrokeWidth2.value = sw !== null ? (sw || '1') : '1';
 
             // Transform
@@ -9265,17 +9383,17 @@
                 { id: 'soft', name: 'Soft Elevate', css: 'filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1))' },
                 { id: 'deep', name: 'Deep Offset', css: 'filter: drop-shadow(4px 4px 10px rgba(0,0,0,0.3))' },
                 { id: 'emboss', name: 'Neo Emboss', css: 'filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)) drop-shadow(-2px -2px 2px rgba(255,255,255,0.4))' },
-                { id: 'neon', name: 'Neon Glow', css: 'filter: drop-shadow(0 0 5px #e5ff00) drop-shadow(0 0 10px #e5ff00)' },
-                { id: 'glass', name: 'Glass Depth', css: 'filter: drop-shadow(0 8px 32px rgba(31,38,135,0.37)) blur(0.5px)' }
+                { id: 'neon', name: 'Neon Glow', css: 'filter: drop-shadow(0 0 5px #FF6B4A) drop-shadow(0 0 10px #FF6B4A)' },
+                { id: 'glass', name: 'Glass Depth', css: 'filter: drop-shadow(0 8px 32px rgba(14,16,19,0.37)) blur(0.5px)' }
             ],
             backgrounds: [
                 { id: 'grid-dark', name: 'Dark Grid', css: 'background-color: #0f172a; background-image: linear-gradient(#4f4f4f2e 1px, transparent 1px), linear-gradient(90deg, #4f4f4f2e 1px, transparent 1px); background-size: 20px 20px;' },
                 { id: 'dots-light', name: 'Light Dots', css: 'background-color: #f8fafc; background-image: radial-gradient(#0000001a 1px, transparent 1px); background-size: 20px 20px;' },
                 { id: 'blueprint', name: 'Tech Blueprint', css: 'background-color: #030b1c; background-image: linear-gradient(rgba(100, 150, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(100, 150, 255, 0.1) 1px, transparent 1px); background-size: 30px 30px;' },
                 { id: 'vantablack', name: 'Vantablack Glow', css: 'background: radial-gradient(circle at 50% 50%, #1c1c23 0%, #000000 100%);' },
-                { id: 'velvet-night', name: 'Velvet Night', css: 'background: linear-gradient(135deg, #09090b 0%, #1e1b4b 50%, #312e81 100%);' },
-                { id: 'hologram', name: 'Holographic Mesh', css: 'background: linear-gradient(120deg, #10b98122 0%, #3b82f622 50%, #8b5cf622 100%), #0f172a;' },
-                { id: 'sunset', name: 'Vapor Wave', css: 'background: linear-gradient(135deg, #f97316 0%, #db2777 50%, #6366f1 100%);' },
+                { id: 'velvet-night', name: 'Velvet Night', css: 'background: linear-gradient(135deg, #0a0a0c 0%, #1b1210 50%, #2b1814 100%);' },
+                { id: 'hologram', name: 'Holographic Mesh', css: 'background: linear-gradient(120deg, #10b98122 0%, #3b82f622 50%, #ff6b4a22 100%), #0f172a;' },
+                { id: 'sunset', name: 'Vapor Wave', css: 'background: linear-gradient(135deg, #ff8f3d 0%, #ff6b4a 50%, #b81d00 100%);' },
                 { id: 'obsidian-carbon', name: 'Obsidian Carbon', css: 'background-color: #050505; background-image: repeating-linear-gradient(45deg, #111 0px, #111 2px, #050505 2px, #050505 4px);' },
                 { id: 'radar-sweep', name: 'Radar Decryptor', css: 'background: #0d0d0d; background-image: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%), repeating-conic-gradient(#f4ff4d11 0% 1%, transparent 1% 2%);' },
                 { id: 'blueprint-tech', name: 'Tech Blueprint', css: 'background-color: #030b1c; background-image: linear-gradient(rgba(244, 255, 77, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(244, 255, 77, 0.05) 1px, transparent 1px); background-size: 20px 20px;' },
@@ -9427,6 +9545,222 @@
             }
         };
 
+        // ═══ MOBILE RESPONSIVENESS AND INTERACTION OPTIMIZATIONS ═══
+        (function() {
+            const headerActions = document.getElementById('headerActions');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileDrawer = document.getElementById('mobileDrawer');
+            const mobileDrawerContent = document.getElementById('mobileDrawerContent');
+            const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
+            const mobileDrawerClose = document.getElementById('mobileDrawerClose');
+
+            const editorSection = document.getElementById('editorSection');
+            const previewSection = document.getElementById('previewSection');
+            const resizer = document.getElementById('resizer');
+            const showCodeBtn = document.getElementById('showCodeBtn');
+            const showCanvasBtn = document.getElementById('showCanvasBtn');
+
+            let activeMobileTab = 'code'; // 'code' or 'canvas'
+            let isMobileLayout = false;
+            let desktopFlexWidth = '35%';
+            let wasMobile = false;
+
+            // Move elements back and forth to keep events active
+            function syncLayoutDOM() {
+                const isMobile = window.innerWidth <= 768;
+                if (isMobile) {
+                    if (!isMobileLayout) {
+                        isMobileLayout = true;
+                        // Move header action children to mobile drawer content
+                        while (headerActions.firstChild) {
+                            mobileDrawerContent.appendChild(headerActions.firstChild);
+                        }
+                    }
+                } else {
+                    if (isMobileLayout) {
+                        isMobileLayout = false;
+                        // Close drawer if open
+                        closeMobileDrawer();
+                        // Move drawer content children back to header actions
+                        while (mobileDrawerContent.firstChild) {
+                            headerActions.appendChild(mobileDrawerContent.firstChild);
+                        }
+                    }
+                }
+            }
+
+            function closeMobileDrawer() {
+                if (mobileDrawer) {
+                    mobileDrawer.classList.add('translate-x-full');
+                }
+                if (mobileDrawerBackdrop) {
+                    mobileDrawerBackdrop.classList.add('hidden');
+                }
+            }
+
+            function openMobileDrawer() {
+                if (mobileDrawer) {
+                    mobileDrawer.classList.remove('translate-x-full');
+                }
+                if (mobileDrawerBackdrop) {
+                    mobileDrawerBackdrop.classList.remove('hidden');
+                }
+            }
+
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', openMobileDrawer);
+            }
+            if (mobileDrawerClose) {
+                mobileDrawerClose.addEventListener('click', closeMobileDrawer);
+            }
+            if (mobileDrawerBackdrop) {
+                mobileDrawerBackdrop.addEventListener('click', closeMobileDrawer);
+            }
+
+            // Close mobile drawer on any button click in content (e.g. templates, Guide etc.)
+            if (mobileDrawerContent) {
+                mobileDrawerContent.addEventListener('click', (e) => {
+                    // If clicking a templates selection item, don't close right away to allow selection
+                    if (e.target.closest('.template-item') || e.target.closest('#templatesBtn')) {
+                        return;
+                    }
+                    closeMobileDrawer();
+                });
+            }
+
+            function updateLayout() {
+                const isMobile = window.innerWidth <= 768;
+                syncLayoutDOM();
+
+                if (isMobile) {
+                    // Save desktop width before applying mobile layout
+                    if (!wasMobile) {
+                        const currentFlex = editorSection.style.flex;
+                        if (currentFlex && currentFlex.startsWith('0 0 ')) {
+                            desktopFlexWidth = currentFlex.replace('0 0 ', '');
+                        }
+                        wasMobile = true;
+                    }
+
+                    // Show tab bar
+                    document.getElementById('mobileTabs').style.display = 'flex';
+                    // Hide resizer on mobile
+                    if (resizer) resizer.classList.add('hidden');
+
+                    if (activeMobileTab === 'code') {
+                        // Show editor, hide canvas
+                        if (editorSection) {
+                            editorSection.style.display = 'flex';
+                            editorSection.style.flex = '1 1 100%';
+                        }
+                        if (previewSection) previewSection.style.display = 'none';
+                        
+                        showCodeBtn.classList.add('text-accent', 'bg-bg', 'font-bold', 'border-b-2', 'border-b-accent');
+                        showCodeBtn.classList.remove('text-muted');
+                        
+                        showCanvasBtn.classList.remove('text-accent', 'bg-bg', 'font-bold', 'border-b-2', 'border-b-accent');
+                        showCanvasBtn.classList.add('text-muted');
+
+                        if (window.editor) {
+                            window.editor.refresh();
+                        }
+                    } else {
+                        // Show canvas, hide editor
+                        if (editorSection) editorSection.style.display = 'none';
+                        if (previewSection) {
+                            previewSection.style.display = 'flex';
+                            previewSection.style.flex = '1 1 100%';
+                        }
+
+                        showCanvasBtn.classList.add('text-accent', 'bg-bg', 'font-bold', 'border-b-2', 'border-b-accent');
+                        showCanvasBtn.classList.remove('text-muted');
+                        
+                        showCodeBtn.classList.remove('text-accent', 'bg-bg', 'font-bold', 'border-b-2', 'border-b-accent');
+                        showCodeBtn.classList.add('text-muted');
+
+                        // Force update preview from editor content (sync code to canvas)
+                        if (window.editor && typeof updatePreview === 'function') {
+                            updatePreview(window.editor.getValue());
+                        }
+                    }
+                } else {
+                    // Desktop mode
+                    wasMobile = false;
+                    document.getElementById('mobileTabs').style.display = 'none';
+                    if (resizer) resizer.classList.remove('hidden');
+                    
+                    // Restore desktop flex layouts
+                    if (editorSection) {
+                        editorSection.style.display = 'flex';
+                        editorSection.style.flex = `0 0 ${desktopFlexWidth}`;
+                    }
+                    if (previewSection) {
+                        previewSection.style.display = 'flex';
+                        previewSection.style.flex = '1 1 0%';
+                    }
+                    
+                    if (window.editor) {
+                        window.editor.refresh();
+                    }
+                }
+            }
+
+            window.addEventListener('resize', updateLayout);
+            if (showCodeBtn) {
+                showCodeBtn.addEventListener('click', () => {
+                    activeMobileTab = 'code';
+                    updateLayout();
+                });
+            }
+            if (showCanvasBtn) {
+                showCanvasBtn.addEventListener('click', () => {
+                    activeMobileTab = 'canvas';
+                    updateLayout();
+                });
+            }
+
+            // Touch gesture optimization
+            let initialDistance = 0;
+            let initialScale = 1;
+
+            if (svgPreviewContainer) {
+                svgPreviewContainer.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 2) {
+                        initialDistance = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+                        initialScale = scale;
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+
+                svgPreviewContainer.addEventListener('touchmove', (e) => {
+                    if (e.touches.length === 2) {
+                        e.preventDefault();
+                        const dist = Math.hypot(
+                            e.touches[0].clientX - e.touches[1].clientX,
+                            e.touches[0].clientY - e.touches[1].clientY
+                        );
+                        if (initialDistance > 0) {
+                            const factor = dist / initialDistance;
+                            scale = Math.max(0.1, Math.min(initialScale * factor, 5));
+                            updateTransform();
+                        }
+                    } else if (e.touches.length === 1) {
+                        if (interactionMode === 'pan' || interactionMode === 'drag' || interactionMode === 'marquee') {
+                            e.preventDefault();
+                        }
+                    }
+                }, { passive: false });
+            }
+
+            // Run initial check
+            setTimeout(() => {
+                updateLayout();
+            }, 200);
+        })();
+
 </script>
 
   
@@ -9519,6 +9853,22 @@
               });
         });
     </script>
+    <!-- Mobile Hamburger Drawer -->
+    <div id="mobileDrawer" class="fixed inset-y-0 right-0 z-[100001] bg-bg/95 backdrop-blur-md translate-x-full transition-transform duration-300 md:hidden flex flex-col border-l border-border w-80 h-full shadow-2xl">
+        <div class="flex justify-between items-center p-4 border-b border-border">
+            <span class="font-display text-xs font-bold tracking-wider text-accent uppercase">MENU</span>
+            <button id="mobileDrawerClose" class="btn-brutal p-1.5 border-accent/30 text-accent">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <div id="mobileDrawerContent" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+            <!-- Buttons will be dynamically moved here on mobile and moved back to header on desktop -->
+        </div>
+    </div>
+    <!-- Mobile Drawer Backdrop -->
+    <div id="mobileDrawerBackdrop" class="fixed inset-0 z-[100000] bg-black/60 hidden md:hidden"></div>
 </body>
 
 <!-- Global Toast Notification -->

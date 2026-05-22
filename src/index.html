@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SVG STUDIO // EDITOR v2.0</title>
+    <meta name="description" content="SVG Studio Editor v2.0 - Professional-grade SVG creation, animation, and real-time visualization workspace.">
+    <meta property="og:title" content="SVG Studio Editor v2.0">
+    <meta property="og:description" content="Professional-grade SVG creation, animation, and real-time visualization workspace.">
+    <meta property="og:type" content="website">
 
     <link rel="stylesheet" href="css/style.css">
 
@@ -213,7 +217,7 @@
                 <!-- Editor Toolbar -->
                 <div class="px-3 py-1.5 bg-panel border-b border-border flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-0.5">
-                    <input type="file" id="fileInput" accept=".svg" class="hidden">
+                    <input type="file" id="fileInput" accept=".svg" class="hidden" aria-label="Upload SVG">
                     <button id="uploadBtn" class="tooltip p-1.5 text-muted hover:text-accent transition-colors"><svg
                             class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -261,7 +265,7 @@
             </div>
             <!-- CodeMirror wrapper -->
             <div class="flex-1 min-h-0 bg-bg overflow-hidden relative text-sm">
-                <textarea id="svgInput" class="hidden"></textarea>
+                <textarea id="svgInput" class="hidden" aria-label="SVG Source Code"></textarea>
             </div>
             </div> <!-- End tab-code -->
 

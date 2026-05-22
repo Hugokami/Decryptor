@@ -18,7 +18,7 @@
             --bg-color-dark: #121316; 
             --panel-bg-dark: #181A20; 
             --panel-bg-alt-dark: #22252D;
-            --canvas-bg-dark: #181A20;
+            --canvas-bg-dark: #FFFFFF;
             --text-color-dark: #F5F5F7; 
             --text-secondary-dark: #8E929E; 
             --accent-color-dark: #FF6B4A;
@@ -390,26 +390,26 @@
         @keyframes loading-step { 0% {box-shadow: 0 10px 0 rgba(0,0,0,0), 0 10px 0 var(--loader-step-color), -35px 50px 0 var(--loader-step-color), -70px 90px 0 var(--loader-step-color);} 100% {box-shadow: 0 10px 0 var(--loader-step-color), -35px 50px 0 var(--loader-step-color), -70px 90px 0 var(--loader-step-color), -70px 90px 0 rgba(0,0,0,0);}}
 
         #backToDashboardBtn {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 5001;
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            background-color: var(--panel-bg);
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background-color: var(--input-bg);
             border: 1px solid var(--input-border);
             color: var(--text-color);
             border-radius: var(--border-radius-md);
             text-decoration: none;
-            font-size: 0.85em;
+            font-size: 0.9em;
             font-weight: 600;
-            box-shadow: 0 2px 8px var(--shadow-sm);
-            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px var(--shadow-sm);
+            transition: all 0.15s ease;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 16px;
         }
         #backToDashboardBtn:hover {
-            background-color: var(--input-bg);
+            background-color: var(--panel-bg);
             border-color: var(--accent-color);
             color: var(--accent-color);
             transform: translateY(-1px);
@@ -459,24 +459,7 @@
                 padding: 8px 10px;
             }
 
-            #backToDashboardBtn {
-                top: auto;
-                right: 20px;
-                bottom: 85px; /* Above the mobile dock */
-                padding: 10px;
-                border-radius: 50%;
-                width: 44px;
-                height: 44px;
-                justify-content: center;
-                box-shadow: 0 4px 16px var(--shadow-md);
-            }
-            #backToDashboardBtn span {
-                display: none;
-            }
-            #backToDashboardBtn .dashboard-icon {
-                width: 20px;
-                height: 20px;
-            }
+
 
             /* Overlay backdrop when sidebar is open */
             .sidebar-backdrop {
@@ -683,15 +666,6 @@
     </style>
 </head>
 <body>
-    <a id="backToDashboardBtn" href="index.html" title="Back to Dashboard">
-        <span>Dashboard</span>
-        <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="7" height="9"></rect>
-            <rect x="14" y="3" width="7" height="5"></rect>
-            <rect x="14" y="12" width="7" height="9"></rect>
-            <rect x="3" y="16" width="7" height="5"></rect>
-        </svg>
-    </a>
 
     <div id="introOverlay">
         <div class="intro-content">
@@ -712,6 +686,15 @@
             <button id="themeToggleBtn" title="Toggle Theme">🌙</button>
         </div>
         <div class="sidebar-content">
+            <a id="backToDashboardBtn" href="index.html" title="Back to Dashboard">
+                <svg class="dashboard-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="9"></rect>
+                    <rect x="14" y="3" width="7" height="5"></rect>
+                    <rect x="14" y="12" width="7" height="9"></rect>
+                    <rect x="3" y="16" width="7" height="5"></rect>
+                </svg>
+                <span>Dashboard</span>
+            </a>
             <div class="tool-section"><h3>Tools</h3><div class="tool-grid">
                 <button id="penTool" class="active" title="Pen (P)">✏️</button>
                 <button id="pixelTool" title="Pixel Art (X)">🔲</button>
@@ -731,6 +714,13 @@
                 <div class="tool-row property-row" id="solidColorPropsRow"><label for="lineColor">Color</label><input type="color" id="lineColor" value="#000000"></div>
                 <div class="tool-row property-row" id="gradientPropsRow1"><label for="gradientStartColor">Start 🎨</label><input type="color" id="gradientStartColor" value="#000000"></div>
                 <div class="tool-row property-row" id="gradientPropsRow2"><label for="gradientEndColor">End 🎨</label><input type="color" id="gradientEndColor" value="#FF8A8A"></div>
+                <div class="tool-row" id="bgColorPropsRow">
+                    <label for="bgColorPicker">Bg Color</label>
+                    <input type="color" id="bgColorPicker" value="#ffffff">
+                    <label for="exportBgCheckbox" style="min-width:auto; margin-left:8px; display:inline-flex; align-items:center; gap:4px; font-size:0.8em;" title="Include background color in exported SVG">
+                        <input type="checkbox" id="exportBgCheckbox" checked style="margin:0; width:14px; height:14px;"> Export
+                    </label>
+                </div>
                 
                 <div class="tool-row property-row" id="shapeTypeRow"> <label for="shapeTypeSelect">Shape</label> <select id="shapeTypeSelect"> <option value="rectangle">Rectangle</option> <option value="roundedRect">Rounded Rect</option> <option value="circle">Circle</option> <option value="ellipse">Ellipse</option> <option value="triangle">Triangle</option> <option value="star">Star</option> <option value="polygon">Polygon</option> <option value="rhombus">Rhombus</option> </select> </div>
                 <div class="tool-row property-row" id="cornerRadiusRow"><label for="cornerRadius">Radius</label><input type="range" id="cornerRadius" min="0" max="100" value="10"><span id="cornerRadiusValue" class="value-display">10</span>px</div>
@@ -894,6 +884,8 @@
             const colorTypeSelect = document.getElementById('colorTypeSelect');
             const solidColorPropsRow = document.getElementById('solidColorPropsRow');
             const lineColorPicker = document.getElementById('lineColor');
+            const bgColorPicker = document.getElementById('bgColorPicker');
+            const exportBgCheckbox = document.getElementById('exportBgCheckbox');
             const gradientPropsRow1 = document.getElementById('gradientPropsRow1');
             const gradientPropsRow2 = document.getElementById('gradientPropsRow2');
             const gradientStartColorPicker = document.getElementById('gradientStartColor');
@@ -1001,6 +993,7 @@
             let currentColorMode = 'solid'; 
             let currentSolidColor = '#000000'; 
             let currentGradient = { start: '#000000', end: '#FF8A8A' };
+            let currentBgColor = '#ffffff';
             let currentWidth = 5; 
             let currentCornerRadius = 10; // New for rounded rect
             let currentPolygonSides = 5;
@@ -1102,6 +1095,14 @@
                 strokeStyleSelect.value = currentStrokeStyle; colorTypeSelect.value = currentColorMode;
                 showGridCheckbox.checked = showGrid; snapToGridCheckbox.checked = snapToGrid;
                 gridSizeInput.value = gridSize; gridColorPicker.value = gridColor;
+                if (bgColorPicker) {
+                    bgColorPicker.value = currentBgColor;
+                    document.body.style.setProperty('--canvas-bg', currentBgColor);
+                }
+                const savedExportBg = localStorage.getItem('sketcherExportBg');
+                if (exportBgCheckbox && savedExportBg !== null) {
+                    exportBgCheckbox.checked = savedExportBg === 'true';
+                }
 
                 loadPalette(); renderSolidColorTemplates(); renderGradientTemplates();
                 initializeCanvasAndLayers(); 
@@ -1244,6 +1245,8 @@
                 sidebar.addEventListener('click', handleToolbarClick);
                 colorTypeSelect.addEventListener('change', handlePropertyChange);
                 lineColorPicker.addEventListener('input', handlePropertyChange);
+                if (bgColorPicker) bgColorPicker.addEventListener('input', handlePropertyChange);
+                if (exportBgCheckbox) exportBgCheckbox.addEventListener('change', handlePropertyChange);
                 gradientStartColorPicker.addEventListener('input', handlePropertyChange);
                 gradientEndColorPicker.addEventListener('input', handlePropertyChange);
                 shapeTypeSelect.addEventListener('change', handlePropertyChange); 
@@ -1842,6 +1845,14 @@
                 const target=e.target; 
                 switch(target.id){
                     case 'colorTypeSelect':currentColorMode=target.value; updateColorPropertiesUI(); break;
+                    case 'bgColorPicker':
+                        currentBgColor = target.value;
+                        document.body.style.setProperty('--canvas-bg', currentBgColor);
+                        renderComposite();
+                        break;
+                    case 'exportBgCheckbox':
+                        try { localStorage.setItem('sketcherExportBg', target.checked); } catch(e) { console.warn("Could not save exportBg preference:", e); }
+                        break;
                     case 'lineColor':currentSolidColor=target.value;break;
                     case 'gradientStartColor':currentGradient.start=target.value;updateCursor();break;
                     case 'gradientEndColor':currentGradient.end=target.value;updateCursor();break;
@@ -3514,7 +3525,9 @@
                     return;
                 }
                 
-                let svgContent = `<svg viewBox="0 0 ${DEFAULT_LOGICAL_WIDTH} ${DEFAULT_LOGICAL_HEIGHT}" xmlns="http://www.w3.org/2000/svg" style="background-color: #0d0d0d">\n`;
+                const includeBg = exportBgCheckbox ? exportBgCheckbox.checked : true;
+                const bgValue = includeBg ? currentBgColor : 'transparent';
+                let svgContent = `<svg viewBox="0 0 ${DEFAULT_LOGICAL_WIDTH} ${DEFAULT_LOGICAL_HEIGHT}" xmlns="http://www.w3.org/2000/svg" style="background-color: ${bgValue}">\n`;
                 
                 // Group strokes by layer
                 const layerGroups = {};
@@ -3640,6 +3653,8 @@
                     height: mainCanvas.height,
                     vectorStrokes: vectorStrokes,
                     paletteColors: paletteColors,
+                    canvasBgColor: currentBgColor,
+                    exportBg: exportBgCheckbox ? exportBgCheckbox.checked : true,
                     layers: layers.map(l => ({
                         id: l.id,
                         name: l.name,
@@ -3665,6 +3680,15 @@
                     try {
                         const data = JSON.parse(evt.target.result);
                         if (data.vectorStrokes) vectorStrokes = data.vectorStrokes;
+                        if (data.canvasBgColor) {
+                            currentBgColor = data.canvasBgColor;
+                            if (bgColorPicker) bgColorPicker.value = currentBgColor;
+                            document.body.style.setProperty('--canvas-bg', currentBgColor);
+                        }
+                        if (data.exportBg !== undefined) {
+                            if (exportBgCheckbox) exportBgCheckbox.checked = data.exportBg;
+                            try { localStorage.setItem('sketcherExportBg', data.exportBg); } catch(e) {}
+                        }
                         if (data.paletteColors) {
                             paletteColors = data.paletteColors;
                             savePalette();
@@ -4122,7 +4146,9 @@
                     const worldCrop = getCropWorldRect();
                     viewBox = `${worldCrop.x.toFixed(1)} ${worldCrop.y.toFixed(1)} ${worldCrop.width.toFixed(1)} ${worldCrop.height.toFixed(1)}`;
                 }
-                let svgContent = `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" style="background-color: ${isAnimated ? 'transparent' : '#0d0d0d'}">\n`;
+                const includeBg = exportBgCheckbox ? exportBgCheckbox.checked : true;
+                const bgValue = includeBg ? currentBgColor : 'transparent';
+                let svgContent = `<svg viewBox="${viewBox}" xmlns="http://www.w3.org/2000/svg" style="background-color: ${bgValue}">\n`;
                 
                 let styleContent = '';
                 if (isAnimated) {
