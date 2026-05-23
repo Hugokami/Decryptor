@@ -464,7 +464,7 @@
             /* Overlay backdrop when sidebar is open */
             .sidebar-backdrop {
                 position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-                background: rgba(0,0,0,0.4); z-index: 5099;
+                background: rgba(0,0,0,0.4); z-index: 4999;
                 opacity: 1; pointer-events: auto;
                 transition: opacity 0.3s ease;
             }
@@ -663,6 +663,156 @@
                 height: calc(100dvh - 80px);
             }
         }
+
+        /* Sticky Notes Styles */
+        #stickyNotesContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            transform-origin: 0 0;
+            overflow: visible;
+            z-index: 5;
+        }
+        .sticky-note {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            padding: 12px;
+            box-sizing: border-box;
+            background: #FFE57F; /* Classic Post-it Yellow default */
+            border-radius: 6px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            pointer-events: auto;
+            cursor: grab;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            transform-origin: center;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.2s ease, transform 0.1s ease;
+        }
+        .sticky-note:active {
+            cursor: grabbing;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            transform: scale(1.02);
+        }
+        .sticky-note textarea {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            resize: none;
+            outline: none;
+            font-family: var(--font-main);
+            font-size: 0.9em;
+            color: #2c2c2c;
+            padding: 0;
+            margin: 0;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+        .sticky-note-delete {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #FF6B4A;
+            color: white;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+        .sticky-note:hover .sticky-note-delete {
+            opacity: 1;
+        }
+        .sticky-note-delete:hover {
+            transform: scale(1.15);
+        }
+
+        /* Canvas Floating HUD style - Glassmorphic */
+        .canvas-hud {
+            position: absolute;
+            bottom: 24px;
+            right: 24px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px;
+            border-radius: 30px;
+            background: color-mix(in srgb, var(--panel-bg) 80%, transparent);
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            border: 1px solid color-mix(in srgb, var(--text-color) 8%, transparent);
+            box-shadow: 0 8px 32px var(--shadow-sm);
+            pointer-events: auto;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .canvas-hud button {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            font-family: var(--font-main);
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        
+        .canvas-hud button:hover {
+            background: color-mix(in srgb, var(--text-color) 10%, transparent);
+            transform: scale(1.05);
+        }
+        
+        .canvas-hud button:active {
+            background: color-mix(in srgb, var(--text-color) 15%, transparent);
+            transform: scale(0.95);
+        }
+        
+        .canvas-hud .hud-zoom-percent {
+            font-size: 0.9em;
+            font-weight: 600;
+            padding: 0 10px;
+            min-width: 54px;
+            text-align: center;
+            color: var(--text-color);
+            cursor: pointer;
+            border-radius: 18px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+        
+        .canvas-hud .hud-zoom-percent:hover {
+            background: color-mix(in srgb, var(--text-color) 8%, transparent);
+        }
+        
+        .canvas-hud .hud-divider {
+            width: 1px;
+            height: 20px;
+            background: color-mix(in srgb, var(--text-color) 12%, transparent);
+            margin: 0 4px;
+        }
     </style>
 </head>
 <body>
@@ -704,6 +854,7 @@
                 <button id="lineTool" title="Line (L)">📏</button>
                 <button id="shapeTool" title="Shape Tool (H)">💠</button> 
                 <button id="textTool" title="Text Tool (T)">Aa</button>
+                <button id="stickyTool" title="Sticky Note (N)">📝</button>
                 <button id="eyedropperTool" title="Eyedropper (I, Alt+Click)">💧</button>
                 <button id="sprayTool" title="Spray Paint (S)">💨</button>
                 <button id="selectTool" title="Selection Tool (M)">⬚</button> 
@@ -819,6 +970,16 @@
     <div class="sidebar-backdrop hidden" id="sidebarBackdrop"></div>
     <div id="canvas-container">
         <canvas id="drawingCanvas"></canvas>
+        <div id="stickyNotesContainer"></div>
+        <!-- Floating Canvas Navigation HUD -->
+        <div id="canvasHud" class="canvas-hud">
+            <button id="hudZoomOut" title="Zoom Out (Ctrl + -)">−</button>
+            <div id="hudZoomPercent" class="hud-zoom-percent" title="Zoom to 100% (Ctrl + 0)">100%</div>
+            <button id="hudZoomIn" title="Zoom In (Ctrl + +)">+</button>
+            <div class="hud-divider"></div>
+            <button id="hudZoomToFit" title="Zoom to Fit Content (✥)">✥</button>
+            <button id="hudResetView" title="Reset View (⟲)">⟲</button>
+        </div>
     </div>
 
     <!-- Visual Crop Mode Overlay -->
@@ -880,7 +1041,7 @@
 
             // --- DOM Elements ---
             const mainCanvas = document.getElementById('drawingCanvas');
-            const mainCtx = mainCanvas.getContext('2d');
+            const mainCtx = mainCanvas.getContext('2d', { desynchronized: true, preserveDrawingBuffer: true });
             const colorTypeSelect = document.getElementById('colorTypeSelect');
             const solidColorPropsRow = document.getElementById('solidColorPropsRow');
             const lineColorPicker = document.getElementById('lineColor');
@@ -1011,6 +1172,7 @@
             let zoomLevel = 1.0;
             let panX = 0; // Screen pixels for panning offset
             let panY = 0; 
+            const canvasAnimState = { zoom: 1.0, px: 0, py: 0 };
             let isPanning = false; 
             let lastPanX_mouse, lastPanY_mouse; // For mouse panning
             let pinchStartDistance = 0;
@@ -1031,6 +1193,7 @@
 
             let vectorStrokes = [];
             let currentVectorStroke = null;
+            let stickyNotes = [];
             let isReplaying = false;
             let isReplayPaused = false;
             let pixelFilledCells = new Map(); // tracks filled cells and their mirror types during a single pixel stroke
@@ -1114,6 +1277,7 @@
                 updateMobileSizeUI();
                 updateActiveToolPropertiesUI(); 
                 updateCursor();
+                loadDefaultStickyNotes();
                 updateStatus("Select a tool to begin or load an image.");
                 updateZoomPanDisplay();
                 requestAnimationFrame(animateSelectionMarch); 
@@ -1180,6 +1344,7 @@
                     layers=[]; history={}; historyStep={}; layerCounter=1; activeLayerIndex=-1; 
                     addLayer(); // addLayer will now use DEFAULT_LOGICAL sizes
                 }
+                updateStickyNotesContainerPosition();
                 resetView(); // Resets zoom/pan and calls renderComposite for the new larger world
             }
 
@@ -1263,18 +1428,14 @@
                 gridSizeInput.addEventListener('input', handlePropertyChange);
                 gridColorPicker.addEventListener('input', handlePropertyChange);
 
-                mainCanvas.addEventListener('mousedown',startAction); 
-                mainCanvas.addEventListener('mousemove',performAction);
-                mainCanvas.addEventListener('mouseup',endAction); 
-                mainCanvas.addEventListener('mouseleave',endAction); 
+                mainCanvas.addEventListener('pointerdown', handlePointerDown); 
+                mainCanvas.addEventListener('pointermove', handlePointerMove);
+                mainCanvas.addEventListener('pointerup', handlePointerUp); 
+                mainCanvas.addEventListener('pointercancel', handlePointerCancel); 
+                mainCanvas.addEventListener('pointerleave', handlePointerUp);
                 mainCanvas.addEventListener('wheel', handleWheelZoom, { passive: false }); 
-                mainCanvas.addEventListener('mousemove', updateCursorCoordinatesDisplay); // For coordinate display
+                mainCanvas.addEventListener('pointermove', updateCursorCoordinatesDisplay); // For coordinate display
                 mainCanvas.addEventListener('contextmenu', (e) => { e.preventDefault(); }); // Prevent right-click menu for right-click pan
-
-                mainCanvas.addEventListener('touchstart',handleTouchStart,{passive:false}); 
-                mainCanvas.addEventListener('touchmove',handleTouchMove,{passive:false});
-                mainCanvas.addEventListener('touchend',handleTouchEnd,{passive:false}); 
-                mainCanvas.addEventListener('touchcancel',endAction,{passive:false}); 
 
                 imageLoader.addEventListener('change',handleImageUpload); 
                 window.addEventListener('resize',handleResize);
@@ -1305,9 +1466,31 @@
                 symmetryToggleBtn.addEventListener('click',cycleSymmetryMode); 
                 paletteAddBtn.addEventListener('click',addCurrentColorToPalette);
                 mergeLayerBtn.addEventListener('click', mergeActiveLayerDown);
-                zoomInBtn.addEventListener('click', () => zoomAroundCenter(1.25));
-                zoomOutBtn.addEventListener('click', () => zoomAroundCenter(0.8));
-                resetZoomBtn.addEventListener('click', resetView);
+                zoomInBtn.addEventListener('click', () => animateZoomAroundCenter(1.25));
+                zoomOutBtn.addEventListener('click', () => animateZoomAroundCenter(0.8));
+                resetZoomBtn.addEventListener('click', animateResetView);
+
+                // Floating Canvas HUD Event Listeners
+                const hudZoomInBtn = document.getElementById('hudZoomIn');
+                const hudZoomOutBtn = document.getElementById('hudZoomOut');
+                const hudZoomPercentBtn = document.getElementById('hudZoomPercent');
+                const hudZoomToFitBtn = document.getElementById('hudZoomToFit');
+                const hudResetViewBtn = document.getElementById('hudResetView');
+                const canvasHud = document.getElementById('canvasHud');
+                
+                if (hudZoomInBtn) hudZoomInBtn.addEventListener('click', () => animateZoomAroundCenter(1.25));
+                if (hudZoomOutBtn) hudZoomOutBtn.addEventListener('click', () => animateZoomAroundCenter(0.8));
+                if (hudZoomPercentBtn) hudZoomPercentBtn.addEventListener('click', animateZoomTo100);
+                if (hudZoomToFitBtn) hudZoomToFitBtn.addEventListener('click', zoomToFit);
+                if (hudResetViewBtn) hudResetViewBtn.addEventListener('click', animateResetView);
+                
+                if (canvasHud) {
+                    ['pointerdown', 'mousedown', 'touchstart'].forEach(eventName => {
+                        canvasHud.addEventListener(eventName, (e) => {
+                            e.stopPropagation();
+                        });
+                    });
+                }
                 rotateScreenBtn.addEventListener('click', toggleOrientationLock);
                 clearSelectionContentBtn.addEventListener('click', clearSelectedArea);
                 flipHorizontalBtn.addEventListener('click', () => flipLayer(true, false));
@@ -1791,8 +1974,8 @@
                     textPropsRow3.classList.add('visible');
                 }
                 const showColorControls = !['select', 'move', 'eyedropper', 'fill', 'grideraser'].includes(currentTool);
-                if (currentTool === 'pixel') {
-                    // Pixel tool: show only solid color picker, no gradient/type switcher
+                if (currentTool === 'pixel' || currentTool === 'sticky') {
+                    // Pixel & Sticky tool: show only solid color picker, no gradient/type switcher
                     colorTypeRow.style.display = 'none';
                     solidColorPropsRow.classList.add('visible');
                     gradientPropsRow1.classList.remove('visible');
@@ -1923,7 +2106,7 @@
 
                 if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='SELECT'||document.activeElement.tagName==='TEXTAREA')return; 
                 
-                const toolMap={p:'penTool',e:'eraserTool',g:'grideraserTool',x:'pixelTool',l:'lineTool',h:'shapeTool',f:'fillTool',t:'textTool',i:'eyedropperTool',s:'sprayTool', m:'selectTool', v:'moveTool'}; 
+                const toolMap={p:'penTool',e:'eraserTool',g:'grideraserTool',x:'pixelTool',l:'lineTool',h:'shapeTool',f:'fillTool',t:'textTool',n:'stickyTool',i:'eyedropperTool',s:'sprayTool', m:'selectTool', v:'moveTool'}; 
                 if(!e.ctrlKey && !e.metaKey && !e.altKey) {
                     if (toolMap[e.key.toLowerCase()]) {
                         e.preventDefault();
@@ -1951,9 +2134,9 @@
                     lastPanX_mouse = undefined; lastPanY_mouse = undefined; 
                     mainCanvas.style.cursor = 'grab';
                 } 
-                if ((e.key === '+' || e.key === '=') && !e.shiftKey) { e.preventDefault(); zoomAroundCenter(1.1); } // Check for shift to avoid conflict with some +/= keys
-                if (e.key === '-') { e.preventDefault(); zoomAroundCenter(0.9); }
-                if (e.key === '0') { e.preventDefault(); resetView(); }
+                if ((e.key === '+' || e.key === '=') && !e.shiftKey) { e.preventDefault(); animateZoomAroundCenter(1.1); } // Check for shift to avoid conflict with some +/= keys
+                if (e.key === '-') { e.preventDefault(); animateZoomAroundCenter(0.9); }
+                if (e.key === '0') { e.preventDefault(); animateResetView(); }
 
                 if (e.key === 'Alt' && !isAltEyedropperActive && currentTool !== 'eyedropper') {
                     e.preventDefault();
@@ -2217,13 +2400,120 @@
                 }
                 targetCtx.restore(); 
             }
+            let renderPending = false;
+            function requestRenderComposite() {
+                if (!renderPending) {
+                    renderPending = true;
+                    requestAnimationFrame(() => {
+                        renderComposite();
+                        renderPending = false;
+                    });
+                }
+            }
             
             function renderComposite(){
                 if(!mainCtx || !mainCanvas)return; 
                 
-                const bg=getComputedStyle(document.body).getPropertyValue('--canvas-bg').trim();
-                mainCtx.fillStyle=bg;
-                // mainCtx already scaled by deviceScale, so fillRect uses logical coords.
+                if (isDrawing && getActiveLayer()) {
+                    // Check if cache is valid and matches current canvas size
+                    if (!isStaticCacheValid || staticCacheCanvas.width !== mainCanvas.width || staticCacheCanvas.height !== mainCanvas.height) {
+                        staticCacheCanvas.width = mainCanvas.width;
+                        staticCacheCanvas.height = mainCanvas.height;
+                        
+                        // Clear staticCacheCtx transform
+                        staticCacheCtx.setTransform(1, 0, 0, 1, 0, 0);
+                        staticCacheCtx.scale(deviceScale, deviceScale);
+                        
+                        // Render static background onto cache
+                        staticCacheCtx.fillStyle = currentBgColor || '#ffffff';
+                        staticCacheCtx.fillRect(0, 0, staticCacheCanvas.width / deviceScale, staticCacheCanvas.height / deviceScale);
+                        
+                        staticCacheCtx.save();
+                        staticCacheCtx.translate(panX, panY);
+                        staticCacheCtx.scale(zoomLevel, zoomLevel);
+                        
+                        drawGrid(staticCacheCtx);
+                        
+                        // Draw all layers EXCEPT the active layer
+                        layers.forEach((l, idx) => {
+                            if (idx !== activeLayerIndex && l.visible && l.canvas && l.context) {
+                                staticCacheCtx.save();
+                                staticCacheCtx.globalAlpha = l.opacity;
+                                staticCacheCtx.globalCompositeOperation = l.blendMode || 'source-over';
+                                staticCacheCtx.drawImage(
+                                    l.canvas,
+                                    0, 0, l.canvas.width, l.canvas.height,
+                                    l.logicalX !== undefined ? l.logicalX : 0,
+                                    l.logicalY !== undefined ? l.logicalY : 0,
+                                    l.canvas.width / deviceScale,
+                                    l.canvas.height / deviceScale
+                                );
+                                staticCacheCtx.restore();
+                            }
+                        });
+                        staticCacheCtx.restore();
+                        isStaticCacheValid = true;
+                    }
+                    
+                    // Draw the cached background
+                    mainCtx.fillStyle = currentBgColor || '#ffffff';
+                    mainCtx.fillRect(0, 0, mainCanvas.width / deviceScale, mainCanvas.height / deviceScale);
+                    mainCtx.drawImage(staticCacheCanvas, 0, 0, mainCanvas.width / deviceScale, mainCanvas.height / deviceScale);
+                    
+                    // Draw the active layer
+                    const activeL = getActiveLayer();
+                    if (activeL && activeL.visible && activeL.canvas && activeL.context) {
+                        mainCtx.save();
+                        mainCtx.translate(panX, panY);
+                        mainCtx.scale(zoomLevel, zoomLevel);
+                        mainCtx.globalAlpha = activeL.opacity;
+                        mainCtx.globalCompositeOperation = activeL.blendMode || 'source-over';
+                        mainCtx.drawImage(
+                            activeL.canvas,
+                            0, 0, activeL.canvas.width, activeL.canvas.height,
+                            activeL.logicalX !== undefined ? activeL.logicalX : 0,
+                            activeL.logicalY !== undefined ? activeL.logicalY : 0,
+                            activeL.canvas.width / deviceScale,
+                            activeL.canvas.height / deviceScale
+                        );
+                        if (currentTool === 'pen' && activeStrokeCanvas.width > 0 && activeStrokeCanvas.height > 0) {
+                            mainCtx.drawImage(
+                                activeStrokeCanvas,
+                                0, 0, activeStrokeCanvas.width, activeStrokeCanvas.height,
+                                activeL.logicalX !== undefined ? activeL.logicalX : 0,
+                                activeL.logicalY !== undefined ? activeL.logicalY : 0,
+                                activeStrokeCanvas.width / deviceScale,
+                                activeStrokeCanvas.height / deviceScale
+                            );
+                        }
+                        drawSelectionOutline(mainCtx);
+                        mainCtx.restore();
+                    }
+                    
+                    // Draw moving selection preview if any
+                    if (currentTool === 'move' && isMovingSelection && movingSelectionData && movingSelectionData.imageData) {
+                        mainCtx.save();
+                        const screenX = (movingSelectionData.x * zoomLevel) + panX;
+                        const screenY = (movingSelectionData.y * zoomLevel) + panY;
+                        const displayWidth = (movingSelectionData.imageData.width / deviceScale) * zoomLevel;
+                        const displayHeight = (movingSelectionData.imageData.height / deviceScale) * zoomLevel;
+
+                        const tempPhysicalCanvas = document.createElement('canvas');
+                        tempPhysicalCanvas.width = movingSelectionData.imageData.width;
+                        tempPhysicalCanvas.height = movingSelectionData.imageData.height;
+                        tempPhysicalCanvas.getContext('2d').putImageData(movingSelectionData.imageData, 0, 0);
+
+                        mainCtx.globalAlpha = 0.7;
+                        mainCtx.drawImage(tempPhysicalCanvas, screenX, screenY, displayWidth, displayHeight);
+                        mainCtx.restore();
+                    }
+                    
+                    updateZoomPanDisplay();
+                    return;
+                }
+                
+                // --- Default Render (Non-drawing) ---
+                mainCtx.fillStyle=currentBgColor || '#ffffff';
                 mainCtx.fillRect(0, 0, mainCanvas.width / deviceScale, mainCanvas.height / deviceScale); 
 
                 mainCtx.save();
@@ -2237,44 +2527,38 @@
                         mainCtx.save();
                         mainCtx.globalAlpha=l.opacity;
                         mainCtx.globalCompositeOperation=l.blendMode||'source-over';
-                        // l.canvas is physical resolution. Draw it at world (0,0) with its logical size
                         mainCtx.drawImage(
                             l.canvas, 
-                            0, 0, l.canvas.width, l.canvas.height,  // Source: full layer canvas (physical)
+                            0, 0, l.canvas.width, l.canvas.height,
                             l.logicalX !== undefined ? l.logicalX : 0, 
                             l.logicalY !== undefined ? l.logicalY : 0, 
                             l.canvas.width / deviceScale, 
-                            l.canvas.height / deviceScale // Dest: at its logical origin with layer's logical size
+                            l.canvas.height / deviceScale
                         );
                         mainCtx.restore();
                     }
                 });
 
                 drawSelectionOutline(mainCtx);
-                mainCtx.restore(); // Restore mainCtx from pan/zoom
+                mainCtx.restore();
 
                 if (currentTool === 'move' && isMovingSelection && movingSelectionData && movingSelectionData.imageData) {
                     mainCtx.save();
-                    // Screen coordinates for drawing moving selection preview on mainCtx (which expects logical for drawing post initial scale)
-                    // movingSelectionData.x/y are world. Transform them to logical screen.
                     const screenX = (movingSelectionData.x * zoomLevel) + panX;
                     const screenY = (movingSelectionData.y * zoomLevel) + panY;
-                    // displayWidth/Height should be logical for drawing on mainCtx
                     const displayWidth = (movingSelectionData.imageData.width / deviceScale) * zoomLevel;
                     const displayHeight = (movingSelectionData.imageData.height / deviceScale) * zoomLevel;
 
-                    // Create a temporary canvas that has the original deviceScale resolution for the image data
                     const tempPhysicalCanvas = document.createElement('canvas');
-                    tempPhysicalCanvas.width = movingSelectionData.imageData.width; // physical width
-                    tempPhysicalCanvas.height = movingSelectionData.imageData.height; // physical height
+                    tempPhysicalCanvas.width = movingSelectionData.imageData.width;
+                    tempPhysicalCanvas.height = movingSelectionData.imageData.height;
                     tempPhysicalCanvas.getContext('2d').putImageData(movingSelectionData.imageData, 0, 0);
 
-                    mainCtx.globalAlpha = 0.7; 
-                    // Draw the physical tempCanvas onto the logical mainCtx, scaling it down appropriately
+                    mainCtx.globalAlpha = 0.7;
                     mainCtx.drawImage(tempPhysicalCanvas, screenX, screenY, displayWidth, displayHeight);
                     mainCtx.restore();
                 }
-                 updateZoomPanDisplay(); 
+                updateZoomPanDisplay(); 
             }
             
             function updateCursor(){
@@ -2317,9 +2601,147 @@
                 return isReplaying && !isReplayPaused;
             }
             
-            function handleTouchStart(e){ if (isCanvasLocked()) { e.preventDefault(); return; } e.preventDefault(); if (e.touches.length === 1 && !isPanning) { startAction(e.touches[0]); } else if (e.touches.length === 2) { isDrawing = false; isSelecting = false; isMovingSelection = false; isPanning = true; pinchStartDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); const r=mainCanvas.getBoundingClientRect(); lastPinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left; lastPinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top; } } 
-            function handleTouchMove(e){ if (isCanvasLocked()) { e.preventDefault(); return; } e.preventDefault(); if (e.touches.length === 1 && !isPanning) { performAction(e.touches[0]); } else if (e.touches.length === 2 && isPanning) { const currentPinchDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); const r=mainCanvas.getBoundingClientRect(); const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left; const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2 - r.top; const scaleAmount = currentPinchDistance / pinchStartDistance; zoom(scaleAmount, midX, midY); panX += (midX - lastPinchMidX); panY += (midY - lastPinchMidY); pinchStartDistance = currentPinchDistance; lastPinchMidX = midX; lastPinchMidY = midY; renderComposite(); } }
-            function handleTouchEnd(e){ if (isCanvasLocked()) { e.preventDefault(); return; } e.preventDefault(); if (e.touches.length < 2 && isPanning) { isPanning = false; updateCursor(); } if (!isPanning && (isDrawing || isSelecting || isMovingSelection) && e.changedTouches.length > 0) { endAction(e.changedTouches[0]); } else if (!isPanning && !isDrawing && !isSelecting && !isMovingSelection && e.changedTouches.length > 0) { if (currentTool === 'eyedropper' || currentTool === 'fill') { startAction(e.changedTouches[0]); endAction(e.changedTouches[0]); } } } 
+            const activePointers = new Map();
+            let drawingPointerId = null;
+            let isStaticCacheValid = false;
+            const staticCacheCanvas = document.createElement('canvas');
+            const staticCacheCtx = staticCacheCanvas.getContext('2d');
+            const activeStrokeCanvas = document.createElement('canvas');
+            const activeStrokeCtx = activeStrokeCanvas.getContext('2d');
+
+            function handlePointerDown(e) {
+                if (isCanvasLocked()) { e.preventDefault(); return; }
+                e.preventDefault();
+                try { mainCanvas.setPointerCapture(e.pointerId); } catch(err) {}
+                activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+
+                if (activePointers.size === 1) {
+                    if (isPanning) {
+                        const r = mainCanvas.getBoundingClientRect();
+                        lastPanX_mouse = e.clientX - r.left;
+                        lastPanY_mouse = e.clientY - r.top;
+                        return;
+                    }
+                    if (e.pointerType === 'mouse' && (e.button === 1 || e.button === 2)) {
+                        isPanning = true;
+                        const r = mainCanvas.getBoundingClientRect();
+                        lastPanX_mouse = e.clientX - r.left;
+                        lastPanY_mouse = e.clientY - r.top;
+                        mainCanvas.style.cursor = 'grabbing';
+                        return;
+                    }
+                    drawingPointerId = e.pointerId;
+                    startAction(e);
+                } else if (activePointers.size === 2) {
+                    isDrawing = false;
+                    isSelecting = false;
+                    isMovingSelection = false;
+                    isPanning = true;
+                    drawingPointerId = null;
+                    const pts = Array.from(activePointers.values());
+                    pinchStartDistance = Math.hypot(pts[0].clientX - pts[1].clientX, pts[0].clientY - pts[1].clientY);
+                    const r = mainCanvas.getBoundingClientRect();
+                    lastPinchMidX = (pts[0].clientX + pts[1].clientX) / 2 - r.left;
+                    lastPinchMidY = (pts[0].clientY + pts[1].clientY) / 2 - r.top;
+                }
+            }
+
+            function handlePointerMove(e) {
+                if (isCanvasLocked()) { e.preventDefault(); return; }
+                if (!activePointers.has(e.pointerId)) return;
+                e.preventDefault();
+                activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+
+                if (isDrawing) {
+                    if (e.pointerId === drawingPointerId) {
+                        let coalesced = [e];
+                        if (typeof e.getCoalescedEvents === 'function') {
+                            try {
+                                const list = e.getCoalescedEvents();
+                                if (list && list.length > 0) coalesced = list;
+                            } catch (err) {
+                                console.warn("getCoalescedEvents failed:", err);
+                            }
+                        }
+                        for (const pt of coalesced) {
+                            performAction(pt);
+                        }
+                    }
+                    return;
+                }
+
+                if (activePointers.size === 1) {
+                    if (isPanning) {
+                        const r = mainCanvas.getBoundingClientRect();
+                        const canvasMouseX = e.clientX - r.left;
+                        const canvasMouseY = e.clientY - r.top;
+                        if (lastPanX_mouse === undefined) { lastPanX_mouse = canvasMouseX; lastPanY_mouse = canvasMouseY; }
+                        const dx = canvasMouseX - lastPanX_mouse;
+                        const dy = canvasMouseY - lastPanY_mouse;
+                        panX += dx; panY += dy;
+                        lastPanX_mouse = canvasMouseX; lastPanY_mouse = canvasMouseY;
+                        requestRenderComposite();
+                        updateZoomPanDisplay();
+                        return;
+                    }
+                    performAction(e);
+                } else if (activePointers.size === 2 && isPanning) {
+                    const pts = Array.from(activePointers.values());
+                    const currentPinchDistance = Math.hypot(pts[0].clientX - pts[1].clientX, pts[0].clientY - pts[1].clientY);
+                    const r = mainCanvas.getBoundingClientRect();
+                    const midX = (pts[0].clientX + pts[1].clientX) / 2 - r.left;
+                    const midY = (pts[0].clientY + pts[1].clientY) / 2 - r.top;
+                    const scaleAmount = currentPinchDistance / pinchStartDistance;
+                    zoom(scaleAmount, midX, midY);
+                    panX += (midX - lastPinchMidX);
+                    panY += (midY - lastPinchMidY);
+                    pinchStartDistance = currentPinchDistance;
+                    lastPinchMidX = midX;
+                    lastPinchMidY = midY;
+                    requestRenderComposite();
+                }
+            }
+
+            function handlePointerUp(e) {
+                if (isCanvasLocked()) { e.preventDefault(); return; }
+                if (!activePointers.has(e.pointerId)) return;
+                e.preventDefault();
+                try { mainCanvas.releasePointerCapture(e.pointerId); } catch(err) {}
+
+                const wasPanning = isPanning;
+                activePointers.delete(e.pointerId);
+
+                if (wasPanning && activePointers.size < 2) {
+                    isPanning = false;
+                    updateCursor();
+                }
+
+                if (e.pointerId === drawingPointerId) {
+                    if (!wasPanning && (isDrawing || isSelecting || isMovingSelection)) {
+                        endAction(e);
+                    } else if (!wasPanning && !isDrawing && !isSelecting && !isMovingSelection) {
+                        if (currentTool === 'eyedropper' || currentTool === 'fill') {
+                            startAction(e);
+                            endAction(e);
+                        }
+                    }
+                    drawingPointerId = null;
+                }
+            }
+
+            function handlePointerCancel(e) {
+                if (!activePointers.has(e.pointerId)) return;
+                try { mainCanvas.releasePointerCapture(e.pointerId); } catch(err) {}
+                activePointers.delete(e.pointerId);
+                if (isPanning && activePointers.size < 2) {
+                    isPanning = false;
+                    updateCursor();
+                }
+                if (e.pointerId === drawingPointerId) {
+                    endAction(e);
+                    drawingPointerId = null;
+                }
+            }
             function handleWheelZoom(e) { 
                 if (isCanvasLocked()) { e.preventDefault(); return; }
                 e.preventDefault(); 
@@ -2342,13 +2764,216 @@
                 panX += (worldAfterZoom.x - worldBeforeZoom.x) * zoomLevel;
                 panY += (worldAfterZoom.y - worldBeforeZoom.y) * zoomLevel;
 
-                renderComposite();
+                requestRenderComposite();
                 updateZoomPanDisplay();
             }
             function zoomAroundCenter(factor) { 
                 const centerX = mainCanvas.clientWidth / 2;
                 const centerY = mainCanvas.clientHeight / 2;
                 zoom(factor, centerX, centerY);
+            }
+
+            let currentZoomTween = null;
+
+            function animateZoomPan(targetZoom, targetPanX, targetPanY) {
+                if (currentZoomTween) {
+                    currentZoomTween.kill();
+                }
+                
+                canvasAnimState.zoom = zoomLevel;
+                canvasAnimState.px = panX;
+                canvasAnimState.py = panY;
+                
+                currentZoomTween = gsap.to(canvasAnimState, {
+                    zoom: targetZoom,
+                    px: targetPanX,
+                    py: targetPanY,
+                    duration: 0.4,
+                    ease: "power2.out",
+                    onUpdate: () => {
+                        zoomLevel = canvasAnimState.zoom;
+                        panX = canvasAnimState.px;
+                        panY = canvasAnimState.py;
+                        requestRenderComposite();
+                        updateZoomPanDisplay();
+                    }
+                });
+            }
+
+            function getZoomTargetParams(factor, screenCenterX, screenCenterY) {
+                const targetZoom = Math.max(0.05, Math.min(20, zoomLevel * factor));
+                
+                const rect = mainCanvas.getBoundingClientRect();
+                const worldBeforeZoom = screenToWorld(
+                    screenCenterX + rect.left, 
+                    screenCenterY + rect.top
+                );
+                
+                const targetPanX = screenCenterX - worldBeforeZoom.x * targetZoom;
+                const targetPanY = screenCenterY - worldBeforeZoom.y * targetZoom;
+                
+                return { zoom: targetZoom, panX: targetPanX, panY: targetPanY };
+            }
+
+            function animateZoomAroundCenter(factor) {
+                const centerX = mainCanvas.clientWidth / 2;
+                const centerY = mainCanvas.clientHeight / 2;
+                const targets = getZoomTargetParams(factor, centerX, centerY);
+                const finalZoom = Math.max(0.1, Math.min(3.0, targets.zoom));
+                
+                // Re-calculate pan with clamped zoom to prevent viewport drift
+                const worldCenterX = (centerX - panX) / zoomLevel;
+                const worldCenterY = (centerY - panY) / zoomLevel;
+                const finalPanX = centerX - worldCenterX * finalZoom;
+                const finalPanY = centerY - worldCenterY * finalZoom;
+                
+                animateZoomPan(finalZoom, finalPanX, finalPanY);
+            }
+
+            function animateZoomTo100() {
+                const centerX = mainCanvas.clientWidth / 2;
+                const centerY = mainCanvas.clientHeight / 2;
+                const worldCenterX = (centerX - panX) / zoomLevel;
+                const worldCenterY = (centerY - panY) / zoomLevel;
+                
+                const finalPanX = centerX - worldCenterX * 1.0;
+                const finalPanY = centerY - worldCenterY * 1.0;
+                
+                animateZoomPan(1.0, finalPanX, finalPanY);
+            }
+
+            function animateResetView() {
+                const targetZoom = 1.0;
+                const targetPanX = (mainCanvas.clientWidth - DEFAULT_LOGICAL_WIDTH * targetZoom) / 2;
+                const targetPanY = (mainCanvas.clientHeight - DEFAULT_LOGICAL_HEIGHT * targetZoom) / 2;
+                animateZoomPan(targetZoom, targetPanX, targetPanY);
+            }
+
+            function getLayerBoundingBox(layer) {
+                if (!layer || !layer.canvas) return null;
+                const canvas = layer.canvas;
+                const scaleDown = 0.05;
+                const tempW = Math.max(1, Math.round(canvas.width * scaleDown));
+                const tempH = Math.max(1, Math.round(canvas.height * scaleDown));
+                
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = tempW;
+                tempCanvas.height = tempH;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                tempCtx.imageSmoothingEnabled = false;
+                tempCtx.drawImage(canvas, 0, 0, tempW, tempH);
+                
+                let imgData;
+                try {
+                    imgData = tempCtx.getImageData(0, 0, tempW, tempH);
+                } catch(e) {
+                    console.error("Failed to get image data:", e);
+                    return null;
+                }
+                
+                const data = imgData.data;
+                let minX = tempW;
+                let maxX = -1;
+                let minY = tempH;
+                let maxY = -1;
+                
+                for (let y = 0; y < tempH; y++) {
+                    for (let x = 0; x < tempW; x++) {
+                        const alpha = data[(y * tempW + x) * 4 + 3];
+                        if (alpha > 0) {
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                        }
+                    }
+                }
+                
+                if (maxX === -1) {
+                    return null; // Empty layer
+                }
+                
+                const layerMinX = minX / scaleDown;
+                const layerMaxX = (maxX + 1) / scaleDown;
+                const layerMinY = minY / scaleDown;
+                const layerMaxY = (maxY + 1) / scaleDown;
+                
+                return {
+                    minX: layer.logicalX + (layerMinX / deviceScale),
+                    maxX: layer.logicalX + (layerMaxX / deviceScale),
+                    minY: layer.logicalY + (layerMinY / deviceScale),
+                    maxY: layer.logicalY + (layerMaxY / deviceScale)
+                };
+            }
+
+            function getContentBoundingBox() {
+                let minX = Infinity;
+                let maxX = -Infinity;
+                let minY = Infinity;
+                let maxY = -Infinity;
+                let hasContent = false;
+                
+                layers.forEach(layer => {
+                    if (layer.visible) {
+                        const bbox = getLayerBoundingBox(layer);
+                        if (bbox) {
+                            if (bbox.minX < minX) minX = bbox.minX;
+                            if (bbox.maxX > maxX) maxX = bbox.maxX;
+                            if (bbox.minY < minY) minY = bbox.minY;
+                            if (bbox.maxY > maxY) maxY = bbox.maxY;
+                            hasContent = true;
+                        }
+                    }
+                });
+                
+                stickyNotes.forEach(note => {
+                    const noteMinX = note.x;
+                    const noteMaxX = note.x + 180;
+                    const noteMinY = note.y;
+                    const noteMaxY = note.y + 180;
+                    
+                    if (noteMinX < minX) minX = noteMinX;
+                    if (noteMaxX > maxX) maxX = noteMaxX;
+                    if (noteMinY < minY) minY = noteMinY;
+                    if (noteMaxY > maxY) maxY = noteMaxY;
+                    hasContent = true;
+                });
+                
+                if (!hasContent) {
+                    return {
+                        minX: 0,
+                        maxX: DEFAULT_LOGICAL_WIDTH,
+                        minY: 0,
+                        maxY: DEFAULT_LOGICAL_HEIGHT
+                    };
+                }
+                
+                return { minX, maxX, minY, maxY };
+            }
+
+            function zoomToFit() {
+                const bbox = getContentBoundingBox();
+                const contentWidth = bbox.maxX - bbox.minX;
+                const contentHeight = bbox.maxY - bbox.minY;
+                
+                const viewportWidth = mainCanvas.clientWidth;
+                const viewportHeight = mainCanvas.clientHeight;
+                
+                const padding = 60;
+                const availableWidth = Math.max(100, viewportWidth - 2 * padding);
+                const availableHeight = Math.max(100, viewportHeight - 2 * padding);
+                
+                let targetZoom = Math.min(availableWidth / contentWidth, availableHeight / contentHeight);
+                targetZoom = Math.max(0.1, Math.min(3.0, targetZoom));
+                
+                const worldCenterX = bbox.minX + contentWidth / 2;
+                const worldCenterY = bbox.minY + contentHeight / 2;
+                
+                const targetPanX = viewportWidth / 2 - worldCenterX * targetZoom;
+                const targetPanY = viewportHeight / 2 - worldCenterY * targetZoom;
+                
+                animateZoomPan(targetZoom, targetPanX, targetPanY);
             }
             function ensureLayerCapacity(layer, wx, wy) {
                 if (!layer || !layer.canvas) return;
@@ -2488,9 +3113,10 @@
                     if (event && event.preventDefault) event.preventDefault();
                     return;
                 }
+                isStaticCacheValid = false;
                 if (typeof hideMobileFloatingPanels === 'function') { hideMobileFloatingPanels(); }
                 const layerCtx=getActiveContext();if(!layerCtx){updateStatus("No active layer selected to draw on.");return;}
-                if (isPanning && event.type && event.type.startsWith('mouse')) return; 
+                if (isPanning && event.type && (event.type.startsWith('mouse') || event.type.startsWith('pointer'))) return; 
 
                 // Middle-click (button=1) or Right-click (button=2) starts panning
                 if (event.button === 1 || event.button === 2) {
@@ -2561,6 +3187,30 @@
                     }
                     updateCursor();
                 } else { 
+                    if (currentTool === 'sticky') {
+                        isDrawing = false;
+                        isSelecting = false;
+                        isMovingSelection = false;
+                        
+                        const note = {
+                            id: 'note-' + Date.now(),
+                            x: worldX - 90,
+                            y: worldY - 90,
+                            text: '',
+                            color: currentSolidColor
+                        };
+                        stickyNotes.push(note);
+                        renderStickyNote(note);
+                        
+                        setTimeout(() => {
+                            const textarea = document.getElementById(note.id).querySelector('textarea');
+                            if (textarea) textarea.focus();
+                        }, 50);
+                        
+                        updateStatus("Sticky note added.");
+                        return;
+                    }
+
                     const layer = getActiveLayer();
                     if (layer && currentTool !== 'eyedropper' && currentTool !== 'select' && currentTool !== 'move') {
                         ensureCapacityWithSymmetry(layer, worldX, worldY);
@@ -2590,11 +3240,6 @@
                         });
                     }
                     else if(['pen','eraser','line','shape'].includes(currentTool)){
-                        if(currentTool==='pen'||currentTool==='eraser'){
-                            setupLineDrawing(layerCtx,currentTool==='eraser',null);
-                            const gradPoints = currentTool === 'eraser' ? null : { x1: worldX, y1: worldY, x2: worldX + 0.01, y2: worldY };
-                            drawDot(layerCtx,worldX,worldY,sym,gradPoints);
-                        }
                         currentVectorStroke = {
                             layer: getActiveLayer() ? getActiveLayer().name : 'Layer_1',
                             tool: currentTool,
@@ -2606,6 +3251,20 @@
                             symmetryMode: sym ? symmetryMode : 'OFF',
                             points: [{x: worldX, y: worldY}]
                         };
+
+                        if (currentTool === 'pen') {
+                            const activeL = getActiveLayer();
+                            if (activeL && activeL.canvas) {
+                                activeStrokeCanvas.width = activeL.canvas.width;
+                                activeStrokeCanvas.height = activeL.canvas.height;
+                                activeStrokeCtx.clearRect(0, 0, activeStrokeCanvas.width, activeStrokeCanvas.height);
+                                drawBezierStroke(activeStrokeCtx, currentVectorStroke.points, sym);
+                            }
+                        } else if (currentTool === 'eraser') {
+                            setupLineDrawing(layerCtx, true, null);
+                            const gradPoints = null;
+                            drawDot(layerCtx, worldX, worldY, sym, gradPoints);
+                        }
                     }
                     else if(currentTool==='eyedropper'){
                         pickColor(clientX, clientY); 
@@ -2644,7 +3303,7 @@
                     const dy = canvasMouseY - lastPanY_mouse; 
                     panX += dx; panY += dy;
                     lastPanX_mouse = canvasMouseX; lastPanY_mouse = canvasMouseY;
-                    renderComposite();
+                    requestRenderComposite();
                     updateZoomPanDisplay();
                     return;
                 }
@@ -2682,10 +3341,17 @@
                             });
                         }
                     }
-                    else if(currentTool==='pen'||currentTool==='eraser'){
-                        const gradPoints = currentTool==='eraser' ? null : {x1: startX, y1: startY, x2: worldX, y2: worldY};
-                        setupLineDrawing(layerCtx,currentTool==='eraser',gradPoints);
-                        drawLine(layerCtx,lastX,lastY,worldX,worldY,sym,gradPoints);
+                    else if (currentTool === 'pen') {
+                        if (currentVectorStroke) {
+                            currentVectorStroke.points.push({x: worldX, y: worldY});
+                            activeStrokeCtx.clearRect(0, 0, activeStrokeCanvas.width, activeStrokeCanvas.height);
+                            drawBezierStroke(activeStrokeCtx, currentVectorStroke.points, sym);
+                        }
+                    }
+                    else if (currentTool === 'eraser') {
+                        const gradPoints = null;
+                        setupLineDrawing(layerCtx, true, gradPoints);
+                        drawLine(layerCtx, lastX, lastY, worldX, worldY, sym, gradPoints);
                         if (currentVectorStroke) {
                             currentVectorStroke.points.push({x: worldX, y: worldY});
                         }
@@ -2697,7 +3363,7 @@
                 }
                 
                 [lastX,lastY]=[worldX,worldY]; 
-                renderComposite();
+                requestRenderComposite();
             }
 
             function endAction(event){ 
@@ -2760,7 +3426,28 @@
                     const noSym=['fill','eyedropper'].includes(currentTool);
                     const sym=symmetryMode!=='OFF'&&!noSym;
 
-                    if(currentTool === 'shape' || currentTool === 'line'){
+                    if (currentTool === 'pen') {
+                        if (currentVectorStroke) {
+                            currentVectorStroke.points.push({x: worldX, y: worldY});
+                            
+                            // Redraw final stroke on offscreen canvas
+                            activeStrokeCtx.clearRect(0, 0, activeStrokeCanvas.width, activeStrokeCanvas.height);
+                            drawBezierStroke(activeStrokeCtx, currentVectorStroke.points, sym);
+                            
+                            // Bake activeStrokeCanvas into layerCtx
+                            if (activeStrokeCanvas.width > 0 && activeStrokeCanvas.height > 0) {
+                                layerCtx.save();
+                                layerCtx.globalCompositeOperation = 'source-over';
+                                layerCtx.drawImage(activeStrokeCanvas, 0, 0);
+                                layerCtx.restore();
+                            }
+                            
+                            // Reset activeStrokeCanvas width/height
+                            activeStrokeCanvas.width = 0;
+                            activeStrokeCanvas.height = 0;
+                        }
+                    }
+                    else if(currentTool === 'shape' || currentTool === 'line'){
                         drawShape(layerCtx,startX,startY,worldX,worldY,sym,{gradX1:startX,gradY1:startY,gradX2:worldX,gradY2:worldY});
                     }
                     else if(currentTool==='fill'){
@@ -2776,7 +3463,7 @@
                         addText(startX,startY,sym); 
                     } 
                     if (currentVectorStroke) {
-                        if(['pen','eraser','line','shape'].includes(currentTool)){
+                        if(['eraser','line','shape'].includes(currentTool)){
                             currentVectorStroke.points.push({x: worldX, y: worldY});
                         } else if (currentTool === 'pixel' || currentTool === 'grideraser') {
                             // Final sync of pixel cells for this stroke
@@ -2810,10 +3497,91 @@
                 isDrawing=false; 
                 isSelecting=false; 
                 isMovingSelection = false;
+                isStaticCacheValid = false;
                 renderComposite();
                 updateCursor();
             }
             
+            function drawBezierStroke(ctx, points, applySymmetry) {
+                if (!points || points.length === 0) return;
+                
+                const activeL = getActiveLayer();
+                if (activeL) {
+                    ctx.save();
+                    ctx.translate(-activeL.logicalX * deviceScale, -activeL.logicalY * deviceScale);
+                }
+
+                const startPt = points[0];
+                const endPt = points[points.length - 1];
+                const gradPoints = { x1: startPt.x, y1: startPt.y, x2: endPt.x, y2: endPt.y };
+                setupLineDrawing(ctx, false, gradPoints);
+                
+                const _drawPath = (pList, mirrorType) => {
+                    ctx.beginPath();
+                    if (currentColorMode === 'linear') {
+                        const mirroredGrad = getMirroredGradPoints(gradPoints, mirrorType);
+                        ctx.strokeStyle = getDrawingStyle(ctx, mirroredGrad.x1, mirroredGrad.y1, mirroredGrad.x2, mirroredGrad.y2);
+                        ctx.fillStyle = ctx.strokeStyle;
+                    } else {
+                        ctx.strokeStyle = currentSolidColor;
+                        ctx.fillStyle = currentSolidColor;
+                    }
+
+                    if (pList.length === 1) {
+                        const physX = pList[0].x * deviceScale;
+                        const physY = pList[0].y * deviceScale;
+                        const r = Math.max(1, (currentWidth * deviceScale) / 2);
+                        ctx.arc(physX, physY, r, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else if (pList.length === 2) {
+                        ctx.moveTo(pList[0].x * deviceScale, pList[0].y * deviceScale);
+                        ctx.lineTo(pList[1].x * deviceScale, pList[1].y * deviceScale);
+                        ctx.stroke();
+                    } else {
+                        ctx.moveTo(pList[0].x * deviceScale, pList[0].y * deviceScale);
+                        for (let i = 1; i < pList.length - 1; i++) {
+                            const xc = (pList[i].x + pList[i+1].x) / 2;
+                            const yc = (pList[i].y + pList[i+1].y) / 2;
+                            ctx.quadraticCurveTo(pList[i].x * deviceScale, pList[i].y * deviceScale, xc * deviceScale, yc * deviceScale);
+                        }
+                        ctx.lineTo(pList[pList.length - 1].x * deviceScale, pList[pList.length - 1].y * deviceScale);
+                        ctx.stroke();
+                    }
+                };
+
+                _drawPath(points, 'none');
+
+                if (applySymmetry) {
+                    const cx = DEFAULT_LOGICAL_WIDTH / 2;
+                    const cy = DEFAULT_LOGICAL_HEIGHT / 2;
+                    
+                    const getMirroredPoints = (pts, mode) => {
+                        return pts.map(p => {
+                            if (mode === 'Y') return { x: cx * 2 - p.x, y: p.y };
+                            if (mode === 'X') return { x: p.x, y: cy * 2 - p.y };
+                            if (mode === 'XY') return { x: cx * 2 - p.x, y: cy * 2 - p.y };
+                            return p;
+                        });
+                    };
+
+                    if (symmetryMode === 'Y') {
+                        _drawPath(getMirroredPoints(points, 'Y'), 'Y');
+                    } else if (symmetryMode === 'X') {
+                        _drawPath(getMirroredPoints(points, 'X'), 'X');
+                    } else if (symmetryMode === 'XY') {
+                        _drawPath(getMirroredPoints(points, 'Y'), 'Y');
+                        _drawPath(getMirroredPoints(points, 'X'), 'X');
+                        _drawPath(getMirroredPoints(points, 'XY'), 'XY');
+                    }
+                }
+                
+                restoreContextAfterDraw(ctx);
+
+                if (activeL) {
+                    ctx.restore();
+                }
+            }
+
             function setupLineDrawing(ctx,isEraser,linePoints){ 
                 ctx.lineWidth = currentWidth * deviceScale; 
                 ctx.lineCap='round';ctx.lineJoin='round';
@@ -3414,6 +4182,7 @@
                         saveHistory(idx); 
                     });
                     vectorStrokes = []; // Also clear vector strokes
+                    clearAllStickyNotes();
                     deselect();renderComposite();updateStatus("All layers cleared.");
                 }
             }
@@ -3641,6 +4410,35 @@
                     svgContent += `    </g>\n  </g>\n`;
                 });
                 
+                // Append Sticky Notes to SVG content
+                if (stickyNotes.length > 0) {
+                    svgContent += `  <g id="Sticky_Notes_Layer">\n`;
+                    stickyNotes.forEach(note => {
+                        const noteColor = note.color || '#FFE57F';
+                        const lines = note.text.split('\n');
+                        
+                        svgContent += `    <g transform="translate(${note.x.toFixed(1)}, ${note.y.toFixed(1)})">\n`;
+                        // Sticky note rectangle card
+                        svgContent += `      <rect width="180" height="180" rx="6" fill="${noteColor}" stroke="rgba(0,0,0,0.05)" stroke-width="1" filter="drop-shadow(0px 5px 10px rgba(0,0,0,0.1))"/>\n`;
+                        
+                        // Sticky note text
+                        svgContent += `      <text x="12" y="24" font-family="'Inter', sans-serif" font-size="13" font-weight="500" fill="#2c2c2c">\n`;
+                        lines.forEach((line, lineIdx) => {
+                            const escapedLine = line
+                                .replace(/&/g, '&amp;')
+                                .replace(/</g, '&lt;')
+                                .replace(/>/g, '&gt;')
+                                .replace(/"/g, '&quot;')
+                                .replace(/'/g, '&apos;');
+                            const dyAttr = lineIdx > 0 ? ` dy="1.4em" x="12"` : '';
+                            svgContent += `        <tspan${dyAttr}>${escapedLine}</tspan>\n`;
+                        });
+                        svgContent += `      </text>\n`;
+                        svgContent += `    </g>\n`;
+                    });
+                    svgContent += `  </g>\n`;
+                }
+                
                 svgContent += `</svg>`;
                 localStorage.setItem('sketcher_vector_export', svgContent);
                 updateStatus('SVG exported to localStorage. Opening SVG Studio...');
@@ -3652,6 +4450,7 @@
                     width: mainCanvas.width,
                     height: mainCanvas.height,
                     vectorStrokes: vectorStrokes,
+                    stickyNotes: stickyNotes,
                     paletteColors: paletteColors,
                     canvasBgColor: currentBgColor,
                     exportBg: exportBgCheckbox ? exportBgCheckbox.checked : true,
@@ -3680,6 +4479,11 @@
                     try {
                         const data = JSON.parse(evt.target.result);
                         if (data.vectorStrokes) vectorStrokes = data.vectorStrokes;
+                        clearAllStickyNotes();
+                        if (data.stickyNotes) {
+                            stickyNotes = data.stickyNotes;
+                            stickyNotes.forEach(renderStickyNote);
+                        }
                         if (data.canvasBgColor) {
                             currentBgColor = data.canvasBgColor;
                             if (bgColorPicker) bgColorPicker.value = currentBgColor;
@@ -4483,11 +5287,9 @@
                         // Force re-creation of layer contexts might be needed for some browsers if internal scaling factors get mixed up.
                         // layers.forEach(l => {l.context = l.canvas.getContext('2d')}); // this clears content
                     }
-
-                    resetView(); // Adjusts pan/zoom for new viewport size, re-renders
-                }, 200); 
+                    updateStickyNotesContainerPosition();
+                }, 100);
             }
-            handleResize.timeoutId = null;
             
             function updateStatus(message) {
                 if(statusText) statusText.textContent = message;
@@ -4495,6 +5297,118 @@
 
             function updateZoomPanDisplay() {
                 if(zoomLevelDisplay) zoomLevelDisplay.textContent = `Zoom: ${Math.round(zoomLevel * 100)}%`;
+                const hudZoomPercent = document.getElementById('hudZoomPercent');
+                if (hudZoomPercent) hudZoomPercent.textContent = `${Math.round(zoomLevel * 100)}%`;
+                const stickyNotesContainer = document.getElementById('stickyNotesContainer');
+                if (stickyNotesContainer) {
+                    stickyNotesContainer.style.transform = `translate(${panX}px, ${panY}px) scale(${zoomLevel})`;
+                    stickyNotesContainer.style.transformOrigin = '0 0';
+                }
+            }
+
+            function updateStickyNotesContainerPosition() {
+                const rect = mainCanvas.getBoundingClientRect();
+                const container = document.getElementById('canvas-container');
+                if (!container) return;
+                const containerRect = container.getBoundingClientRect();
+                const stickyNotesContainer = document.getElementById('stickyNotesContainer');
+                if (stickyNotesContainer) {
+                    stickyNotesContainer.style.left = (rect.left - containerRect.left) + 'px';
+                    stickyNotesContainer.style.top = (rect.top - containerRect.top) + 'px';
+                    stickyNotesContainer.style.width = rect.width + 'px';
+                    stickyNotesContainer.style.height = rect.height + 'px';
+                }
+            }
+
+            function renderStickyNote(note) {
+                const el = document.createElement('div');
+                el.className = 'sticky-note';
+                el.id = note.id;
+                el.style.left = note.x + 'px';
+                el.style.top = note.y + 'px';
+                el.style.backgroundColor = note.color;
+                
+                const textarea = document.createElement('textarea');
+                textarea.value = note.text;
+                textarea.placeholder = "Write note...";
+                textarea.addEventListener('input', (e) => {
+                    note.text = e.target.value;
+                });
+                
+                const deleteBtn = document.createElement('div');
+                deleteBtn.className = 'sticky-note-delete';
+                deleteBtn.textContent = '✕';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    el.remove();
+                    stickyNotes = stickyNotes.filter(n => n.id !== note.id);
+                });
+                
+                el.appendChild(textarea);
+                el.appendChild(deleteBtn);
+                
+                let isDraggingNote = false;
+                let startDragX = 0;
+                let startDragY = 0;
+                let startNoteX = 0;
+                let startNoteY = 0;
+                
+                el.addEventListener('pointerdown', (e) => {
+                    if (e.target === textarea || e.target === deleteBtn) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    isDraggingNote = true;
+                    startDragX = e.clientX;
+                    startDragY = e.clientY;
+                    startNoteX = note.x;
+                    startNoteY = note.y;
+                    try { el.setPointerCapture(e.pointerId); } catch(err) {}
+                });
+                
+                el.addEventListener('pointermove', (e) => {
+                    if (!isDraggingNote) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const dx = e.clientX - startDragX;
+                    const dy = e.clientY - startDragY;
+                    note.x = startNoteX + dx / zoomLevel;
+                    note.y = startNoteY + dy / zoomLevel;
+                    el.style.left = note.x + 'px';
+                    el.style.top = note.y + 'px';
+                });
+                
+                const stopDrag = (e) => {
+                    if (isDraggingNote) {
+                        isDraggingNote = false;
+                        try { el.releasePointerCapture(e.pointerId); } catch(err) {}
+                    }
+                };
+                
+                el.addEventListener('pointerup', stopDrag);
+                el.addEventListener('pointercancel', stopDrag);
+                
+                const container = document.getElementById('stickyNotesContainer');
+                if (container) container.appendChild(el);
+            }
+
+            function loadDefaultStickyNotes() {
+                if (stickyNotes.length === 0) {
+                    const welcomeNote = {
+                        id: 'note-welcome',
+                        x: DEFAULT_LOGICAL_WIDTH / 2 - 90,
+                        y: DEFAULT_LOGICAL_HEIGHT / 2 - 90,
+                        text: "Welcome to SSSS Lv Sketcher!\n\n- Click 📝 to add sticky notes.\n- Drag notes to move them.\n- Double-click layer names to rename.",
+                        color: '#FFE57F'
+                    };
+                    stickyNotes.push(welcomeNote);
+                    renderStickyNote(welcomeNote);
+                }
+            }
+
+            function clearAllStickyNotes() {
+                const container = document.getElementById('stickyNotesContainer');
+                if (container) container.innerHTML = '';
+                stickyNotes = [];
             }
 
             function updateCursorCoordinatesDisplay(event) {
