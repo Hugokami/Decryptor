@@ -1168,7 +1168,15 @@
             let gridSize = 20; 
             let gridColor = '#cccccc';
             
-            let deviceScale = window.devicePixelRatio || 1; 
+            function isMobileDevice() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 0);
+            }
+            let deviceScale = window.devicePixelRatio || 1;
+            if (isMobileDevice()) {
+                deviceScale = Math.min(1.2, deviceScale); // Cap to 1.2x on mobile to avoid OOM memory crashes and drawing delays
+            } else {
+                deviceScale = Math.min(1.8, deviceScale); // Cap to 1.8x on desktop to maintain safe memory bounds
+            }
             let zoomLevel = 1.0;
             let panX = 0; // Screen pixels for panning offset
             let panY = 0; 
@@ -1189,7 +1197,7 @@
             
             let history = {}; // { layerIndex: [dataURL1, dataURL2, ...] }
             let historyStep = {}; // { layerIndex: currentStepIndex }
-            const MAX_HISTORY_STEPS = 25; // Increased slightly
+            const MAX_HISTORY_STEPS = isMobileDevice() ? 8 : 25; // Keep stack small on mobile to save memory
 
             let vectorStrokes = [];
             let currentVectorStroke = null;
@@ -2663,8 +2671,40 @@
                                 console.warn("getCoalescedEvents failed:", err);
                             }
                         }
-                        for (const pt of coalesced) {
-                            performAction(pt);
+                        
+                        if (currentTool === 'pen' && currentVectorStroke) {
+                            // Push all coalesced points in a single lightweight loop to avoid redundant clears and redraws
+                            for (const pt of coalesced) {
+                                const clientX = pt.clientX;
+                                const clientY = pt.clientY;
+                                let {x: wX, y: wY} = screenToWorld(clientX, clientY);
+                                wX = snapCoord(wX, gridSize);
+                                wY = snapCoord(wY, gridSize);
+                                currentVectorStroke.points.push({x: wX, y: wY});
+                                [lastX, lastY] = [wX, wY];
+                            }
+                            
+                            // Check capacity once for the final coalesced point
+                            const finalPt = coalesced[coalesced.length - 1];
+                            let {x: fX, y: fY} = screenToWorld(finalPt.clientX, finalPt.clientY);
+                            fX = snapCoord(fX, gridSize);
+                            fY = snapCoord(fY, gridSize);
+                            const layer = getActiveLayer();
+                            if (layer) {
+                                ensureCapacityWithSymmetry(layer, fX, fY);
+                            }
+                            
+                            // Draw the Bezier stroke once on the activeStrokeCanvas for this animation frame
+                            const sym = symmetryMode !== 'OFF';
+                            activeStrokeCtx.clearRect(0, 0, activeStrokeCanvas.width, activeStrokeCanvas.height);
+                            drawBezierStroke(activeStrokeCtx, currentVectorStroke.points, sym);
+                            
+                            requestRenderComposite();
+                        } else {
+                            // Non-pen tools (pixel, spray, eraser) update incrementally and are run point-by-point
+                            for (const pt of coalesced) {
+                                performAction(pt);
+                            }
                         }
                     }
                     return;
