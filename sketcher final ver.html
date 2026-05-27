@@ -862,6 +862,9 @@
                 <button id="stickyTool" title="Sticky Note (N)">📝</button>
                 <button id="eyedropperTool" title="Eyedropper (I, Alt+Click)">💧</button>
                 <button id="sprayTool" title="Spray Paint (S)">💨</button>
+                <button id="gridbucketTool" title="Grid Bucket Fill (B)">🔳</button>
+                <button id="gridselectTool" title="Grid Selection Tool (Shift+M)">🏁</button>
+                <button id="isostampTool" title="Isometric Stamp (K)">🧊</button>
                 <button id="selectTool" title="Selection Tool (M)">⬚</button> 
                 <button id="moveTool" title="Move Tool (V)">✥</button> 
             </div></div>
@@ -894,6 +897,15 @@
                 <div class="tool-row property-row" id="textPropsRow1"><label for="textSize">Text Size</label><input type="number" id="textSize" min="8" max="150" value="24"><span class="value-display">px</span></div>
                 <div class="tool-row property-row" id="textPropsRow2"><label for="fontFamily">Font</label><select id="fontFamily"><option>Inter</option><option>Arial</option><option>Verdana</option><option>Georgia</option><option>Times New Roman</option><option>Courier New</option></select></div>
                 <div class="tool-row property-row" id="textPropsRow3"><label for="textAlign">Align</label><select id="textAlign"><option value="left">Left</option><option value="center">Center</option><option value="right">Right</option></select></div>
+                <div class="tool-row property-row" id="isostampPropsRow">
+                    <label for="isostampSelect">Primitive</label>
+                    <select id="isostampSelect">
+                        <option value="cube">Cube</option>
+                        <option value="stairs">Stairs</option>
+                        <option value="cylinder">Cylinder</option>
+                        <option value="ramp">Ramp</option>
+                    </select>
+                </div>
                 
                 <div class="tool-row" id="gridPropsRow1">
                     <label for="showGridCheckbox">Show Grid</label><input type="checkbox" id="showGridCheckbox" title="Toggle Grid (Ctrl+G)">
@@ -962,6 +974,40 @@
                 <div class="tool-row" style="margin-bottom: 8px; align-items: center; gap: 8px;">
                     <input type="checkbox" id="showSymmetryGuidesCheckbox" style="width: 16px; height: 16px; margin: 0; cursor: pointer;">
                     <label for="showSymmetryGuidesCheckbox" style="cursor: pointer; user-select: none;">Show Symmetry Guides</label>
+                </div>
+            </details>
+            <details class="tool-section" id="gridUtilitiesRow">
+                <summary style="font-size: 0.9em; font-weight: bold; cursor: pointer; user-select: none; margin-bottom: 8px; outline: none; list-style: none;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>Grid Utilities</span>
+                        <span style="font-size: 0.8em; opacity: 0.7;">▼</span>
+                    </div>
+                </summary>
+
+                <div class="tool-row" style="margin-bottom: 8px; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="gridOutlineModeCheckbox" style="width: 16px; height: 16px; margin: 0; cursor: pointer;">
+                    <label for="gridOutlineModeCheckbox" style="cursor: pointer; user-select: none;">Grid Outline Mode</label>
+                </div>
+
+                <div class="tool-row" style="margin-bottom: 8px; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="tilingPreviewCheckbox" style="width: 16px; height: 16px; margin: 0; cursor: pointer;">
+                    <label for="tilingPreviewCheckbox" style="cursor: pointer; user-select: none;">Infinite Tiling Preview</label>
+                </div>
+
+                <div class="tool-row" style="margin-bottom: 8px;">
+                    <label style="min-width: 100px;">Quadrant Src</label>
+                    <select id="mirrorQuadrantSelect" style="padding: 4px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-color); flex-grow: 1; margin-right: 4px;">
+                        <option value="0">Top-Left</option>
+                        <option value="1">Top-Right</option>
+                        <option value="2">Bottom-Left</option>
+                        <option value="3">Bottom-Right</option>
+                    </select>
+                    <button id="mirrorQuadrantBtn" title="Mirror selected quadrant to all others" style="padding: 4px 8px; font-size: 0.8em; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-color); cursor: pointer;">🪞 Mirror</button>
+                </div>
+
+                <div class="tool-row property-row" id="gridPaletteRow" style="flex-direction:column; gap:4px; align-items:stretch; margin-top:8px;">
+                    <label style="font-size:0.85em; font-weight:600; opacity:0.85; margin-bottom:2px;">Grid Palette Recolor</label>
+                    <div id="gridPaletteContainer" style="display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; width:100%;"></div>
                 </div>
             </details>
             <div class="tool-section"><h3>Actions & Effects</h3>
@@ -1359,6 +1405,10 @@
             let rotationalDivisions = 6;
             let customSymmetryAngle = 0;
             let showSymmetryGuides = false;
+            let gridOutlineMode = false;
+            let tilingPreview = false;
+            let tilingCacheCanvas = document.createElement('canvas');
+            let tilingCacheCtx = tilingCacheCanvas.getContext('2d');
             let paletteColors = [];
             const MAX_PALETTE_COLORS = 24;
             let layers = [];
@@ -1694,6 +1744,27 @@
                         showSymmetryGuides = showGuidesCheckbox.checked;
                         renderComposite();
                     });
+                }
+                const outlineCheckbox = document.getElementById('gridOutlineModeCheckbox');
+                if (outlineCheckbox) {
+                    outlineCheckbox.checked = gridOutlineMode;
+                    outlineCheckbox.addEventListener('change', () => {
+                        gridOutlineMode = outlineCheckbox.checked;
+                        isStaticCacheValid = false;
+                        renderComposite();
+                    });
+                }
+                const tilingCheckbox = document.getElementById('tilingPreviewCheckbox');
+                if (tilingCheckbox) {
+                    tilingCheckbox.checked = tilingPreview;
+                    tilingCheckbox.addEventListener('change', () => {
+                        tilingPreview = tilingCheckbox.checked;
+                        renderComposite();
+                    });
+                }
+                const mirrorQuadBtn = document.getElementById('mirrorQuadrantBtn');
+                if (mirrorQuadBtn) {
+                    mirrorQuadBtn.addEventListener('click', mirrorQuadrant);
                 }
 
                 const copySvgBtn = document.getElementById('copySvgBtn');
@@ -2269,7 +2340,7 @@
                     textPropsRow3.classList.add('visible');
                 }
                 const showColorControls = !['select', 'move', 'eyedropper', 'fill', 'grideraser'].includes(currentTool);
-                if (currentTool === 'pixel' || currentTool === 'sticky') {
+                if (currentTool === 'pixel' || currentTool === 'sticky' || currentTool === 'gridbucket') {
                     // Pixel & Sticky tool: show only solid color picker, no gradient/type switcher
                     colorTypeRow.style.display = 'none';
                     solidColorPropsRow.classList.add('visible');
@@ -2292,7 +2363,7 @@
                 document.getElementById('smartShapeRow').style.display = currentTool === 'pen' ? 'flex' : 'none';
                 document.getElementById('stabilizerRow').style.display = ['pen', 'eraser'].includes(currentTool) ? 'flex' : 'none';
                 // Auto-enable grid when pixel or grideraser tool selected
-                if ((currentTool === 'pixel' || currentTool === 'grideraser') && !showGrid) {
+                if ((currentTool === 'pixel' || currentTool === 'grideraser' || currentTool === 'gridbucket') && !showGrid) {
                     showGrid = true;
                     showGridCheckbox.checked = true;
                     updateColorPropertiesUI();
@@ -2399,7 +2470,7 @@
                     const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
                     const isUndoRedo = ctrlKey && (keyLower === 'z' || keyLower === 'y');
                     const isToolMap = !e.ctrlKey && !e.metaKey && !e.altKey && (
-                        ['p','e','g','x','l','h','f','t','i','s','m','v'].includes(keyLower) ||
+                        ['p','e','g','x','l','h','f','t','i','s','m','v','b','k'].includes(keyLower) ||
                         e.key === '[' || e.key === ']'
                     );
                     const isOtherShortcuts = (ctrlKey && (keyLower === 'x' || keyLower === 'g')) ||
@@ -2443,11 +2514,32 @@
 
                 if(document.activeElement.tagName==='INPUT'||document.activeElement.tagName==='SELECT'||document.activeElement.tagName==='TEXTAREA')return; 
                 
-                const toolMap={p:'penTool',e:'eraserTool',g:'grideraserTool',x:'pixelTool',l:'lineTool',h:'shapeTool',f:'fillTool',t:'textTool',n:'stickyTool',i:'eyedropperTool',s:'sprayTool', m:'selectTool', v:'moveTool'}; 
+                let keyName = e.key.toLowerCase();
+                if (keyName === 'm' && e.shiftKey) {
+                    keyName = 'shift_m';
+                }
+                const toolMap = {
+                    p: 'penTool',
+                    e: 'eraserTool',
+                    g: 'grideraserTool',
+                    x: 'pixelTool',
+                    l: 'lineTool',
+                    h: 'shapeTool',
+                    f: 'fillTool',
+                    t: 'textTool',
+                    n: 'stickyTool',
+                    i: 'eyedropperTool',
+                    s: 'sprayTool',
+                    b: 'gridbucketTool',
+                    m: 'selectTool',
+                    shift_m: 'gridselectTool',
+                    k: 'isostampTool',
+                    v: 'moveTool'
+                };
                 if(!e.ctrlKey && !e.metaKey && !e.altKey) {
-                    if (toolMap[e.key.toLowerCase()]) {
+                    if (toolMap[keyName]) {
                         e.preventDefault();
-                        document.getElementById(toolMap[e.key.toLowerCase()])?.click();
+                        document.getElementById(toolMap[keyName])?.click();
                     } else if (e.key === '[') {
                         e.preventDefault();
                         lineWidthSlider.value = Math.max(1, parseInt(lineWidthSlider.value) - 1);
@@ -2463,7 +2555,7 @@
 
 
                 if (e.key === 'Escape') { if (selectionRect) { deselect(); updateStatus("Selection cleared."); e.preventDefault(); } }
-                if (e.key === 'Delete' || e.key === 'Backspace') { if (selectionRect && (currentTool === 'select' || currentTool === 'move')) { clearSelectedArea(); e.preventDefault(); } }
+                if (e.key === 'Delete' || e.key === 'Backspace') { if (selectionRect && (currentTool === 'select' || currentTool === 'move' || currentTool === 'gridselect')) { clearSelectedArea(); e.preventDefault(); } }
 
                 if (e.key === ' ' && !isDrawing && !isSelecting && !isMovingSelection && !isPanning && (document.activeElement === document.body || document.activeElement === mainCanvas)) { 
                     e.preventDefault(); 
@@ -2556,7 +2648,48 @@
                 layers.splice(activeLayerIndex,1);const oH=history,oHS=historyStep;history={};historyStep={};for(let i=0;i<layers.length;i++){const oIdx=(i<activeLayerIndex)?i:i+1;history[i]=oH[oIdx]||[];historyStep[i]=oHS[oIdx]===undefined?0:oHS[oIdx];}setActiveLayer(activeLayerIndex-1);renderLayerPanel();renderComposite();updateStatus(`Merged "${srcL.name}" down.`);}
             function updateMergeButtonState(){mergeLayerBtn.disabled=!(activeLayerIndex>0&&activeLayerIndex<layers.length);}
             
-            function setActiveLayer(i){if(i>=0&&i<layers.length){activeLayerIndex=i;renderLayerPanel();updateUndoRedoButtonStates();updateMergeButtonState();if(layers[i])updateStatus(`Active layer: ${layers[i].name}.`);}else{activeLayerIndex=-1;updateMergeButtonState();}}
+            function setActiveLayer(i){
+                const oldL = getActiveLayer();
+                if (oldL) {
+                    oldL.symmetryState = {
+                        symmetryMode: symmetryMode,
+                        symmetryCenter: { ...symmetryCenter },
+                        rotationalDivisions: rotationalDivisions,
+                        customSymmetryAngle: customSymmetryAngle,
+                        showSymmetryGuides: showSymmetryGuides
+                    };
+                }
+                
+                if(i>=0&&i<layers.length){
+                    activeLayerIndex=i;
+                    const newL = layers[i];
+                    if (newL && newL.symmetryState) {
+                        symmetryMode = newL.symmetryState.symmetryMode;
+                        symmetryCenter = { ...newL.symmetryState.symmetryCenter };
+                        rotationalDivisions = newL.symmetryState.rotationalDivisions;
+                        customSymmetryAngle = newL.symmetryState.customSymmetryAngle;
+                        showSymmetryGuides = newL.symmetryState.showSymmetryGuides;
+                        currentSymmetryIndex = symmetryModes.indexOf(symmetryMode);
+                        if (currentSymmetryIndex === -1) currentSymmetryIndex = 0;
+                    } else if (newL) {
+                        symmetryMode = 'OFF';
+                        symmetryCenter = { x: DEFAULT_LOGICAL_WIDTH / 2, y: DEFAULT_LOGICAL_HEIGHT / 2 };
+                        rotationalDivisions = 6;
+                        customSymmetryAngle = 0;
+                        showSymmetryGuides = false;
+                        currentSymmetryIndex = 0;
+                    }
+                    updateSymmetryUI();
+                    renderLayerPanel();
+                    updateUndoRedoButtonStates();
+                    updateMergeButtonState();
+                    if(layers[i])updateStatus(`Active layer: ${layers[i].name}.`);
+                    updateGridCellPalette();
+                }else{
+                    activeLayerIndex=-1;
+                    updateMergeButtonState();
+                }
+            }
             function getActiveLayer(){return(activeLayerIndex>=0&&activeLayerIndex<layers.length)?layers[activeLayerIndex]:null;}
             function getActiveContext(){const l=getActiveLayer();return l?l.context:null;}
             
@@ -3031,6 +3164,51 @@
             
             function renderComposite(){
                 if(!mainCtx || !mainCanvas)return; 
+                
+                if (tilingPreview) {
+                    updateTilingCache();
+                    
+                    mainCtx.fillStyle = currentBgColor || '#ffffff';
+                    mainCtx.fillRect(0, 0, mainCanvas.width / deviceScale, mainCanvas.height / deviceScale);
+                    
+                    mainCtx.save();
+                    mainCtx.translate(panX, panY);
+                    mainCtx.scale(zoomLevel, zoomLevel);
+                    
+                    drawGrid(mainCtx);
+                    
+                    for (let dx = -1; dx <= 1; dx++) {
+                        for (let dy = -1; dy <= 1; dy++) {
+                            mainCtx.save();
+                            if (dx !== 0 || dy !== 0) {
+                                mainCtx.globalAlpha = 0.4;
+                            } else {
+                                mainCtx.globalAlpha = 1.0;
+                            }
+                            mainCtx.drawImage(
+                                tilingCacheCanvas,
+                                0, 0, tilingCacheCanvas.width, tilingCacheCanvas.height,
+                                dx * DEFAULT_LOGICAL_WIDTH,
+                                dy * DEFAULT_LOGICAL_HEIGHT,
+                                DEFAULT_LOGICAL_WIDTH,
+                                DEFAULT_LOGICAL_HEIGHT
+                            );
+                            mainCtx.restore();
+                        }
+                    }
+                    
+                    drawSelectionOutline(mainCtx);
+                    drawActiveUploadedImage(mainCtx);
+                    drawActiveUploadedImageOverlay(mainCtx);
+                    drawAlignmentGuides(mainCtx);
+                    drawUserGuidelines(mainCtx);
+                    drawGridHandles(mainCtx);
+                    drawSymmetryGuidesAndHandles(mainCtx);
+                    
+                    mainCtx.restore();
+                    updateZoomPanDisplay();
+                    return;
+                }
                 
                 if (isDrawing && getActiveLayer()) {
                     // Check if cache is valid and matches current canvas size
@@ -3923,7 +4101,7 @@
                     if (!wasPanning && (isDrawing || isSelecting || isMovingSelection)) {
                         endAction(e);
                     } else if (!wasPanning && !isDrawing && !isSelecting && !isMovingSelection) {
-                        if (currentTool === 'eyedropper' || currentTool === 'fill') {
+                        if (currentTool === 'eyedropper' || currentTool === 'fill' || currentTool === 'gridbucket') {
                             startAction(e);
                             endAction(e);
                         }
@@ -4472,13 +4650,13 @@
                 const clientY = event.clientY;
                 let {x: worldX, y: worldY} = screenToWorld(clientX, clientY); 
                 
-                if (currentTool !== 'select' && currentTool !== 'move' && currentTool !== 'eyedropper') {
+                if (currentTool !== 'select' && currentTool !== 'move' && currentTool !== 'eyedropper' && currentTool !== 'gridselect') {
                     const snapped = snapPoint(worldX, worldY); worldX = snapped.x; worldY = snapped.y;
                 }
                 
                 const activeL = getActiveLayer();
                 if (activeL && activeL.locked) {
-                    const isEditTool = ['pen', 'eraser', 'line', 'shape', 'pixel', 'grideraser', 'fill', 'text', 'spray'].includes(currentTool);
+                    const isEditTool = ['pen', 'eraser', 'line', 'shape', 'pixel', 'grideraser', 'fill', 'text', 'spray', 'gridbucket', 'isostamp'].includes(currentTool);
                     const isSelectionMove = (currentTool === 'move' && selectionRect && 
                         ((worldX >= selectionRect.x && worldX <= selectionRect.x + (selectionRect.width < 0 ? 0 : selectionRect.width) && 
                           worldY >= selectionRect.y && worldY <= selectionRect.y + (selectionRect.height < 0 ? 0 : selectionRect.height)) ||
@@ -4494,7 +4672,7 @@
                 
                 [lastX,lastY]=[worldX,worldY];[startX,startY]=[worldX,worldY];
 
-                if (currentTool === 'select') {
+                if (currentTool === 'select' || currentTool === 'gridselect') {
                     isDrawing = false; isSelecting = true; isMovingSelection = false;
                     deselect(); 
                     selectionRect = { x: worldX, y: worldY, width: 0, height: 0 }; 
@@ -4567,15 +4745,94 @@
                     }
 
                     const layer = getActiveLayer();
-                    if (layer && currentTool !== 'eyedropper' && currentTool !== 'select' && currentTool !== 'move') {
+                    if (layer && currentTool !== 'eyedropper' && currentTool !== 'select' && currentTool !== 'move' && currentTool !== 'gridselect') {
                         ensureCapacityWithSymmetry(layer, worldX, worldY);
                         layerCtx = layer.context;
                     }
                     isDrawing=true; isSelecting = false; isMovingSelection = false;
-                    const noSym=['fill','eyedropper'].includes(currentTool);
+                    const noSym=['fill','eyedropper','select','move','gridselect'].includes(currentTool);
                     const sym=symmetryMode!=='OFF'&&!noSym;
 
-                    if(currentTool==='pixel' || currentTool==='grideraser'){
+                    if (currentTool === 'isostamp') {
+                        const resolved = resolveCell(worldX, worldY);
+                        if (resolved) {
+                            const { key, cellData } = resolved;
+                            const sym = symmetryMode !== 'OFF';
+                            
+                            saveHistory(activeLayerIndex);
+                            
+                            currentVectorStroke = {
+                                layer: getActiveLayer() ? getActiveLayer().name : 'Layer_1',
+                                tool: 'isostamp',
+                                shapeType: document.getElementById('isostampSelect') ? document.getElementById('isostampSelect').value : 'cube',
+                                color: currentSolidColor,
+                                colorMode: 'solid',
+                                width: gridSize,
+                                symmetryMode: sym ? symmetryMode : 'OFF',
+                                symmetrySlices: symmetryMode === 'KALEIDOSCOPE' ? (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8) : 8,
+                                symmetryCenterX: symmetryCenter.x,
+                                symmetryCenterY: symmetryCenter.y,
+                                customSymmetryAngle: customSymmetryAngle,
+                                rotationalDivisions: rotationalDivisions,
+                                points: []
+                            };
+                            
+                            if (layer) {
+                                layerCtx.save();
+                                layerCtx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
+                            }
+                            
+                            drawIsometricPrimitive(layerCtx, cellData, currentVectorStroke.shapeType, currentSolidColor);
+                            
+                            currentVectorStroke.points.push({
+                                x: cellData.x,
+                                y: cellData.y,
+                                mirrorType: 'none',
+                                gridType: gridType,
+                                vertices: cellData.vertices
+                            });
+                            
+                            if (layer) layerCtx.restore();
+                            
+                            if (sym) {
+                                const refPoints = getSymmetricPoints(cellData.x, cellData.y);
+                                refPoints.forEach(rp => {
+                                    const mirrored = { ...cellData, mirrorType: rp.mirrorType };
+                                    const symPt = applySymmetryToPoint(cellData.x, cellData.y, rp.mirrorType);
+                                    mirrored.x = symPt.x;
+                                    mirrored.y = symPt.y;
+                                    if (cellData.vertices) {
+                                        mirrored.vertices = cellData.vertices.map(v => applySymmetryToPoint(v.x, v.y, rp.mirrorType));
+                                    }
+                                    
+                                    if (layer) {
+                                        layerCtx.save();
+                                        layerCtx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
+                                    }
+                                    drawIsometricPrimitive(layerCtx, mirrored, currentVectorStroke.shapeType, currentSolidColor);
+                                    if (layer) layerCtx.restore();
+                                    
+                                    currentVectorStroke.points.push({
+                                        x: mirrored.x,
+                                        y: mirrored.y,
+                                        mirrorType: rp.mirrorType,
+                                        gridType: gridType,
+                                        vertices: mirrored.vertices
+                                    });
+                                });
+                            }
+                            
+                            vectorStrokes.push(currentVectorStroke);
+                            currentVectorStroke = null;
+                            isDrawing = false;
+                            isStaticCacheValid = false;
+                            renderComposite();
+                            updateGridCellPalette();
+                            updateStatus("Isometric Primitive stamped.");
+                            return;
+                        }
+                    }
+                    else if(currentTool==='pixel' || currentTool==='grideraser'){
                         pixelFilledCells = new Map();
                         fillPixelCell(layerCtx, worldX, worldY, sym);
                         currentVectorStroke = {
@@ -4798,8 +5055,28 @@
                 }
 
                 if (isSelecting && selectionRect) {
-                    if (selectionRect.width < 0) { selectionRect.x += selectionRect.width; selectionRect.width *= -1; }
-                    if (selectionRect.height < 0) { selectionRect.y += selectionRect.height; selectionRect.height *= -1; }
+                    if (currentTool === 'gridselect') {
+                        const gs = gridSize;
+                        if (gs > 0) {
+                            let x1 = selectionRect.x;
+                            let y1 = selectionRect.y;
+                            let x2 = selectionRect.x + selectionRect.width;
+                            let y2 = selectionRect.y + selectionRect.height;
+                            
+                            x1 = Math.round(x1 / gs) * gs;
+                            y1 = Math.round(y1 / gs) * gs;
+                            x2 = Math.round(x2 / gs) * gs;
+                            y2 = Math.round(y2 / gs) * gs;
+                            
+                            selectionRect.x = Math.min(x1, x2);
+                            selectionRect.y = Math.min(y1, y2);
+                            selectionRect.width = Math.abs(x2 - x1);
+                            selectionRect.height = Math.abs(y2 - y1);
+                        }
+                    } else {
+                        if (selectionRect.width < 0) { selectionRect.x += selectionRect.width; selectionRect.width *= -1; }
+                        if (selectionRect.height < 0) { selectionRect.y += selectionRect.height; selectionRect.height *= -1; }
+                    }
                     
                     if (selectionRect.width < 1 || selectionRect.height < 1) {
                         selectionRect = null; 
@@ -4821,7 +5098,7 @@
                     movingSelectionData = null;
                     updateStatus("Selection moved.");
                 } else if (isDrawing && layerCtx) {
-                    const noSym=['fill','eyedropper'].includes(currentTool);
+                    const noSym=['fill','eyedropper','select','move','gridselect'].includes(currentTool);
                     const sym=symmetryMode!=='OFF'&&!noSym;
 
                     if (currentTool === 'pen') {
@@ -4899,6 +5176,15 @@
                         },10);
                         isDrawing = false; isSelecting = false; isMovingSelection = false; renderComposite(); updateCursor(); return; 
                     }
+                    else if(currentTool==='gridbucket'){
+                        updateStatus("Grid filling area...");
+                        setTimeout(()=>{
+                            try { gridBucketFill(startX, startY); } 
+                            catch(err){console.error("Grid Fill Error:",err);updateStatus("Grid fill failed: " + err.message);}
+                            renderComposite(); saveHistory();
+                        },10);
+                        isDrawing = false; isSelecting = false; isMovingSelection = false; renderComposite(); updateCursor(); return;
+                    }
                     else if(currentTool==='text'){
                         addText(startX,startY,sym); 
                     } 
@@ -4941,6 +5227,7 @@
                 isStaticCacheValid = false;
                 renderComposite();
                 updateCursor();
+                updateGridCellPalette();
             }
             
             function detectShape(points) {
@@ -5187,6 +5474,11 @@
                 const scale = deviceScale;
                 const gType = cellData.gridType || cellData.type;
                 
+                if (gridOutlineMode) {
+                    ctx.strokeStyle = ctx.fillStyle;
+                    ctx.lineWidth = 1;
+                }
+
                 if (cellData.vertices) {
                     ctx.beginPath();
                     ctx.moveTo(cellData.vertices[0].x * scale, cellData.vertices[0].y * scale);
@@ -5194,7 +5486,11 @@
                         ctx.lineTo(cellData.vertices[i].x * scale, cellData.vertices[i].y * scale);
                     }
                     ctx.closePath();
-                    ctx.fill();
+                    if (gridOutlineMode) {
+                        ctx.stroke();
+                    } else {
+                        ctx.fill();
+                    }
                 } else if (gType === 'polar') {
                     const pc = cellData.mirroredPolarCenter || polarCenter;
                     ctx.beginPath();
@@ -5202,18 +5498,27 @@
                     ctx.lineTo(pc.x * scale + cellData.r1 * scale * Math.cos(cellData.theta2), pc.y * scale + cellData.r1 * scale * Math.sin(cellData.theta2));
                     ctx.arc(pc.x * scale, pc.y * scale, cellData.r1 * scale, cellData.theta2, cellData.theta1, true);
                     ctx.closePath();
-                    ctx.fill();
+                    if (gridOutlineMode) {
+                        ctx.stroke();
+                    } else {
+                        ctx.fill();
+                    }
                 } else {
-                    ctx.fillRect(cellData.x * scale, cellData.y * scale, gs * scale, gs * scale);
+                    if (gridOutlineMode) {
+                        ctx.strokeRect(cellData.x * scale, cellData.y * scale, gs * scale, gs * scale);
+                    } else {
+                        ctx.fillRect(cellData.x * scale, cellData.y * scale, gs * scale, gs * scale);
+                    }
                 }
             }
 
             function getCustomCellSvgString(p, fillStr, gs, extraAttrs = '') {
                 const gType = p.gridType || p.type;
                 const attrs = extraAttrs ? ' ' + extraAttrs : '';
+                const fillOrStroke = gridOutlineMode ? `fill="none" stroke="${fillStr}" stroke-width="1"` : `fill="${fillStr}"`;
                 if (p.vertices && p.vertices.length > 0) {
                     const pts = p.vertices.map(v => `${v.x.toFixed(1)},${v.y.toFixed(1)}`).join(' ');
-                    return `<polygon points="${pts}" fill="${fillStr}"${attrs}/>`;
+                    return `<polygon points="${pts}" ${fillOrStroke}${attrs}/>`;
                 } else if (gType === 'polar') {
                     const pc = p.mirroredPolarCenter || polarCenter;
                     const r1 = p.r1;
@@ -5229,24 +5534,18 @@
                     const x_in_2 = pc.x + r1 * Math.cos(theta2);
                     const y_in_2 = pc.y + r1 * Math.sin(theta2);
                     
-                    return `<path d="M ${x_in_1.toFixed(1)} ${y_in_1.toFixed(1)} L ${x_out_1.toFixed(1)} ${y_out_1.toFixed(1)} A ${r2.toFixed(1)} ${r2.toFixed(1)} 0 0 1 ${x_out_2.toFixed(1)} ${y_out_2.toFixed(1)} L ${x_in_2.toFixed(1)} ${y_in_2.toFixed(1)} A ${r1.toFixed(1)} ${r1.toFixed(1)} 0 0 0 ${x_in_1.toFixed(1)} ${y_in_1.toFixed(1)} Z" fill="${fillStr}"${attrs}/>`;
+                    return `<path d="M ${x_in_1.toFixed(1)} ${y_in_1.toFixed(1)} L ${x_out_1.toFixed(1)} ${y_out_1.toFixed(1)} A ${r2.toFixed(1)} ${r2.toFixed(1)} 0 0 1 ${x_out_2.toFixed(1)} ${y_out_2.toFixed(1)} L ${x_in_2.toFixed(1)} ${y_in_2.toFixed(1)} A ${r1.toFixed(1)} ${r1.toFixed(1)} 0 0 0 ${x_in_1.toFixed(1)} ${y_in_1.toFixed(1)} Z" ${fillOrStroke}${attrs}/>`;
                 } else {
-                    return `<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${gs}" height="${gs}" fill="${fillStr}" shape-rendering="crispEdges"${attrs}/>`;
+                    return `<rect x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" width="${gs}" height="${gs}" ${fillOrStroke} shape-rendering="crispEdges"${attrs}/>`;
                 }
             }
 
-            function fillPixelCell(ctx, worldX, worldY, applySymmetry, mirrorType = 'none') {
+            function resolveCell(worldX, worldY) {
                 const gs = gridSize;
-                if (gs <= 0) return;
-                
-                const layer = layers.find(l => l.context === ctx);
-                if (layer) {
-                    ctx.save();
-                    ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
-                }
+                if (gs <= 0) return null;
 
                 let key = '';
-                let cellData = { type: gridType, x: worldX, y: worldY, mirrorType: mirrorType };
+                let cellData = { type: gridType, x: worldX, y: worldY };
 
                 if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric') {
                     let alpha = Math.PI / 6;
@@ -5364,6 +5663,23 @@
                     key = `${cellX},${cellY}`;
                     cellData.x = cellX;
                     cellData.y = cellY;
+                }
+                return { key, cellData };
+            }
+
+            function fillPixelCell(ctx, worldX, worldY, applySymmetry, mirrorType = 'none') {
+                const gs = gridSize;
+                if (gs <= 0) return;
+                
+                const resolved = resolveCell(worldX, worldY);
+                if (!resolved) return;
+                const { key, cellData } = resolved;
+                cellData.mirrorType = mirrorType;
+                
+                const layer = layers.find(l => l.context === ctx);
+                if (layer) {
+                    ctx.save();
+                    ctx.translate(-layer.logicalX * deviceScale, -layer.logicalY * deviceScale);
                 }
 
                 if (pixelFilledCells.has(key)) {
@@ -5543,9 +5859,696 @@
                         ctx.fillStyle = stroke.color || currentSolidColor;
                     }
                 }
-                drawSingleCustomCell(ctx, p, gs);
+                if (stroke.tool === 'isostamp') {
+                    drawIsometricPrimitive(ctx, p, stroke.shapeType, stroke.color || currentSolidColor);
+                } else {
+                    drawSingleCustomCell(ctx, p, gs);
+                }
                 
                 if (layer) ctx.restore();
+            }
+
+            function adjustColorBrightness(colorStr, percent) {
+                let rgb = hexToRgbWithAlpha(colorStr);
+                if (!rgb) rgb = [128, 128, 128, 255];
+                const [r, g, b, a] = rgb;
+                const adjust = (val) => Math.min(255, Math.max(0, Math.round(val + (percent * 255) / 100)));
+                const alphaFloat = (a / 255).toFixed(2);
+                return `rgba(${adjust(r)},${adjust(g)},${adjust(b)},${alphaFloat})`;
+            }
+
+            function drawIsometricPrimitive(ctx, cellData, primitiveType, color) {
+                const scale = deviceScale;
+                const gs = gridSize;
+                if (!cellData.vertices || cellData.vertices.length !== 4) return;
+                
+                const p0 = cellData.vertices[0];
+                const p1 = cellData.vertices[1];
+                const p2 = cellData.vertices[2];
+                const p3 = cellData.vertices[3];
+                
+                const topColor = adjustColorBrightness(color, 15);
+                const leftColor = color;
+                const rightColor = adjustColorBrightness(color, -15);
+                
+                const drawPolygon = (pts, fillCol) => {
+                    ctx.beginPath();
+                    ctx.moveTo(pts[0].x * scale, pts[0].y * scale);
+                    for (let i = 1; i < pts.length; i++) {
+                        ctx.lineTo(pts[i].x * scale, pts[i].y * scale);
+                    }
+                    ctx.closePath();
+                    if (gridOutlineMode) {
+                        ctx.strokeStyle = adjustColorBrightness(fillCol, -20);
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    } else {
+                        ctx.fillStyle = fillCol;
+                        ctx.fill();
+                    }
+                };
+                
+                if (primitiveType === 'cube') {
+                    // Top face
+                    drawPolygon([
+                        { x: p0.x, y: p0.y - gs },
+                        { x: p1.x, y: p1.y - gs },
+                        { x: p2.x, y: p2.y - gs },
+                        { x: p3.x, y: p3.y - gs }
+                    ], topColor);
+                    
+                    // Left face
+                    drawPolygon([
+                        p3, p2,
+                        { x: p2.x, y: p2.y - gs },
+                        { x: p3.x, y: p3.y - gs }
+                    ], leftColor);
+                    
+                    // Right face
+                    drawPolygon([
+                        p2, p1,
+                        { x: p1.x, y: p1.y - gs },
+                        { x: p2.x, y: p2.y - gs }
+                    ], rightColor);
+                } else if (primitiveType === 'ramp') {
+                    // Ramp sloped top
+                    drawPolygon([
+                        p3,
+                        { x: p2.x, y: p2.y - gs },
+                        { x: p1.x, y: p1.y - gs },
+                        p0
+                    ], topColor);
+                    
+                    // Side face (triangular)
+                    drawPolygon([
+                        p3, p2,
+                        { x: p2.x, y: p2.y - gs }
+                    ], leftColor);
+                    
+                    drawPolygon([
+                        p2, p1,
+                        { x: p1.x, y: p1.y - gs },
+                        { x: p2.x, y: p2.y - gs }
+                    ], rightColor);
+                } else if (primitiveType === 'stairs') {
+                    const steps = 3;
+                    for (let i = 0; i < steps; i++) {
+                        const h = (i + 1) * (gs / steps);
+                        const tStart = i / steps;
+                        const tEnd = (i + 1) / steps;
+                        
+                        const pStart3 = { x: p3.x + (p2.x - p3.x) * tStart, y: p3.y + (p2.y - p3.y) * tStart };
+                        const pEnd3 = { x: p3.x + (p2.x - p3.x) * tEnd, y: p3.y + (p2.y - p3.y) * tEnd };
+                        
+                        const pStart0 = { x: p0.x + (p1.x - p0.x) * tStart, y: p0.y + (p1.y - p0.y) * tStart };
+                        const pEnd0 = { x: p0.x + (p1.x - p0.x) * tEnd, y: p0.y + (p1.y - p0.y) * tEnd };
+                        
+                        drawPolygon([
+                            { x: pStart3.x, y: pStart3.y - h },
+                            { x: pEnd3.x, y: pEnd3.y - h },
+                            { x: pEnd0.x, y: pEnd0.y - h },
+                            { x: pStart0.x, y: pStart0.y - h }
+                        ], topColor);
+                        
+                        drawPolygon([
+                            { x: pEnd3.x, y: pEnd3.y },
+                            { x: pEnd0.x, y: pEnd0.y },
+                            { x: pEnd0.x, y: pEnd0.y - h },
+                            { x: pEnd3.x, y: pEnd3.y - h }
+                        ], leftColor);
+                    }
+                } else if (primitiveType === 'cylinder') {
+                    const cx = (p0.x + p2.x) / 2;
+                    const cy = (p0.y + p2.y) / 2 - gs;
+                    const rx = Math.hypot(p1.x - p3.x, p1.y - p3.y) / 2;
+                    const ry = Math.hypot(p2.y - p0.y, p2.y - p0.y) / 4;
+                    
+                    if (gridOutlineMode) {
+                        ctx.strokeStyle = adjustColorBrightness(leftColor, -20);
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(p3.x * scale, (p3.y - gs) * scale, (p1.x - p3.x) * scale, gs * scale);
+                    } else {
+                        ctx.fillStyle = leftColor;
+                        ctx.fillRect(p3.x * scale, (p3.y - gs) * scale, (p1.x - p3.x) * scale, gs * scale);
+                    }
+                    
+                    ctx.beginPath();
+                    ctx.ellipse(cx * scale, cy * scale, rx * scale, ry * scale, 0, 0, 2 * Math.PI);
+                    if (gridOutlineMode) {
+                        ctx.strokeStyle = adjustColorBrightness(topColor, -20);
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    } else {
+                        ctx.fillStyle = topColor;
+                        ctx.fill();
+                    }
+                }
+            }
+
+            function getIsometricPrimitiveSvgString(p, primType, color, gs) {
+                if (!p.vertices || p.vertices.length !== 4) return '';
+                const p0 = p.vertices[0];
+                const p1 = p.vertices[1];
+                const p2 = p.vertices[2];
+                const p3 = p.vertices[3];
+                
+                const topColor = adjustColorBrightness(color, 15);
+                const leftColor = color;
+                const rightColor = adjustColorBrightness(color, -15);
+                
+                const getPolygonSvg = (pts, fillCol) => {
+                    const ptsStr = pts.map(v => `${v.x.toFixed(1)},${v.y.toFixed(1)}`).join(' ');
+                    if (gridOutlineMode) {
+                        return `<polygon points="${ptsStr}" fill="none" stroke="${adjustColorBrightness(fillCol, -20)}" stroke-width="1"/>`;
+                    } else {
+                        return `<polygon points="${ptsStr}" fill="${fillCol}"/>`;
+                    }
+                };
+                
+                let svg = '';
+                if (primType === 'cube') {
+                    svg += getPolygonSvg([
+                        { x: p0.x, y: p0.y - gs },
+                        { x: p1.x, y: p1.y - gs },
+                        { x: p2.x, y: p2.y - gs },
+                        { x: p3.x, y: p3.y - gs }
+                    ], topColor);
+                    svg += getPolygonSvg([
+                        p3, p2,
+                        { x: p2.x, y: p2.y - gs },
+                        { x: p3.x, y: p3.y - gs }
+                    ], leftColor);
+                    svg += getPolygonSvg([
+                        p2, p1,
+                        { x: p1.x, y: p1.y - gs },
+                        { x: p2.x, y: p2.y - gs }
+                    ], rightColor);
+                } else if (primType === 'ramp') {
+                    svg += getPolygonSvg([
+                        p3,
+                        { x: p2.x, y: p2.y - gs },
+                        { x: p1.x, y: p1.y - gs },
+                        p0
+                    ], topColor);
+                    svg += getPolygonSvg([
+                        p3, p2,
+                        { x: p2.x, y: p2.y - gs }
+                    ], leftColor);
+                    svg += getPolygonSvg([
+                        p2, p1,
+                        { x: p1.x, y: p1.y - gs },
+                        { x: p2.x, y: p2.y - gs }
+                    ], rightColor);
+                } else if (primType === 'stairs') {
+                    const steps = 3;
+                    for (let i = 0; i < steps; i++) {
+                        const h = (i + 1) * (gs / steps);
+                        const tStart = i / steps;
+                        const tEnd = (i + 1) / steps;
+                        
+                        const pStart3 = { x: p3.x + (p2.x - p3.x) * tStart, y: p3.y + (p2.y - p3.y) * tStart };
+                        const pEnd3 = { x: p3.x + (p2.x - p3.x) * tEnd, y: p3.y + (p2.y - p3.y) * tEnd };
+                        const pStart0 = { x: p0.x + (p1.x - p0.x) * tStart, y: p0.y + (p1.y - p0.y) * tStart };
+                        const pEnd0 = { x: p0.x + (p1.x - p0.x) * tEnd, y: p0.y + (p1.y - p0.y) * tEnd };
+                        
+                        svg += getPolygonSvg([
+                            { x: pStart3.x, y: pStart3.y - h },
+                            { x: pEnd3.x, y: pEnd3.y - h },
+                            { x: pEnd0.x, y: pEnd0.y - h },
+                            { x: pStart0.x, y: pStart0.y - h }
+                        ], topColor);
+                        svg += getPolygonSvg([
+                            { x: pEnd3.x, y: pEnd3.y },
+                            { x: pEnd0.x, y: pEnd0.y },
+                            { x: pEnd0.x, y: pEnd0.y - h },
+                            { x: pEnd3.x, y: pEnd3.y - h }
+                        ], leftColor);
+                    }
+                } else if (primType === 'cylinder') {
+                    const cx = (p0.x + p2.x) / 2;
+                    const cy = (p0.y + p2.y) / 2 - gs;
+                    const rx = Math.hypot(p1.x - p3.x, p1.y - p3.y) / 2;
+                    const ry = Math.hypot(p2.y - p0.y, p2.y - p0.y) / 4;
+                    
+                    if (gridOutlineMode) {
+                        svg += `<rect x="${p3.x.toFixed(1)}" y="${(p3.y - gs).toFixed(1)}" width="${(p1.x - p3.x).toFixed(1)}" height="${gs.toFixed(1)}" fill="none" stroke="${adjustColorBrightness(leftColor, -20)}" stroke-width="1"/>`;
+                        svg += `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="none" stroke="${adjustColorBrightness(topColor, -20)}" stroke-width="1"/>`;
+                    } else {
+                        svg += `<rect x="${p3.x.toFixed(1)}" y="${(p3.y - gs).toFixed(1)}" width="${(p1.x - p3.x).toFixed(1)}" height="${gs.toFixed(1)}" fill="${leftColor}"/>`;
+                        svg += `<ellipse cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="${topColor}"/>`;
+                    }
+                }
+                return svg;
+            }
+
+            function gridBucketFill(worldStartX, worldStartY) {
+                const l = getActiveLayer();
+                if (!l) return;
+                const ctx = l.context;
+                
+                const startCell = resolveCell(worldStartX, worldStartY);
+                if (!startCell) return;
+                const { key: startKey, cellData: startCellData } = startCell;
+                
+                const imageData = ctx.getImageData(0, 0, l.canvas.width, l.canvas.height);
+                const data = imageData.data;
+                const canvasWidth = l.canvas.width;
+                const canvasHeight = l.canvas.height;
+                
+                const getPixelColor = (cx, cy) => {
+                    const localX = cx - (l.logicalX || 0);
+                    const localY = cy - (l.logicalY || 0);
+                    const px = Math.round(localX * deviceScale);
+                    const py = Math.round(localY * deviceScale);
+                    if (px < 0 || px >= canvasWidth || py < 0 || py >= canvasHeight) {
+                        return null;
+                    }
+                    const idx = (py * canvasWidth + px) * 4;
+                    return [data[idx], data[idx+1], data[idx+2], data[idx+3]];
+                };
+                
+                const startColor = getPixelColor(startCellData.x, startCellData.y);
+                if (!startColor) return;
+                
+                const destColorHex = currentSolidColor;
+                const destColor = hexToRgbWithAlpha(destColorHex);
+                if (!destColor) return;
+                const [dR, dG, dB, dA] = destColor;
+                
+                const tolerance = 20;
+                const colorsMatch = (c1, c2) => {
+                    return Math.abs(c1[0] - c2[0]) <= tolerance &&
+                           Math.abs(c1[1] - c2[1]) <= tolerance &&
+                           Math.abs(c1[2] - c2[2]) <= tolerance &&
+                           Math.abs(c1[3] - c2[3]) <= tolerance;
+                };
+                
+                if (colorsMatch(startColor, [dR, dG, dB, Math.round(dA * 255)])) {
+                    updateStatus("Target area already has the selected fill color.");
+                    return;
+                }
+                
+                const queue = [startCellData];
+                const visited = new Set();
+                visited.add(startKey);
+                
+                const cellsToFill = [];
+                let iterations = 0;
+                const maxIterations = 10000;
+                
+                const checkAndEnqueue = (wx, wy) => {
+                    const cell = resolveCell(wx, wy);
+                    if (!cell) return;
+                    const { key, cellData } = cell;
+                    if (visited.has(key)) return;
+                    visited.add(key);
+                    
+                    const cellColor = getPixelColor(cellData.x, cellData.y);
+                    if (cellColor && colorsMatch(cellColor, startColor)) {
+                        queue.push(cellData);
+                    }
+                };
+                
+                const gs = gridSize;
+                
+                while (queue.length > 0 && iterations < maxIterations) {
+                    const currCell = queue.shift();
+                    cellsToFill.push(currCell);
+                    iterations++;
+                    
+                    if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric') {
+                        let alpha = Math.PI / 6;
+                        let beta = Math.PI / 6;
+                        if (gridType === 'dimetric') {
+                            alpha = 15 * Math.PI / 180;
+                            beta = 15 * Math.PI / 180;
+                        } else if (gridType === 'trimetric') {
+                            alpha = 15 * Math.PI / 180;
+                            beta = 35 * Math.PI / 180;
+                        }
+                        const cosA = Math.cos(alpha);
+                        const sinA = Math.sin(alpha);
+                        const cosB = Math.cos(beta);
+                        const sinB = Math.sin(beta);
+                        
+                        checkAndEnqueue(currCell.x + gs * cosA, currCell.y + gs * sinA);
+                        checkAndEnqueue(currCell.x - gs * cosA, currCell.y - gs * sinA);
+                        checkAndEnqueue(currCell.x + gs * cosB, currCell.y - gs * sinB);
+                        checkAndEnqueue(currCell.x - gs * cosB, currCell.y + gs * sinB);
+                    } else if (gridType === 'triangular') {
+                        if (currCell.vertices && currCell.vertices.length === 3) {
+                            const p0 = currCell.vertices[0];
+                            const p1 = currCell.vertices[1];
+                            const p2 = currCell.vertices[2];
+                            const cx = currCell.x;
+                            const cy = currCell.y;
+                            
+                            checkAndEnqueue(p0.x + p1.x - cx, p0.y + p1.y - cy);
+                            checkAndEnqueue(p1.x + p2.x - cx, p1.y + p2.y - cy);
+                            checkAndEnqueue(p2.x + p0.x - cx, p2.y + p0.y - cy);
+                        }
+                    } else if (gridType === 'polar') {
+                        const r1 = currCell.r1;
+                        const theta1 = currCell.theta1;
+                        const dTheta = Math.PI / 6;
+                        
+                        const checkPolarNeigh = (nr, nt) => {
+                            if (nr < 0) return;
+                            const ncx = polarCenter.x + (nr + gs / 2) * Math.cos(nt + dTheta / 2);
+                            const ncy = polarCenter.y + (nr + gs / 2) * Math.sin(nt + dTheta / 2);
+                            checkAndEnqueue(ncx, ncy);
+                        };
+                        
+                        checkPolarNeigh(r1 + gs, theta1);
+                        checkPolarNeigh(r1 - gs, theta1);
+                        checkPolarNeigh(r1, theta1 + dTheta);
+                        checkPolarNeigh(r1, theta1 - dTheta);
+                    } else if (gridType === 'perspective1') {
+                        const horizonY = perspectiveV1.y;
+                        const signY = Math.sign(currCell.y - horizonY) || 1;
+                        const focal = 1000;
+                        
+                        const z = (focal * gs) / Math.max(1, Math.abs(currCell.y - horizonY));
+                        const z_grid = Math.floor(z / gs);
+                        const x_grid = Math.round(((currCell.x - perspectiveV1.x) * z) / (focal * gs));
+                        
+                        const projectNeigh = (gx, gz) => {
+                            const X = (gx + 0.5) * gs;
+                            const Y = signY * 300;
+                            const gz_val = (gz + 0.5) * gs;
+                            return {
+                                x: perspectiveV1.x + X * (focal / gz_val),
+                                y: horizonY + Y * (focal / gz_val)
+                            };
+                        };
+                        
+                        const n1 = projectNeigh(x_grid + 1, z_grid);
+                        checkAndEnqueue(n1.x, n1.y);
+                        const n2 = projectNeigh(x_grid - 1, z_grid);
+                        checkAndEnqueue(n2.x, n2.y);
+                        const n3 = projectNeigh(x_grid, z_grid + 1);
+                        checkAndEnqueue(n3.x, n3.y);
+                        const n4 = projectNeigh(x_grid, z_grid - 1);
+                        checkAndEnqueue(n4.x, n4.y);
+                    } else {
+                        checkAndEnqueue(currCell.x + gs/2, currCell.y + gs/2);
+                        checkAndEnqueue(currCell.x + gs + gs/2, currCell.y + gs/2);
+                        checkAndEnqueue(currCell.x - gs + gs/2, currCell.y + gs/2);
+                        checkAndEnqueue(currCell.x + gs/2, currCell.y + gs + gs/2);
+                        checkAndEnqueue(currCell.x + gs/2, currCell.y - gs + gs/2);
+                    }
+                }
+                
+                if (cellsToFill.length > 0) {
+                    saveHistory(activeLayerIndex);
+                    
+                    currentVectorStroke = {
+                        layer: getActiveLayer() ? getActiveLayer().name : 'Layer_1',
+                        tool: 'gridbucket',
+                        shapeType: 'gridbucket',
+                        color: currentSolidColor,
+                        colorMode: 'solid',
+                        points: [],
+                        width: gridSize,
+                        symmetryMode: symmetryMode,
+                        symmetrySlices: symmetryMode === 'KALEIDOSCOPE' ? (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8) : 8,
+                        symmetryCenterX: symmetryCenter.x,
+                        symmetryCenterY: symmetryCenter.y,
+                        customSymmetryAngle: customSymmetryAngle,
+                        rotationalDivisions: rotationalDivisions
+                    };
+                    
+                    pixelFilledCells.clear();
+                    
+                    cellsToFill.forEach(cell => {
+                        fillPixelCell(ctx, cell.x + gs/2, cell.y + gs/2, true);
+                    });
+                    
+                    vectorStrokes.push(currentVectorStroke);
+                    currentVectorStroke = null;
+                    
+                    isStaticCacheValid = false;
+                    renderComposite();
+                    updateStatus(`Grid Bucket Fill completed. Filled ${cellsToFill.length} cells.`);
+                }
+            }
+
+            function mirrorQuadrant() {
+                const l = getActiveLayer();
+                if (!l) {
+                    updateStatus("No active layer to mirror.");
+                    return;
+                }
+                const selectElement = document.getElementById('mirrorQuadrantSelect');
+                if (!selectElement) return;
+                const srcVal = parseInt(selectElement.value);
+                
+                saveHistory(activeLayerIndex);
+                
+                const canvas = l.canvas;
+                const ctx = l.context;
+                
+                const w = canvas.width;
+                const h = canvas.height;
+                const halfW = Math.floor(w / 2);
+                const halfH = Math.floor(h / 2);
+                
+                const buffer = document.createElement('canvas');
+                buffer.width = halfW;
+                buffer.height = halfH;
+                const bufCtx = buffer.getContext('2d');
+                
+                let srcX = 0, srcY = 0;
+                if (srcVal === 1) { srcX = halfW; }
+                else if (srcVal === 2) { srcY = halfH; }
+                else if (srcVal === 3) { srcX = halfW; srcY = halfH; }
+                
+                bufCtx.drawImage(canvas, srcX, srcY, halfW, halfH, 0, 0, halfW, halfH);
+                
+                ctx.save();
+                ctx.imageSmoothingEnabled = false;
+                
+                const drawQuadrant = (qIdx, destX, destY) => {
+                    if (qIdx === srcVal) return;
+                    const srcIsRight = (srcVal === 1 || srcVal === 3);
+                    const destIsRight = (qIdx === 1 || qIdx === 3);
+                    const flipH = (srcIsRight !== destIsRight);
+                    
+                    const srcIsBottom = (srcVal === 2 || srcVal === 3);
+                    const destIsBottom = (qIdx === 2 || qIdx === 3);
+                    const flipY = (srcIsBottom !== destIsBottom);
+                    
+                    ctx.clearRect(destX, destY, halfW, halfH);
+                    ctx.save();
+                    ctx.translate(destX + (flipH ? halfW : 0), destY + (flipY ? halfH : 0));
+                    ctx.scale(flipH ? -1 : 1, flipY ? -1 : 1);
+                    ctx.drawImage(buffer, 0, 0);
+                    ctx.restore();
+                };
+                
+                drawQuadrant(0, 0, 0);
+                drawQuadrant(1, halfW, 0);
+                drawQuadrant(2, 0, halfH);
+                drawQuadrant(3, halfW, halfH);
+                
+                ctx.restore();
+                isStaticCacheValid = false;
+                renderComposite();
+                updateStatus("Quadrant mirrored successfully.");
+            }
+
+            function updateTilingCache() {
+                const targetW = Math.round(DEFAULT_LOGICAL_WIDTH * deviceScale);
+                const targetH = Math.round(DEFAULT_LOGICAL_HEIGHT * deviceScale);
+                
+                if (tilingCacheCanvas.width !== targetW || tilingCacheCanvas.height !== targetH) {
+                    tilingCacheCanvas.width = targetW;
+                    tilingCacheCanvas.height = targetH;
+                }
+                
+                tilingCacheCtx.setTransform(1, 0, 0, 1, 0, 0);
+                tilingCacheCtx.clearRect(0, 0, targetW, targetH);
+                
+                tilingCacheCtx.fillStyle = currentBgColor || '#ffffff';
+                tilingCacheCtx.fillRect(0, 0, targetW, targetH);
+                
+                tilingCacheCtx.scale(deviceScale, deviceScale);
+                
+                layers.forEach((l, idx) => {
+                    if (l.visible && l.canvas && l.context) {
+                        tilingCacheCtx.save();
+                        tilingCacheCtx.globalAlpha = l.opacity;
+                        tilingCacheCtx.globalCompositeOperation = l.blendMode || 'source-over';
+                        tilingCacheCtx.drawImage(
+                            l.canvas,
+                            0, 0, l.canvas.width, l.canvas.height,
+                            l.logicalX !== undefined ? l.logicalX : 0,
+                            l.logicalY !== undefined ? l.logicalY : 0,
+                            l.canvas.width / deviceScale,
+                            l.canvas.height / deviceScale
+                        );
+                        tilingCacheCtx.restore();
+                        
+                        if (idx === activeLayerIndex && currentTool === 'pen' && activeStrokeCanvas.width > 0 && activeStrokeCanvas.height > 0) {
+                            tilingCacheCtx.save();
+                            tilingCacheCtx.globalAlpha = l.opacity;
+                            tilingCacheCtx.globalCompositeOperation = l.blendMode || 'source-over';
+                            tilingCacheCtx.drawImage(
+                                activeStrokeCanvas,
+                                0, 0, activeStrokeCanvas.width, activeStrokeCanvas.height,
+                                l.logicalX !== undefined ? l.logicalX : 0,
+                                l.logicalY !== undefined ? l.logicalY : 0,
+                                activeStrokeCanvas.width / deviceScale,
+                                activeStrokeCanvas.height / deviceScale
+                            );
+                            tilingCacheCtx.restore();
+                        }
+                    }
+                });
+            }
+
+            function getActiveLayerColors() {
+                const l = getActiveLayer();
+                if (!l) return [];
+                const ctx = l.context;
+                try {
+                    const imgData = ctx.getImageData(0, 0, l.canvas.width, l.canvas.height).data;
+                    const colors = new Set();
+                    for (let i = 0; i < imgData.length; i += 16) {
+                        const a = imgData[i+3];
+                        if (a === 0) continue;
+                        const r = imgData[i];
+                        const g = imgData[i+1];
+                        const b = imgData[i+2];
+                        const hex = rgbToHex(r, g, b);
+                        colors.add(hex);
+                        if (colors.size >= 24) break;
+                    }
+                    return Array.from(colors);
+                } catch (e) {
+                    console.warn("Could not scan active layer colors:", e);
+                    return [];
+                }
+            }
+
+            function updateGridCellPalette() {
+                const container = document.getElementById('gridPaletteContainer');
+                if (!container) return;
+                container.innerHTML = '';
+                
+                const colors = getActiveLayerColors();
+                if (colors.length === 0) {
+                    container.innerHTML = '<span style="grid-column: span 6; font-size: 0.8em; opacity: 0.6; text-align: center; color: var(--text-color);">No colors detected</span>';
+                    return;
+                }
+                
+                colors.forEach(col => {
+                    const wrapper = document.createElement('div');
+                    wrapper.style.position = 'relative';
+                    wrapper.style.width = '100%';
+                    wrapper.style.paddingBottom = '100%';
+                    wrapper.style.borderRadius = '4px';
+                    wrapper.style.cursor = 'pointer';
+                    wrapper.style.border = '1px solid var(--border-color)';
+                    wrapper.style.background = col;
+                    wrapper.title = `Pick or edit color ${col}`;
+                    
+                    const picker = document.createElement('input');
+                    picker.type = 'color';
+                    picker.value = col;
+                    picker.style.position = 'absolute';
+                    picker.style.top = '0';
+                    picker.style.left = '0';
+                    picker.style.width = '100%';
+                    picker.style.height = '100%';
+                    picker.style.opacity = '0';
+                    picker.style.cursor = 'pointer';
+                    
+                    picker.addEventListener('change', (e) => {
+                        recolorActiveLayer(col, e.target.value);
+                    });
+                    
+                    wrapper.appendChild(picker);
+                    container.appendChild(wrapper);
+                });
+            }
+
+            function recolorActiveLayer(oldHex, newHex) {
+                const l = getActiveLayer();
+                if (!l) return;
+                const ctx = l.context;
+                saveHistory(activeLayerIndex);
+                
+                try {
+                    const imgDataObj = ctx.getImageData(0, 0, l.canvas.width, l.canvas.height);
+                    const imgData = imgDataObj.data;
+                    
+                    const oldRgb = hexToRgbWithAlpha(oldHex);
+                    const newRgb = hexToRgbWithAlpha(newHex);
+                    if (!oldRgb || !newRgb) return;
+                    
+                    const [oR, oG, oB] = oldRgb;
+                    const [nR, nG, nB] = newRgb;
+                    
+                    for (let i = 0; i < imgData.length; i += 4) {
+                        if (imgData[i+3] > 0) {
+                            if (imgData[i] === oR && imgData[i+1] === oG && imgData[i+2] === oB) {
+                                imgData[i] = nR;
+                                imgData[i+1] = nG;
+                                imgData[i+2] = nB;
+                            }
+                        }
+                    }
+                    
+                    ctx.putImageData(imgDataObj, 0, 0);
+                    
+                    vectorStrokes.forEach(vs => {
+                        if (vs.layer === l.name) {
+                            if (vs.color && vs.color.toLowerCase() === oldHex.toLowerCase()) {
+                                vs.color = newHex;
+                            }
+                        }
+                    });
+                    
+                    isStaticCacheValid = false;
+                    renderComposite();
+                    updateGridCellPalette();
+                } catch (e) {
+                    console.error("Recoloring failed:", e);
+                    updateStatus("Recolor failed.");
+                }
+            }
+
+            function updateSymmetryUI() {
+                const symmetryToggleBtn = document.getElementById('symmetryToggleBtn');
+                if (symmetryToggleBtn) {
+                    symmetryToggleBtn.textContent = `${symmetryMode !== 'OFF' ? symmetryMode + ' ' : ''}Symmetry: ${symmetryMode !== 'OFF' ? 'ON' : 'OFF'}`;
+                    symmetryToggleBtn.classList.toggle('active', symmetryMode !== 'OFF');
+                }
+                
+                const rotSlider = document.getElementById('rotationalDivisionsSlider');
+                const rotVal = document.getElementById('rotationalDivisionsValue');
+                if (rotSlider) {
+                    rotSlider.value = rotationalDivisions;
+                    if (rotVal) rotVal.textContent = rotationalDivisions;
+                }
+                
+                const angleSlider = document.getElementById('customSymmetryAngleSlider');
+                const angleVal = document.getElementById('customSymmetryAngleValue');
+                if (angleSlider) {
+                    angleSlider.value = customSymmetryAngle;
+                    if (angleVal) angleVal.textContent = customSymmetryAngle;
+                }
+                
+                const cxInput = document.getElementById('symmetryCenterXInput');
+                const cyInput = document.getElementById('symmetryCenterYInput');
+                if (cxInput) cxInput.value = Math.round(symmetryCenter.x);
+                if (cyInput) cyInput.value = Math.round(symmetryCenter.y);
+                
+                const settingsRow = document.getElementById('symmetrySettingsRow');
+                if (settingsRow) {
+                    settingsRow.style.display = (symmetryMode === 'KALEIDOSCOPE' || symmetryMode === 'ROTATIONAL') ? 'flex' : 'none';
+                }
             }
 
             function interpolatePixelCells(ctx, wx1, wy1, wx2, wy2, applySymmetry) {
@@ -5553,7 +6556,6 @@
                 if (gs <= 0) return;
 
                 if (gridType === 'square' || gridType === '') {
-                    // Bresenham-style interpolation in grid-cell space (fast for square grids)
                     let gx0 = Math.floor(wx1 / gs);
                     let gy0 = Math.floor(wy1 / gs);
                     const gx1 = Math.floor(wx2 / gs);
@@ -5573,7 +6575,6 @@
                         if (e2 < dx) { err += dx; gy0 += sy; }
                     }
                 } else {
-                    // World-space interpolation for non-square grids
                     const dist = Math.hypot(wx2 - wx1, wy2 - wy1);
                     const stepSize = gs * 0.4;
                     const steps = Math.max(1, Math.ceil(dist / stepSize));
@@ -5826,13 +6827,113 @@
                 restoreContextAfterDraw(ctx);
             }
 
+            function updateActiveToolPropertiesUI() {
+                const propsRows = document.querySelectorAll('.property-row');
+                propsRows.forEach(row => row.classList.remove('visible'));
+
+                if (currentTool === 'pen' || currentTool === 'eraser') {
+                    lineWidthRow.classList.add('visible');
+                    strokeStyleRow.classList.add('visible');
+                    brushEffectRow.classList.add('visible');
+                    stabilizerRow.classList.add('visible');
+                    smartShapeRow.classList.add('visible');
+                } else if (currentTool === 'line') {
+                    lineWidthRow.classList.add('visible');
+                    strokeStyleRow.classList.add('visible');
+                    brushEffectRow.classList.add('visible');
+                } else if (currentTool === 'shape') {
+                    shapeTypeRow.classList.add('visible');
+                    lineWidthRow.classList.add('visible');
+                    strokeStyleRow.classList.add('visible');
+                    fillShapeRow.classList.add('visible');
+                    brushEffectRow.classList.add('visible');
+                } else if (currentTool === 'spray') {
+                    lineWidthRow.classList.add('visible');
+                    brushEffectRow.classList.add('visible');
+                } else if (currentTool === 'text') {
+                    textPropsRow1.classList.add('visible');
+                    textPropsRow2.classList.add('visible');
+                    textPropsRow3.classList.add('visible');
+                } else if (currentTool === 'isostamp') {
+                    isostampPropsRow.classList.add('visible');
+                } else if (currentTool === 'gridselect') {
+                    gridPaletteRow.classList.add('visible');
+                }
+                const showColorControls = !['select', 'move', 'eyedropper', 'fill', 'grideraser', 'gridselect'].includes(currentTool);
+                if (currentTool === 'pixel' || currentTool === 'sticky' || currentTool === 'gridbucket' || currentTool === 'isostamp') {
+                    colorTypeRow.style.display = 'none';
+                    solidColorPropsRow.classList.add('visible');
+                    gradientPropsRow1.classList.remove('visible');
+                    gradientPropsRow2.classList.remove('visible');
+                } else {
+                    colorTypeRow.style.display = showColorControls ? 'flex' : 'none';
+                    if (showColorControls) {
+                        solidColorPropsRow.classList.toggle('visible', currentColorMode === 'solid');
+                        gradientPropsRow1.classList.toggle('visible', currentColorMode === 'linear');
+                        gradientPropsRow2.classList.toggle('visible', currentColorMode === 'linear');
+                    }
+                }
+
+                document.getElementById('lineWidth').parentElement.style.display = ['pen', 'eraser', 'line', 'shape', 'spray'].includes(currentTool) ? 'flex' : 'none';
+                document.getElementById('strokeStyle').parentElement.style.display = ['pen', 'line', 'shape'].includes(currentTool) ? 'flex' : 'none';
+                
+                const showBrushSettings = ['pen', 'eraser', 'line', 'shape', 'spray'].includes(currentTool);
+                document.getElementById('brushEffectRow').style.display = showBrushSettings ? 'flex' : 'none';
+                document.getElementById('smartShapeRow').style.display = currentTool === 'pen' ? 'flex' : 'none';
+                document.getElementById('stabilizerRow').style.display = ['pen', 'eraser'].includes(currentTool) ? 'flex' : 'none';
+                if ((currentTool === 'pixel' || currentTool === 'grideraser' || currentTool === 'gridbucket' || currentTool === 'isostamp' || currentTool === 'gridselect') && !showGrid) {
+                    showGrid = true;
+                    showGridCheckbox.checked = true;
+                    updateColorPropertiesUI();
+                    updateStatus(`Grid auto-enabled for ${currentTool} tool.`);
+                }
+                if (currentTool === 'isostamp' && !['isometric', 'dimetric', 'trimetric'].includes(gridType)) {
+                    gridType = 'isometric';
+                    const select = document.getElementById('gridTypeSelect');
+                    if (select) select.value = 'isometric';
+                    isStaticCacheValid = false;
+                    updateStatus("Grid type auto-switched to isometric for stamps.");
+                }
+                 
+                updateColorPropertiesUI(); 
+                syncMobileToolButtons(); 
+            }
+
+            function toggleTheme() { document.body.classList.toggle('light-theme'); const isLight=document.body.classList.contains('light-theme'); themeToggleBtn.textContent=isLight?'🌙':'☀️'; try { localStorage.setItem('sketcherTheme',isLight?'light':'dark'); } catch(e) {console.warn("Could not save theme:", e);} updateStatus(`${isLight?'Light':'Dark'} Theme activated.`); renderComposite(); }
+            function clearSetSymmetryCenterBtnHighlight() {
+                const btn = document.getElementById('setSymmetryCenterBtn');
+                if (btn) {
+                    btn.classList.remove('active');
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }
+            }
+            function cycleSymmetryMode() { 
+                currentSymmetryIndex=(currentSymmetryIndex+1)%symmetryModes.length; 
+                symmetryMode=symmetryModes[currentSymmetryIndex]; 
+                updateSymmetryUI();
+                renderComposite();
+            }
+
+            function handleToolbarClick(e) {
+                const button=e.target.closest('button'); if(!button||button.disabled)return;
+                const toolButtons=sidebar.querySelectorAll('.tool-grid button[id$="Tool"]');
+
+                toolButtons.forEach(btn=>btn.classList.remove('active'));
+                button.classList.add('active');
+                currentTool=button.id.replace('Tool',''); 
+                updateActiveToolPropertiesUI();
+                
+                updateStatus(`${currentTool.charAt(0).toUpperCase()+currentTool.slice(1)} tool selected.`);
+                if (currentTool !== 'select' && currentTool !== 'move' && currentTool !== 'gridselect') deselect(); 
+                renderComposite();
+            }
+
             function pickColor(screenClientX, screenClientY){ 
                 const rect = mainCanvas.getBoundingClientRect();
                 const canvasPhysicalX = Math.round((screenClientX - rect.left) * deviceScale);
                 const canvasPhysicalY = Math.round((screenClientY - rect.top) * deviceScale);
                 
-                // Correct way to get pixel data from mainCtx, as it's scaled.
-                // So provide physical coords to its getImageData call.
                 const p = mainCtx.getImageData( (screenClientX - rect.left), (screenClientY - rect.top), 1, 1).data;
 
                 const c=`rgb(${p[0]},${p[1]},${p[2]})`;
@@ -5916,10 +7017,10 @@
                     data[currentPos]=tR;data[currentPos+1]=tG;data[currentPos+2]=tB;data[currentPos+3]=tA;
                     iterations++;
                 
-                    if(x_phys-1 >= 0) q.push([x_phys-1,y_phys]);
-                    if(x_phys+1 < canvasWidth) q.push([x_phys+1,y_phys]);
-                    if(y_phys-1 >= 0) q.push([x_phys,y_phys-1]);
-                    if(y_phys+1 < ctx.canvas.height) q.push([x_phys,y_phys+1]);
+                    q.push([x_phys+1,y_phys]); 
+                    q.push([x_phys-1,y_phys]); 
+                    q.push([x_phys,y_phys+1]); 
+                    q.push([x_phys,y_phys-1]); 
                 }
                 if(iterations>=maxIterations)updateStatus("Fill might be incomplete due to complexity or large area.");
                 ctx.putImageData(imageData,0,0);
@@ -6889,7 +7990,7 @@
                     if (stroke.colorMode === 'linear' && stroke.gradient && stroke.tool !== 'eraser' && stroke.tool !== 'grideraser') {
                         hasDefs = true;
                         
-                        if (stroke.tool === 'pixel') {
+                        if (stroke.tool === 'pixel' || stroke.tool === 'gridbucket') {
                             const gs = stroke.width || gridSize;
                             const originalPoints = stroke.points.filter(pt => !pt.mirrorType || pt.mirrorType === 'none');
                             const startPt = originalPoints[0] || stroke.points[0];
@@ -7051,11 +8152,18 @@
                     // Second pass: normal strokes
                     layerGroups[layerName].forEach(stroke => {
                         if (stroke.tool === 'eraser' || stroke.tool === 'grideraser') return;
-                        if (stroke.tool === 'pixel') {
+                        if (stroke.tool === 'pixel' || stroke.tool === 'gridbucket') {
                             const gs = stroke.width || gridSize;
                             stroke.points.forEach(p => {
                                 const fillStr = stroke.colorMode === 'linear' ? `url(#grad_${stroke._globalIdx}_${p.mirrorType || 'none'})` : stroke.color;
                                 svgContent += `      ${getCustomCellSvgString(p, fillStr, gs)}\n`;
+                            });
+                            return;
+                        }
+                        if (stroke.tool === 'isostamp') {
+                            const gs = stroke.width || gridSize;
+                            stroke.points.forEach(p => {
+                                svgContent += `      ${getIsometricPrimitiveSvgString(p, stroke.shapeType, stroke.color, gs)}\n`;
                             });
                             return;
                         }
@@ -7115,6 +8223,7 @@
                         visible: l.visible,
                         opacity: l.opacity,
                         blendMode: l.blendMode,
+                        symmetryState: l.symmetryState || null,
                         dataURL: l.canvas.toDataURL()
                     }))
                 };
@@ -7174,6 +8283,7 @@
                             l.blendMode = lData.blendMode || 'source-over';
                             l.logicalX = lData.logicalX !== undefined ? lData.logicalX : 0;
                             l.logicalY = lData.logicalY !== undefined ? lData.logicalY : 0;
+                            l.symmetryState = lData.symmetryState || null;
                             
                             const img = new Image();
                             img.onload = function() {
@@ -7225,7 +8335,7 @@
                     const stroke = vectorStrokes[i];
                     if (!stroke || !stroke.recorded) continue;
 
-                    if (stroke.tool === 'pixel') {
+                    if (stroke.tool === 'pixel' || stroke.tool === 'gridbucket' || stroke.tool === 'isostamp') {
                         stroke.points = stroke.points.filter(p => {
                             const cellSize = stroke.width || gridSize;
                             const cellCenterX = p.x + cellSize / 2;
@@ -7269,7 +8379,7 @@
                     const stroke = vectorStrokes[i];
                     if (!stroke || !stroke.recorded) continue;
 
-                    if (stroke.tool === 'pixel') {
+                    if (stroke.tool === 'pixel' || stroke.tool === 'gridbucket' || stroke.tool === 'isostamp') {
                         stroke.points = stroke.points.filter(p => {
                             for (const gp of gridEraserStroke.points) {
                                 if (p.x === gp.x && p.y === gp.y) {
@@ -7753,7 +8863,7 @@
                     
                     layerGroups[layerName].forEach(stroke => {
                         if (stroke.tool === 'eraser' || stroke.tool === 'grideraser') return;
-                        if (stroke.tool === 'pixel') {
+                        if (stroke.tool === 'pixel' || stroke.tool === 'gridbucket') {
                             const gs = stroke.width || gridSize;
                             stroke.points.forEach((p, pIdx) => {
                                 const id = `stroke_${stroke._globalIdx}_rect_${pIdx}`;
@@ -7762,6 +8872,19 @@
                                     styleContent += `#${id} { opacity: 0; animation: pixelAppear ${strokeDuration * 0.5}s linear ${stroke._globalIdx * strokeDuration + (pIdx * strokeDuration * 0.5 / (stroke.points.length || 1))}s forwards; }\n`;
                                 }
                                 pathsContent += `      ${getCustomCellSvgString(p, fillStr, gs, `id="${id}"`)}\n`;
+                            });
+                            return;
+                        }
+                        if (stroke.tool === 'isostamp') {
+                            const gs = stroke.width || gridSize;
+                            stroke.points.forEach((p, pIdx) => {
+                                const id = `stroke_${stroke._globalIdx}_isostamp_${pIdx}`;
+                                if (isAnimated) {
+                                    styleContent += `#${id} { opacity: 0; animation: pixelAppear ${strokeDuration * 0.5}s linear ${stroke._globalIdx * strokeDuration + (pIdx * strokeDuration * 0.5 / (stroke.points.length || 1))}s forwards; }\n`;
+                                }
+                                pathsContent += `      <g id="${id}">\n`;
+                                pathsContent += `        ${getIsometricPrimitiveSvgString(p, stroke.shapeType, stroke.color, gs)}\n`;
+                                pathsContent += `      </g>\n`;
                             });
                             return;
                         }
