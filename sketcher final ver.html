@@ -911,7 +911,7 @@
                     <label for="showGridCheckbox">Show Grid</label><input type="checkbox" id="showGridCheckbox" title="Toggle Grid (Ctrl+G)">
                     <label for="snapToGridCheckbox" style="min-width:auto; margin-left:5px;">Snap</label><input type="checkbox" id="snapToGridCheckbox">
                 </div>
-                <div class="tool-row property-row" id="gridPropsRow2">
+                <div class="tool-row" id="gridPropsRow2">
                     <label for="gridSizeInput">Size</label><input type="number" id="gridSizeInput" value="20" min="5" max="200" step="1" style="width:40px;"><span class="value-display" style="margin-right:2px;">px</span>
                     <label for="gridColorPicker" style="min-width:auto; margin-left:2px;">Color</label><input type="color" id="gridColorPicker" value="#cccccc">
                     <label for="gridTypeSelect" style="min-width:auto; margin-left:2px;">Type</label>
@@ -2320,59 +2320,12 @@
                 }
                 gradientPropsRow1.classList.toggle('visible', currentColorMode === 'linear');
                 gradientPropsRow2.classList.toggle('visible', currentColorMode === 'linear');
-                document.getElementById('gridPropsRow2').classList.toggle('visible', showGrid); 
+                // gridPropsRow2 is always visible
                 updateMobileColorUI();
                 updateCursor();
                 updateColorHarmonies();
             }
-            function updateActiveToolPropertiesUI() {
-                const allPropRows = sidebar.querySelectorAll('.property-row[id$="PropsRow"], .property-row[id$="Row"], .property-row[id$="Row1"], .property-row[id$="Row2"], .property-row[id$="Row3"]');
-                allPropRows.forEach(row => row.classList.remove('visible'));
 
-                if (currentTool === 'shape') {
-                    shapeTypeRow.classList.add('visible');
-                    shapeCommonPropsRow.classList.add('visible');
-                    if (currentShapeType === 'polygon') polygonSidesRow.classList.add('visible');
-                    if (currentShapeType === 'roundedRect') cornerRadiusRow.classList.add('visible');
-                } else if (currentTool === 'text') {
-                    textPropsRow1.classList.add('visible');
-                    textPropsRow2.classList.add('visible');
-                    textPropsRow3.classList.add('visible');
-                }
-                const showColorControls = !['select', 'move', 'eyedropper', 'fill', 'grideraser'].includes(currentTool);
-                if (currentTool === 'pixel' || currentTool === 'sticky' || currentTool === 'gridbucket') {
-                    // Pixel & Sticky tool: show only solid color picker, no gradient/type switcher
-                    colorTypeRow.style.display = 'none';
-                    solidColorPropsRow.classList.add('visible');
-                    gradientPropsRow1.classList.remove('visible');
-                    gradientPropsRow2.classList.remove('visible');
-                } else {
-                    colorTypeRow.style.display = showColorControls ? 'flex' : 'none';
-                    if (showColorControls) {
-                        solidColorPropsRow.classList.toggle('visible', currentColorMode === 'solid');
-                        gradientPropsRow1.classList.toggle('visible', currentColorMode === 'linear');
-                        gradientPropsRow2.classList.toggle('visible', currentColorMode === 'linear');
-                    }
-                }
-
-                document.getElementById('lineWidth').parentElement.style.display = ['pen', 'eraser', 'line', 'shape', 'spray'].includes(currentTool) ? 'flex' : 'none';
-                document.getElementById('strokeStyle').parentElement.style.display = ['pen', 'line', 'shape'].includes(currentTool) ? 'flex' : 'none';
-                
-                const showBrushSettings = ['pen', 'eraser', 'line', 'shape', 'spray'].includes(currentTool);
-                document.getElementById('brushEffectRow').style.display = showBrushSettings ? 'flex' : 'none';
-                document.getElementById('smartShapeRow').style.display = currentTool === 'pen' ? 'flex' : 'none';
-                document.getElementById('stabilizerRow').style.display = ['pen', 'eraser'].includes(currentTool) ? 'flex' : 'none';
-                // Auto-enable grid when pixel or grideraser tool selected
-                if ((currentTool === 'pixel' || currentTool === 'grideraser' || currentTool === 'gridbucket') && !showGrid) {
-                    showGrid = true;
-                    showGridCheckbox.checked = true;
-                    updateColorPropertiesUI();
-                    updateStatus(`Grid auto-enabled for ${currentTool === 'pixel' ? 'Pixel' : 'Grid Eraser'} tool.`);
-                }
-                 
-                updateColorPropertiesUI(); 
-                syncMobileToolButtons(); 
-            }
 
             function toggleTheme() { document.body.classList.toggle('light-theme'); const isLight=document.body.classList.contains('light-theme'); themeToggleBtn.textContent=isLight?'🌙':'☀️'; try { localStorage.setItem('sketcherTheme',isLight?'light':'dark'); } catch(e) {console.warn("Could not save theme:", e);} updateStatus(`${isLight?'Light':'Dark'} Theme activated.`); renderComposite(); }
             function clearSetSymmetryCenterBtnHighlight() {
@@ -2406,7 +2359,7 @@
                         updateActiveToolPropertiesUI();
                         updateCursor(); 
                         updateStatus(`${currentTool.charAt(0).toUpperCase()+currentTool.slice(1)} tool selected.`);
-                        if (currentTool !== 'select' && currentTool !== 'move') deselect(); 
+                        if (currentTool !== 'select' && currentTool !== 'move' && currentTool !== 'gridselect') deselect(); 
                         closeSidebarOnMobile();
                     }
                 }
@@ -3444,19 +3397,18 @@
                             alpha = 15 * Math.PI / 180;
                             beta = 35 * Math.PI / 180;
                         }
-                        const cosA = Math.cos(alpha);
-                        const sinA = Math.sin(alpha);
-                        const cosB = Math.cos(beta);
-                        const sinB = Math.sin(beta);
-                        const sinAplusB = Math.sin(alpha + beta);
-                        if (sinAplusB !== 0) {
-                            const u = (x * sinB + y * cosB) / sinAplusB;
-                            const v = (sinA * x - cosA * y) / sinAplusB;
-                            const snappedU = Math.round(u / gridSize) * gridSize;
-                            const snappedV = Math.round(v / gridSize) * gridSize;
-                            snapX = snappedU * cosA + snappedV * cosB;
-                            snapY = snappedU * sinA - snappedV * sinB;
-                        }
+                        
+                        const W = gridSize * Math.cos(alpha);
+                        const k = Math.round(x / W);
+                        snapX = k * W;
+
+                        const j = Math.round((y - snapX * Math.tan(alpha)) / gridSize);
+                        const y1 = snapX * Math.tan(alpha) + j * gridSize;
+
+                        const m = Math.round((y + snapX * Math.tan(beta)) / gridSize);
+                        const y2 = -snapX * Math.tan(beta) + m * gridSize;
+
+                        snapY = Math.abs(y - y1) < Math.abs(y - y2) ? y1 : y2;
                     } else if (gridType === 'triangular') {
                         const H_spacing = gridSize * 0.8660254;
                         let bestDist = Infinity;
@@ -6915,19 +6867,6 @@
                 renderComposite();
             }
 
-            function handleToolbarClick(e) {
-                const button=e.target.closest('button'); if(!button||button.disabled)return;
-                const toolButtons=sidebar.querySelectorAll('.tool-grid button[id$="Tool"]');
-
-                toolButtons.forEach(btn=>btn.classList.remove('active'));
-                button.classList.add('active');
-                currentTool=button.id.replace('Tool',''); 
-                updateActiveToolPropertiesUI();
-                
-                updateStatus(`${currentTool.charAt(0).toUpperCase()+currentTool.slice(1)} tool selected.`);
-                if (currentTool !== 'select' && currentTool !== 'move' && currentTool !== 'gridselect') deselect(); 
-                renderComposite();
-            }
 
             function pickColor(screenClientX, screenClientY){ 
                 const rect = mainCanvas.getBoundingClientRect();
