@@ -922,6 +922,48 @@
                 </div>
                 <div id="guidesListContainer" style="display: flex; flex-direction: column; gap: 4px; max-height: 80px; overflow-y: auto; padding: 0 4px; margin-bottom: 8px;"></div>
             </div>
+            <details class="tool-section" id="symmetryPropsRow">
+                <summary style="font-size: 0.9em; font-weight: bold; cursor: pointer; user-select: none; margin-bottom: 8px; outline: none; list-style: none;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>Advanced Symmetry</span>
+                        <span style="font-size: 0.8em; opacity: 0.7;">▼</span>
+                    </div>
+                </summary>
+                
+                <div class="tool-row" style="margin-bottom: 8px;">
+                    <label style="min-width: 100px;">Center Point</label>
+                    <button id="setSymmetryCenterBtn" title="Set Symmetry Center on Canvas" style="padding: 4px 8px; font-size: 0.8em; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-color); cursor: pointer; flex-grow: 1;">📍 Set Center</button>
+                    <button id="resetSymmetryCenterBtn" title="Reset Center to Canvas Middle" style="padding: 4px 8px; font-size: 0.8em; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-color); cursor: pointer; margin-left: 4px;">🔄 Reset</button>
+                </div>
+
+                <div class="tool-row" style="margin-bottom: 8px; gap: 8px;">
+                    <label style="min-width: auto; margin-right: 4px;">X</label>
+                    <input type="number" id="symmetryCenterXInput" style="width: 60px; padding: 4px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-color);" value="600">
+                    <label style="min-width: auto; margin-right: 4px;">Y</label>
+                    <input type="number" id="symmetryCenterYInput" style="width: 60px; padding: 4px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-color);" value="450">
+                </div>
+
+                <div class="tool-row" style="margin-bottom: 8px; flex-direction: column; align-items: stretch; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85em;">
+                        <label for="rotationalDivisionsSlider">Rotations</label>
+                        <span id="rotationalDivisionsValue" class="value-display">6</span>
+                    </div>
+                    <input type="range" id="rotationalDivisionsSlider" min="2" max="36" value="6" style="width: 100%;">
+                </div>
+
+                <div class="tool-row" style="margin-bottom: 8px; flex-direction: column; align-items: stretch; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.85em;">
+                        <label for="customSymmetryAngleSlider">Mirror Angle</label>
+                        <span id="customSymmetryAngleValue" class="value-display">0</span>°
+                    </div>
+                    <input type="range" id="customSymmetryAngleSlider" min="0" max="180" value="0" style="width: 100%;">
+                </div>
+
+                <div class="tool-row" style="margin-bottom: 8px; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="showSymmetryGuidesCheckbox" style="width: 16px; height: 16px; margin: 0; cursor: pointer;">
+                    <label for="showSymmetryGuidesCheckbox" style="cursor: pointer; user-select: none;">Show Symmetry Guides</label>
+                </div>
+            </details>
             <div class="tool-section"><h3>Actions & Effects</h3>
                 <div class="tool-grid"> 
                     <button id="undoBtn" title="Undo (Ctrl+Z)">↩️</button> 
@@ -1310,8 +1352,13 @@
             let lastPinchMidX, lastPinchMidY; // For pinch zoom/pan
 
             let symmetryMode = 'OFF'; 
-            const symmetryModes = ['OFF', 'Y', 'X', 'XY', 'KALEIDOSCOPE'];
+            const symmetryModes = ['OFF', 'Y', 'X', 'XY', 'ROTATIONAL', 'KALEIDOSCOPE'];
             let currentSymmetryIndex = 0;
+            let symmetryCenter = { x: DEFAULT_LOGICAL_WIDTH / 2, y: DEFAULT_LOGICAL_HEIGHT / 2 };
+            let isDraggingSymmetryCenter = false;
+            let rotationalDivisions = 6;
+            let customSymmetryAngle = 0;
+            let showSymmetryGuides = false;
             let paletteColors = [];
             const MAX_PALETTE_COLORS = 24;
             let layers = [];
@@ -1567,6 +1614,86 @@
                 const gridTypeSelect = document.getElementById('gridTypeSelect');
                 if (gridTypeSelect) {
                     gridTypeSelect.addEventListener('change', handlePropertyChange);
+                }
+
+                // Advanced Symmetry settings listeners
+                const sxInput = document.getElementById('symmetryCenterXInput');
+                const syInput = document.getElementById('symmetryCenterYInput');
+                if (sxInput) {
+                    sxInput.value = Math.round(symmetryCenter.x);
+                    sxInput.addEventListener('change', () => {
+                        symmetryCenter.x = parseFloat(sxInput.value) || (DEFAULT_LOGICAL_WIDTH / 2);
+                        renderComposite();
+                    });
+                }
+                if (syInput) {
+                    syInput.value = Math.round(symmetryCenter.y);
+                    syInput.addEventListener('change', () => {
+                        symmetryCenter.y = parseFloat(syInput.value) || (DEFAULT_LOGICAL_HEIGHT / 2);
+                        renderComposite();
+                    });
+                }
+                const setCenterBtn = document.getElementById('setSymmetryCenterBtn');
+                if (setCenterBtn) {
+                    setCenterBtn.addEventListener('click', () => {
+                        if (currentTool === 'setSymmetryCenter') {
+                            const penBtn = document.getElementById('penTool');
+                            if (penBtn) penBtn.click();
+                        } else {
+                            const toolButtons = sidebar.querySelectorAll('.tool-grid button[id$="Tool"]');
+                            toolButtons.forEach(btn => btn.classList.remove('active'));
+                            currentTool = 'setSymmetryCenter';
+                            setCenterBtn.classList.add('active');
+                            updateActiveToolPropertiesUI();
+                            updateCursor();
+                            updateStatus("Set Symmetry Center tool selected. Click or drag on canvas to reposition center.");
+                            setCenterBtn.style.background = 'var(--accent-color)';
+                            setCenterBtn.style.color = 'white';
+                        }
+                    });
+                }
+                const resetCenterBtn = document.getElementById('resetSymmetryCenterBtn');
+                if (resetCenterBtn) {
+                    resetCenterBtn.addEventListener('click', () => {
+                        symmetryCenter.x = DEFAULT_LOGICAL_WIDTH / 2;
+                        symmetryCenter.y = DEFAULT_LOGICAL_HEIGHT / 2;
+                        if (sxInput) sxInput.value = Math.round(symmetryCenter.x);
+                        if (syInput) syInput.value = Math.round(symmetryCenter.y);
+                        renderComposite();
+                        updateStatus("Symmetry center reset to logical canvas center.");
+                    });
+                }
+                const rotDivSlider = document.getElementById('rotationalDivisionsSlider');
+                const rotDivVal = document.getElementById('rotationalDivisionsValue');
+                if (rotDivSlider) {
+                    rotDivSlider.value = rotationalDivisions;
+                    if (rotDivVal) rotDivVal.textContent = rotationalDivisions;
+                    rotDivSlider.addEventListener('input', () => {
+                        rotationalDivisions = parseInt(rotDivSlider.value) || 6;
+                        if (rotDivVal) rotDivVal.textContent = rotationalDivisions;
+                        const sliceInput = document.getElementById('symmetrySliceInput');
+                        if (sliceInput) sliceInput.value = rotationalDivisions;
+                        renderComposite();
+                    });
+                }
+                const customAngleSlider = document.getElementById('customSymmetryAngleSlider');
+                const customAngleVal = document.getElementById('customSymmetryAngleValue');
+                if (customAngleSlider) {
+                    customAngleSlider.value = customSymmetryAngle;
+                    if (customAngleVal) customAngleVal.textContent = customSymmetryAngle;
+                    customAngleSlider.addEventListener('input', () => {
+                        customSymmetryAngle = parseFloat(customAngleSlider.value) || 0;
+                        if (customAngleVal) customAngleVal.textContent = customSymmetryAngle;
+                        renderComposite();
+                    });
+                }
+                const showGuidesCheckbox = document.getElementById('showSymmetryGuidesCheckbox');
+                if (showGuidesCheckbox) {
+                    showGuidesCheckbox.checked = showSymmetryGuides;
+                    showGuidesCheckbox.addEventListener('change', () => {
+                        showSymmetryGuides = showGuidesCheckbox.checked;
+                        renderComposite();
+                    });
                 }
 
                 const copySvgBtn = document.getElementById('copySvgBtn');
@@ -2177,13 +2304,21 @@
             }
 
             function toggleTheme() { document.body.classList.toggle('light-theme'); const isLight=document.body.classList.contains('light-theme'); themeToggleBtn.textContent=isLight?'🌙':'☀️'; try { localStorage.setItem('sketcherTheme',isLight?'light':'dark'); } catch(e) {console.warn("Could not save theme:", e);} updateStatus(`${isLight?'Light':'Dark'} Theme activated.`); renderComposite(); }
+            function clearSetSymmetryCenterBtnHighlight() {
+                const btn = document.getElementById('setSymmetryCenterBtn');
+                if (btn) {
+                    btn.classList.remove('active');
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }
+            }
             function cycleSymmetryMode() { 
                 currentSymmetryIndex=(currentSymmetryIndex+1)%symmetryModes.length; 
                 symmetryMode=symmetryModes[currentSymmetryIndex]; 
-                symmetryToggleBtn.textContent=`${symmetryMode!=='OFF'?symmetryMode+'-':''}Symmetry: ${symmetryMode!=='OFF'?'ON':'OFF'}`; 
+                symmetryToggleBtn.textContent=`${symmetryMode!=='OFF'?symmetryMode+' ':''}Symmetry: ${symmetryMode!=='OFF'?'ON':'OFF'}`; 
                 symmetryToggleBtn.classList.toggle('active',symmetryMode!=='OFF'); 
                 document.getElementById('symmetrySettingsRow').style.display = (symmetryMode === 'KALEIDOSCOPE') ? 'flex' : 'none';
-                updateStatus(`${symmetryMode}-Axis Symmetry ${symmetryMode!=='OFF'?'Enabled':'Disabled'}.`); 
+                updateStatus(`${symmetryMode} Symmetry ${symmetryMode!=='OFF'?'Enabled':'Disabled'}.`); 
                 renderComposite();
             }
 
@@ -2193,6 +2328,7 @@
 
                 if(Array.from(toolButtons).includes(button)){ 
                     if(!button.classList.contains('active')){ 
+                        clearSetSymmetryCenterBtnHighlight();
                         toolButtons.forEach(btn=>btn.classList.remove('active'));
                         button.classList.add('active'); 
                         currentTool=button.id.replace('Tool',''); 
@@ -2974,6 +3110,7 @@
                         drawAlignmentGuides(mainCtx);
                         drawUserGuidelines(mainCtx);
                         drawGridHandles(mainCtx);
+                        drawSymmetryGuidesAndHandles(mainCtx);
                         mainCtx.restore();
                     }
                     
@@ -3032,6 +3169,7 @@
                 drawAlignmentGuides(mainCtx);
                 drawUserGuidelines(mainCtx);
                 drawGridHandles(mainCtx);
+                drawSymmetryGuidesAndHandles(mainCtx);
                 mainCtx.restore();
 
                 if (currentTool === 'move' && isMovingSelection && movingSelectionData && movingSelectionData.imageData) {
@@ -3083,6 +3221,7 @@
                     case 'spray':mainCanvas.style.cursor=`url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${encodeURIComponent(currentColorMode==='solid'?currentSolidColor:currentGradient.start)}" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 5 V 2 M12 22 V 19 M19 12 H 22 M2 12 H 5 M17.65 6.35 L 19.07 4.93 M4.93 19.07 L 6.35 17.65 M17.65 17.65 L 19.07 19.07 M4.93 4.93 L 6.35 6.35"/></svg>') 12 12, crosshair`;break;
                     case 'select': mainCanvas.style.cursor = 'crosshair'; break;
                     case 'move': mainCanvas.style.cursor = (selectionRect ? 'grab' : 'default'); break; 
+                    case 'setSymmetryCenter': mainCanvas.style.cursor = 'move'; break;
                     default:mainCanvas.style.cursor='crosshair';break;
                 }
             }
@@ -3315,6 +3454,24 @@
                 if (isCanvasLocked()) { e.preventDefault(); return; }
                 e.preventDefault();
 
+                const {x: initWX, y: initWY} = screenToWorld(e.clientX, e.clientY);
+                const isNearSymCenter = Math.hypot(initWX - symmetryCenter.x, initWY - symmetryCenter.y) < 15;
+                if (currentTool === 'setSymmetryCenter' || (currentTool === 'move' && isNearSymCenter)) {
+                    try { mainCanvas.setPointerCapture(e.pointerId); } catch(err) {}
+                    activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+                    drawingPointerId = e.pointerId;
+                    isDraggingSymmetryCenter = true;
+                    symmetryCenter.x = initWX;
+                    symmetryCenter.y = initWY;
+                    const sxInput = document.getElementById('symmetryCenterXInput');
+                    const syInput = document.getElementById('symmetryCenterYInput');
+                    if (sxInput) sxInput.value = Math.round(symmetryCenter.x);
+                    if (syInput) syInput.value = Math.round(symmetryCenter.y);
+                    updateStatus(`Moving symmetry center to: (${Math.round(initWX)}, ${Math.round(initWY)}).`);
+                    renderComposite();
+                    return;
+                }
+
                 if (currentTool === 'move') {
                     const {x: wX, y: wY} = screenToWorld(e.clientX, e.clientY);
                     const nearGuide = findGuidelineNear(wX, wY);
@@ -3399,6 +3556,19 @@
             function handlePointerMove(e) {
                 if (isCanvasLocked()) { e.preventDefault(); return; }
                 e.preventDefault();
+
+                if (isDraggingSymmetryCenter && e.pointerId === drawingPointerId) {
+                    const {x: wX, y: wY} = screenToWorld(e.clientX, e.clientY);
+                    symmetryCenter.x = wX;
+                    symmetryCenter.y = wY;
+                    const sxInput = document.getElementById('symmetryCenterXInput');
+                    const syInput = document.getElementById('symmetryCenterYInput');
+                    if (sxInput) sxInput.value = Math.round(symmetryCenter.x);
+                    if (syInput) syInput.value = Math.round(symmetryCenter.y);
+                    updateStatus(`Moving symmetry center to: (${Math.round(wX)}, ${Math.round(wY)}).`);
+                    renderComposite();
+                    return;
+                }
 
                 if (isDraggingGridHandle && e.pointerId === drawingPointerId) {
                     const {x: wX, y: wY} = screenToWorld(e.clientX, e.clientY);
@@ -3695,6 +3865,16 @@
 
             function handlePointerUp(e) {
                 if (isCanvasLocked()) { e.preventDefault(); return; }
+
+                if (isDraggingSymmetryCenter && e.pointerId === drawingPointerId) {
+                    try { mainCanvas.releasePointerCapture(e.pointerId); } catch(err) {}
+                    isDraggingSymmetryCenter = false;
+                    drawingPointerId = null;
+                    activePointers.delete(e.pointerId);
+                    updateCursor();
+                    renderComposite();
+                    return;
+                }
 
                 if (isDraggingGuideline && e.pointerId === drawingPointerId) {
                     try { mainCanvas.releasePointerCapture(e.pointerId); } catch(err) {}
@@ -4090,17 +4270,10 @@
                 if (!layer) return;
                 ensureLayerCapacity(layer, wx, wy);
                 if (symmetryMode !== 'OFF') {
-                    const cx = DEFAULT_LOGICAL_WIDTH / 2;
-                    const cy = DEFAULT_LOGICAL_HEIGHT / 2;
-                    if (symmetryMode === 'Y' || symmetryMode === 'XY') {
-                        ensureLayerCapacity(layer, cx * 2 - wx, wy);
-                    }
-                    if (symmetryMode === 'X' || symmetryMode === 'XY') {
-                        ensureLayerCapacity(layer, wx, cy * 2 - wy);
-                    }
-                    if (symmetryMode === 'XY') {
-                        ensureLayerCapacity(layer, cx * 2 - wx, cy * 2 - wy);
-                    }
+                    const symPoints = getSymmetricPoints(wx, wy);
+                    symPoints.forEach(sp => {
+                        ensureLayerCapacity(layer, sp.x, sp.y);
+                    });
                 }
             }
 
@@ -4132,6 +4305,131 @@
                 return solid;
             }
 
+            function reflectPointAcrossAxis(x, y, cx, cy, angleRad) {
+                const dx = x - cx;
+                const dy = y - cy;
+                const cos2 = Math.cos(2 * angleRad);
+                const sin2 = Math.sin(2 * angleRad);
+                return {
+                    x: cx + dx * cos2 + dy * sin2,
+                    y: cy + dx * sin2 - dy * cos2
+                };
+            }
+
+            function applySymmetryToPoint(x, y, mirrorType, strokeOpts) {
+                if (mirrorType === 'none') return { x, y };
+
+                const cx = (strokeOpts && strokeOpts.symmetryCenterX !== undefined) ? strokeOpts.symmetryCenterX : symmetryCenter.x;
+                const cy = (strokeOpts && strokeOpts.symmetryCenterY !== undefined) ? strokeOpts.symmetryCenterY : symmetryCenter.y;
+                const angleDeg = (strokeOpts && strokeOpts.customSymmetryAngle !== undefined) ? strokeOpts.customSymmetryAngle : customSymmetryAngle;
+                const div = (strokeOpts && strokeOpts.rotationalDivisions !== undefined) ? strokeOpts.rotationalDivisions : rotationalDivisions;
+                const alpha = angleDeg * Math.PI / 180;
+
+                if (mirrorType === 'Y') {
+                    return reflectPointAcrossAxis(x, y, cx, cy, alpha + Math.PI / 2);
+                }
+                if (mirrorType === 'X') {
+                    return reflectPointAcrossAxis(x, y, cx, cy, alpha);
+                }
+                if (mirrorType === 'XY') {
+                    return { x: cx * 2 - x, y: cy * 2 - y };
+                }
+                if (mirrorType.startsWith('R_')) {
+                    const i = parseInt(mirrorType.substring(2));
+                    const angle = (i * 2 * Math.PI) / div;
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    return {
+                        x: cx + dx * Math.cos(angle) - dy * Math.sin(angle),
+                        y: cy + dx * Math.sin(angle) + dy * Math.cos(angle)
+                    };
+                }
+                if (mirrorType.startsWith('K_')) {
+                    const i = parseInt(mirrorType.substring(2));
+                    const angle = (i * 2 * Math.PI) / div;
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    return {
+                        x: cx + dx * Math.cos(angle) - dy * Math.sin(angle),
+                        y: cy + dx * Math.sin(angle) + dy * Math.cos(angle)
+                    };
+                }
+                if (mirrorType.startsWith('KM_')) {
+                    const i = parseInt(mirrorType.substring(3));
+                    const angle = (i * 2 * Math.PI) / div;
+                    const pReflected = reflectPointAcrossAxis(x, y, cx, cy, alpha);
+                    const rDx = pReflected.x - cx;
+                    const rDy = pReflected.y - cy;
+                    return {
+                        x: cx + rDx * Math.cos(angle) - rDy * Math.sin(angle),
+                        y: cy + rDx * Math.sin(angle) + rDy * Math.cos(angle)
+                    };
+                }
+                return { x, y };
+            }
+
+            function getSymmetricPoints(x, y, strokeOpts) {
+                const points = [];
+                const cx = (strokeOpts && strokeOpts.symmetryCenterX !== undefined) ? strokeOpts.symmetryCenterX : symmetryCenter.x;
+                const cy = (strokeOpts && strokeOpts.symmetryCenterY !== undefined) ? strokeOpts.symmetryCenterY : symmetryCenter.y;
+                const angleDeg = (strokeOpts && strokeOpts.customSymmetryAngle !== undefined) ? strokeOpts.customSymmetryAngle : customSymmetryAngle;
+                const div = (strokeOpts && strokeOpts.rotationalDivisions !== undefined) ? strokeOpts.rotationalDivisions : rotationalDivisions;
+                const alpha = angleDeg * Math.PI / 180;
+                const mode = (strokeOpts && strokeOpts.symmetryMode !== undefined) ? strokeOpts.symmetryMode : symmetryMode;
+
+                if (mode === 'Y') {
+                    const pY = reflectPointAcrossAxis(x, y, cx, cy, alpha + Math.PI / 2);
+                    points.push({ x: pY.x, y: pY.y, mirrorType: 'Y' });
+                } else if (mode === 'X') {
+                    const pX = reflectPointAcrossAxis(x, y, cx, cy, alpha);
+                    points.push({ x: pX.x, y: pX.y, mirrorType: 'X' });
+                } else if (mode === 'XY') {
+                    const pY = reflectPointAcrossAxis(x, y, cx, cy, alpha + Math.PI / 2);
+                    const pX = reflectPointAcrossAxis(x, y, cx, cy, alpha);
+                    const pXY = { x: cx * 2 - x, y: cy * 2 - y };
+                    points.push({ x: pY.x, y: pY.y, mirrorType: 'Y' });
+                    points.push({ x: pX.x, y: pX.y, mirrorType: 'X' });
+                    points.push({ x: pXY.x, y: pXY.y, mirrorType: 'XY' });
+                } else if (mode === 'ROTATIONAL') {
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    for (let i = 1; i < div; i++) {
+                        const angle = (i * 2 * Math.PI) / div;
+                        const cos = Math.cos(angle);
+                        const sin = Math.sin(angle);
+                        points.push({
+                            x: cx + dx * cos - dy * sin,
+                            y: cy + dx * sin + dy * cos,
+                            mirrorType: 'R_' + i
+                        });
+                    }
+                } else if (mode === 'KALEIDOSCOPE') {
+                    const dx = x - cx;
+                    const dy = y - cy;
+                    for (let i = 0; i < div; i++) {
+                        const angle = (i * 2 * Math.PI) / div;
+                        const cos = Math.cos(angle);
+                        const sin = Math.sin(angle);
+                        if (i > 0) {
+                            points.push({
+                                x: cx + dx * cos - dy * sin,
+                                y: cy + dx * sin + dy * cos,
+                                mirrorType: 'K_' + i
+                            });
+                        }
+                        const pReflected = reflectPointAcrossAxis(x, y, cx, cy, alpha);
+                        const rDx = pReflected.x - cx;
+                        const rDy = pReflected.y - cy;
+                        points.push({
+                            x: cx + rDx * cos - rDy * sin,
+                            y: cy + rDx * sin + rDy * cos,
+                            mirrorType: 'KM_' + i
+                        });
+                    }
+                }
+                return points;
+            }
+
             function rotatePointAround(x, y, cx, cy, angle, isMirrored) {
                 let dx = x - cx;
                 let dy = y - cy;
@@ -4142,42 +4440,11 @@
                 };
             }
 
-            function getMirroredGradPoints(gradPoints, mode) {
+            function getMirroredGradPoints(gradPoints, mode, strokeOpts) {
                 if (!gradPoints) return null;
-                const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
-                const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
-                if (mode === 'Y') {
-                    return {
-                        x1: logicalCanvasCenterX * 2 - gradPoints.x1,
-                        y1: gradPoints.y1,
-                        x2: logicalCanvasCenterX * 2 - gradPoints.x2,
-                        y2: gradPoints.y2
-                    };
-                } else if (mode === 'X') {
-                    return {
-                        x1: gradPoints.x1,
-                        y1: logicalCanvasCenterY * 2 - gradPoints.y1,
-                        x2: gradPoints.x2,
-                        y2: logicalCanvasCenterY * 2 - gradPoints.y2
-                    };
-                } else if (mode === 'XY') {
-                    return {
-                        x1: logicalCanvasCenterX * 2 - gradPoints.x1,
-                        y1: logicalCanvasCenterY * 2 - gradPoints.y1,
-                        x2: logicalCanvasCenterX * 2 - gradPoints.x2,
-                        y2: logicalCanvasCenterY * 2 - gradPoints.y2
-                    };
-                } else if (mode && mode.startsWith('K')) {
-                    const parts = mode.split('_');
-                    const isMirrored = parts[0] === 'KM';
-                    const idx = parseInt(parts[1]) || 0;
-                    const S = parseInt(document.getElementById('symmetrySliceInput')?.value || 8) || 8;
-                    const angle = (idx * 2 * Math.PI) / S;
-                    const pt1 = rotatePointAround(gradPoints.x1, gradPoints.y1, logicalCanvasCenterX, logicalCanvasCenterY, angle, isMirrored);
-                    const pt2 = rotatePointAround(gradPoints.x2, gradPoints.y2, logicalCanvasCenterX, logicalCanvasCenterY, angle, isMirrored);
-                    return { x1: pt1.x, y1: pt1.y, x2: pt2.x, y2: pt2.y };
-                }
-                return gradPoints;
+                const pt1 = applySymmetryToPoint(gradPoints.x1, gradPoints.y1, mode, strokeOpts);
+                const pt2 = applySymmetryToPoint(gradPoints.x2, gradPoints.y2, mode, strokeOpts);
+                return { x1: pt1.x, y1: pt1.y, x2: pt2.x, y2: pt2.y };
             }
 
 
@@ -4321,6 +4588,10 @@
                             width: gridSize,
                             symmetryMode: sym ? symmetryMode : 'OFF',
                             symmetrySlices: symmetryMode === 'KALEIDOSCOPE' ? (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8) : 8,
+                            symmetryCenterX: symmetryCenter.x,
+                            symmetryCenterY: symmetryCenter.y,
+                            customSymmetryAngle: customSymmetryAngle,
+                            rotationalDivisions: rotationalDivisions,
                             points: []
                         };
                         // Add all cells filled during this first click
@@ -4342,6 +4613,10 @@
                             width: currentWidth,
                             symmetryMode: sym ? symmetryMode : 'OFF',
                             symmetrySlices: symmetryMode === 'KALEIDOSCOPE' ? (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8) : 8,
+                            symmetryCenterX: symmetryCenter.x,
+                            symmetryCenterY: symmetryCenter.y,
+                            customSymmetryAngle: customSymmetryAngle,
+                            rotationalDivisions: rotationalDivisions,
                             brushEffect: document.getElementById('brushEffectSelect') ? document.getElementById('brushEffectSelect').value : 'normal',
                             points: [{x: worldX, y: worldY, w: currentWidth, t: time}]
                         };
@@ -4842,48 +5117,15 @@
                 _drawPath(points, 'none');
 
                 if (applySymmetry) {
-                    const cx = DEFAULT_LOGICAL_WIDTH / 2;
-                    const cy = DEFAULT_LOGICAL_HEIGHT / 2;
-                    
-                    const getMirroredPoints = (pts, mode) => {
-                        return pts.map(p => {
-                            if (mode === 'Y') return { x: cx * 2 - p.x, y: p.y, w: p.w };
-                            if (mode === 'X') return { x: p.x, y: cy * 2 - p.y, w: p.w };
-                            if (mode === 'XY') return { x: cx * 2 - p.x, y: cy * 2 - p.y, w: p.w };
-                            return p;
+                    const refPoints = getSymmetricPoints(0, 0, strokeOpts);
+                    refPoints.forEach(rp => {
+                        const mType = rp.mirrorType;
+                        const symPoints = points.map(p => {
+                            const symPt = applySymmetryToPoint(p.x, p.y, mType, strokeOpts);
+                            return { x: symPt.x, y: symPt.y, w: p.w, t: p.t };
                         });
-                    };
-
-                    if (symmetryMode === 'Y') {
-                        _drawPath(getMirroredPoints(points, 'Y'), 'Y');
-                    } else if (symmetryMode === 'X') {
-                        _drawPath(getMirroredPoints(points, 'X'), 'X');
-                    } else if (symmetryMode === 'XY') {
-                        _drawPath(getMirroredPoints(points, 'Y'), 'Y');
-                        _drawPath(getMirroredPoints(points, 'X'), 'X');
-                        _drawPath(getMirroredPoints(points, 'XY'), 'XY');
-                    } else if (symmetryMode === 'KALEIDOSCOPE') {
-                        const S = parseInt(document.getElementById('symmetrySliceInput') ? document.getElementById('symmetrySliceInput').value : 8) || 8;
-                        const getKaleidoscopePoints = (pts, angle, isMirrored) => {
-                            return pts.map(p => {
-                                let dx = p.x - cx;
-                                let dy = p.y - cy;
-                                if (isMirrored) dx = -dx;
-                                return {
-                                    x: cx + dx * Math.cos(angle) - dy * Math.sin(angle),
-                                    y: cy + dx * Math.sin(angle) + dy * Math.cos(angle),
-                                    w: p.w
-                                };
-                            });
-                        };
-                        for (let i = 0; i < S; i++) {
-                            const angle = (i * 2 * Math.PI) / S;
-                            if (i > 0) {
-                                _drawPath(getKaleidoscopePoints(points, angle, false), 'K_' + i);
-                            }
-                            _drawPath(getKaleidoscopePoints(points, angle, true), 'KM_' + i);
-                        }
-                    }
+                        _drawPath(symPoints, mType);
+                    });
                 }
                 
                 restoreContextAfterDraw(ctx);
@@ -5167,39 +5409,60 @@
                 if (layer) ctx.restore();
 
                 if (applySymmetry) {
-                    const cw = DEFAULT_LOGICAL_WIDTH;
-                    const ch = DEFAULT_LOGICAL_HEIGHT;
-
                     const mirrorCellData = (cd, mode) => {
                         const mirrored = { ...cd, mirrorType: mode };
-                        if (mode === 'Y') {
-                            mirrored.x = cw - cd.x;
-                            mirrored.y = cd.y;
-                        } else if (mode === 'X') {
-                            mirrored.x = cd.x;
-                            mirrored.y = ch - cd.y;
-                        } else {
-                            mirrored.x = cw - cd.x;
-                            mirrored.y = ch - cd.y;
-                        }
+                        const symPt = applySymmetryToPoint(cd.x, cd.y, mode);
+                        mirrored.x = symPt.x;
+                        mirrored.y = symPt.y;
+                        
                         if (cd.vertices) {
                             mirrored.vertices = cd.vertices.map(v => {
-                                if (mode === 'Y') return { x: cw - v.x, y: v.y };
-                                if (mode === 'X') return { x: v.x, y: ch - v.y };
-                                return { x: cw - v.x, y: ch - v.y };
+                                return applySymmetryToPoint(v.x, v.y, mode);
                             });
                         }
                         if (cd.r1 !== undefined) {
-                            const mcx = (mode === 'Y' || mode === 'XY') ? cw - polarCenter.x : polarCenter.x;
-                            const mcy = (mode === 'X' || mode === 'XY') ? ch - polarCenter.y : polarCenter.y;
-                            mirrored.mirroredPolarCenter = { x: mcx, y: mcy };
+                            const mCenter = applySymmetryToPoint(polarCenter.x, polarCenter.y, mode);
+                            mirrored.mirroredPolarCenter = { x: mCenter.x, y: mCenter.y };
                             mirrored.r1 = cd.r1;
                             mirrored.r2 = cd.r2;
+                            
                             let t1 = cd.theta1, t2 = cd.theta2;
-                            if (mode === 'Y') { t1 = Math.PI - t2; t2 = Math.PI - cd.theta1; }
-                            else if (mode === 'X') { t1 = -t2; t2 = -cd.theta1; }
-                            else { t1 = Math.PI + cd.theta1; t2 = Math.PI + cd.theta2; }
-                            while (t1 < 0) { t1 += 2 * Math.PI; t2 += 2 * Math.PI; }
+                            const alpha = customSymmetryAngle * Math.PI / 180;
+                            let isReflection = false;
+                            let thetaRef = 0;
+                            let rotAngle = 0;
+                            
+                            if (mode === 'Y') {
+                                isReflection = true;
+                                thetaRef = alpha + Math.PI / 2;
+                            } else if (mode === 'X') {
+                                isReflection = true;
+                                thetaRef = alpha;
+                            } else if (mode === 'XY') {
+                                rotAngle = Math.PI;
+                            } else if (mode.startsWith('R_')) {
+                                const i = parseInt(mode.substring(2));
+                                rotAngle = (i * 2 * Math.PI) / rotationalDivisions;
+                            } else if (mode.startsWith('K_')) {
+                                const i = parseInt(mode.substring(2));
+                                rotAngle = (i * 2 * Math.PI) / rotationalDivisions;
+                            } else if (mode.startsWith('KM_')) {
+                                isReflection = true;
+                                thetaRef = alpha;
+                                const i = parseInt(mode.substring(3));
+                                rotAngle = (i * 2 * Math.PI) / rotationalDivisions;
+                            }
+                            
+                            if (isReflection) {
+                                let nt1 = 2 * thetaRef - t2;
+                                let nt2 = 2 * thetaRef - t1;
+                                t1 = nt1;
+                                t2 = nt2;
+                            }
+                            if (rotAngle !== 0) {
+                                t1 += rotAngle;
+                                t2 += rotAngle;
+                            }
                             mirrored.theta1 = t1;
                             mirrored.theta2 = t2;
                         }
@@ -5240,13 +5503,10 @@
                         if (layer2) ctx.restore();
                     };
 
-                    if (symmetryMode === 'Y') drawMirroredCell('Y');
-                    else if (symmetryMode === 'X') drawMirroredCell('X');
-                    else if (symmetryMode === 'XY') {
-                        drawMirroredCell('Y');
-                        drawMirroredCell('X');
-                        drawMirroredCell('XY');
-                    }
+                    const refPoints = getSymmetricPoints(cellData.x, cellData.y);
+                    refPoints.forEach(rp => {
+                        drawMirroredCell(rp.mirrorType);
+                    });
                 }
             }
 
@@ -5325,7 +5585,8 @@
                     }
                 }
             }
-                        function drawDot(ctx,worldX,worldY,applySymmetry,gradPoints,strokeOpts){ 
+
+            function drawDot(ctx,worldX,worldY,applySymmetry,gradPoints,strokeOpts){ 
                 const layer = layers.find(l => l.context === ctx);
                 if (layer) {
                     ctx.save();
@@ -5363,27 +5624,10 @@
                 };
                 _draw(ctx,worldX,worldY,'none');
                 if(applySymmetry){ 
-                    const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
-                    const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
-
-                    if(symmetryMode==='Y')_draw(ctx, logicalCanvasCenterX * 2 - worldX ,worldY,'Y');
-                    else if(symmetryMode==='X')_draw(ctx,worldX, logicalCanvasCenterY * 2 - worldY,'X');
-                    else if(symmetryMode==='XY'){
-                        _draw(ctx,logicalCanvasCenterX * 2 - worldX,worldY,'Y');
-                        _draw(ctx,worldX,logicalCanvasCenterY * 2 - worldY,'X');
-                        _draw(ctx,logicalCanvasCenterX * 2 - worldX,logicalCanvasCenterY * 2 - worldY,'XY');
-                    } else if (symmetryMode === 'KALEIDOSCOPE') {
-                        const S = strokeOpts ? (strokeOpts.symmetrySlices || 8) : (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8);
-                        for (let i = 0; i < S; i++) {
-                            const angle = (i * 2 * Math.PI) / S;
-                            if (i > 0) {
-                                const pt = rotatePointAround(worldX, worldY, logicalCanvasCenterX, logicalCanvasCenterY, angle, false);
-                                _draw(ctx, pt.x, pt.y, 'K_' + i);
-                            }
-                            const ptM = rotatePointAround(worldX, worldY, logicalCanvasCenterX, logicalCanvasCenterY, angle, true);
-                            _draw(ctx, ptM.x, ptM.y, 'KM_' + i);
-                        }
-                    }
+                    const refPoints = getSymmetricPoints(worldX, worldY, strokeOpts);
+                    refPoints.forEach(rp => {
+                        _draw(ctx, rp.x, rp.y, rp.mirrorType);
+                    });
                 }
                 if (layer) ctx.restore();
                 restoreContextAfterDraw(ctx);
@@ -5413,29 +5657,14 @@
                     _ctx.stroke();
                 };
                 _draw(ctx,worldX1,worldY1,worldX2,worldY2,'none');
-                if(applySymmetry){
-                    const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
-                    const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
-                    if(symmetryMode==='Y'){_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2,'Y');}
-                    else if(symmetryMode==='X'){_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2,'X');}
-                    else if(symmetryMode==='XY'){
-                        _draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2,'Y');
-                        _draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2,'X');
-                        _draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2,'XY');
-                    } else if (symmetryMode === 'KALEIDOSCOPE') {
-                        const S = strokeOpts ? (strokeOpts.symmetrySlices || 8) : (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8);
-                        for (let i = 0; i < S; i++) {
-                            const angle = (i * 2 * Math.PI) / S;
-                            if (i > 0) {
-                                const pt1 = rotatePointAround(worldX1, worldY1, logicalCanvasCenterX, logicalCanvasCenterY, angle, false);
-                                const pt2 = rotatePointAround(worldX2, worldY2, logicalCanvasCenterX, logicalCanvasCenterY, angle, false);
-                                _draw(ctx, pt1.x, pt1.y, pt2.x, pt2.y, 'K_' + i);
-                            }
-                            const pt1M = rotatePointAround(worldX1, worldY1, logicalCanvasCenterX, logicalCanvasCenterY, angle, true);
-                            const pt2M = rotatePointAround(worldX2, worldY2, logicalCanvasCenterX, logicalCanvasCenterY, angle, true);
-                            _draw(ctx, pt1M.x, pt1M.y, pt2M.x, pt2M.y, 'KM_' + i);
-                        }
-                    }
+                if (applySymmetry) {
+                    const refPoints = getSymmetricPoints(0, 0, strokeOpts);
+                    refPoints.forEach(rp => {
+                        const mType = rp.mirrorType;
+                        const symPt1 = applySymmetryToPoint(worldX1, worldY1, mType, strokeOpts);
+                        const symPt2 = applySymmetryToPoint(worldX2, worldY2, mType, strokeOpts);
+                        _draw(ctx, symPt1.x, symPt1.y, symPt2.x, symPt2.y, mType);
+                    });
                 }
                 if (layer) ctx.restore();
                 restoreContextAfterDraw(ctx);
@@ -5489,37 +5718,27 @@
                     }
                 };
                 _draw(ctx,worldX1,worldY1,worldX2,worldY2,gradPoints, 'none'); 
-                if(applySymmetry){ 
-                    const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
-                    const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
-
-                    const symGrad = (op, baseGradP) => {
-                         if (!baseGradP) return null;
-                         if (op === 'Y') return {gradX1:logicalCanvasCenterX*2-baseGradP.gradX1,gradY1:baseGradP.gradY1,gradX2:logicalCanvasCenterX*2-baseGradP.gradX2,gradY2:baseGradP.gradY2};
-                         if (op === 'X') return {gradX1:baseGradP.gradX1,gradY1:logicalCanvasCenterY*2-baseGradP.gradY1,gradX2:baseGradP.gradX2,gradY2:logicalCanvasCenterY*2-baseGradP.gradY2};
-                         return {gradX1:logicalCanvasCenterX*2-baseGradP.gradX1, gradY1:logicalCanvasCenterY*2-baseGradP.gradY1, gradX2:logicalCanvasCenterX*2-baseGradP.gradX2, gradY2:logicalCanvasCenterY*2-baseGradP.gradY2};
-                    };
-
-                    if(symmetryMode==='Y')_draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2, symGrad('Y',gradPoints), 'Y');
-                    else if(symmetryMode==='X')_draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2, symGrad('X',gradPoints), 'X');
-                    else if(symmetryMode==='XY'){
-                        _draw(ctx,logicalCanvasCenterX*2-worldX1,worldY1,logicalCanvasCenterX*2-worldX2,worldY2,symGrad('Y',gradPoints), 'Y');
-                        _draw(ctx,worldX1,logicalCanvasCenterY*2-worldY1,worldX2,logicalCanvasCenterY*2-worldY2,symGrad('X',gradPoints), 'X');
-                        _draw(ctx,logicalCanvasCenterX*2-worldX1,logicalCanvasCenterY*2-worldY1,logicalCanvasCenterX*2-worldX2,logicalCanvasCenterY*2-worldY2,symGrad('XY',gradPoints), 'XY');
-                    } else if (symmetryMode === 'KALEIDOSCOPE') {
-                        const S = strokeOpts ? (strokeOpts.symmetrySlices || 8) : (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8);
-                        for (let i = 0; i < S; i++) {
-                            const angle = (i * 2 * Math.PI) / S;
-                            if (i > 0) {
-                                const pt1 = rotatePointAround(worldX1, worldY1, logicalCanvasCenterX, logicalCanvasCenterY, angle, false);
-                                const pt2 = rotatePointAround(worldX2, worldY2, logicalCanvasCenterX, logicalCanvasCenterY, angle, false);
-                                _draw(ctx, pt1.x, pt1.y, pt2.x, pt2.y, symGrad('K_' + i, gradPoints), 'K_' + i);
-                            }
-                            const pt1M = rotatePointAround(worldX1, worldY1, logicalCanvasCenterX, logicalCanvasCenterY, angle, true);
-                            const pt2M = rotatePointAround(worldX2, worldY2, logicalCanvasCenterX, logicalCanvasCenterY, angle, true);
-                            _draw(ctx, pt1M.x, pt1M.y, pt2M.x, pt2M.y, symGrad('KM_' + i, gradPoints), 'KM_' + i);
+                if (applySymmetry) {
+                    const refPoints = getSymmetricPoints(0, 0, strokeOpts);
+                    refPoints.forEach(rp => {
+                        const mType = rp.mirrorType;
+                        const symPt1 = applySymmetryToPoint(worldX1, worldY1, mType, strokeOpts);
+                        const symPt2 = applySymmetryToPoint(worldX2, worldY2, mType, strokeOpts);
+                        
+                        let symGradP = null;
+                        if (gradPoints) {
+                            const symG1 = applySymmetryToPoint(gradPoints.gradX1, gradPoints.gradY1, mType, strokeOpts);
+                            const symG2 = applySymmetryToPoint(gradPoints.gradX2, gradPoints.gradY2, mType, strokeOpts);
+                            symGradP = {
+                                gradX1: symG1.x,
+                                gradY1: symG1.y,
+                                gradX2: symG2.x,
+                                gradY2: symG2.y
+                            };
                         }
-                    }
+                        
+                        _draw(ctx, symPt1.x, symPt1.y, symPt2.x, symPt2.y, symGradP, mType);
+                    });
                 }
                 if (layer) ctx.restore();
                 restoreContextAfterDraw(ctx);
@@ -5555,11 +5774,10 @@
                     };
                     _draw(ctx,worldX,worldY,currentTextAlign);
                     if(applySymmetry){
-                        const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
-                        const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
-                        let mirroredX;
-                        if(symmetryMode==='Y'||symmetryMode==='XY'){mirroredX=logicalCanvasCenterX*2-worldX;_draw(ctx,mirroredX,worldY,currentTextAlign);}
-                        if(symmetryMode==='X'||symmetryMode==='XY'){mirroredX=(symmetryMode==='XY')?logicalCanvasCenterX*2-worldX:worldX;_draw(ctx,mirroredX,logicalCanvasCenterY*2-worldY,currentTextAlign);}
+                        const refPoints = getSymmetricPoints(worldX, worldY);
+                        refPoints.forEach(rp => {
+                            _draw(ctx, rp.x, rp.y, currentTextAlign);
+                        });
                     }
                     if (layer) ctx.restore();
                     restoreContextAfterDraw(ctx);
@@ -5599,11 +5817,11 @@
                 };
                 _draw(ctx,worldCX,worldCY);
                 if(applySymmetry){
-                    const logicalCanvasCenterX = DEFAULT_LOGICAL_WIDTH / 2;
-                    const logicalCanvasCenterY = DEFAULT_LOGICAL_HEIGHT / 2;
-                    if(symmetryMode==='Y')_draw(ctx,logicalCanvasCenterX*2-worldCX,worldCY);
-                    else if(symmetryMode==='X')_draw(ctx,worldCX,logicalCanvasCenterY*2-worldCY);
-                    else if(symmetryMode==='XY'){_draw(ctx,logicalCanvasCenterX*2-worldCX,worldCY);_draw(ctx,worldCX,logicalCanvasCenterY*2-worldCY);_draw(ctx,logicalCanvasCenterX*2-worldCX,logicalCanvasCenterY*2-worldCY);}}
+                    const refPoints = getSymmetricPoints(worldCX, worldCY);
+                    refPoints.forEach(rp => {
+                        _draw(ctx, rp.x, rp.y);
+                    });
+                }
                 if (layer) ctx.restore();
                 restoreContextAfterDraw(ctx);
             }
@@ -6063,6 +6281,111 @@
                     }
                 }
                 return null;
+            }
+
+            function drawSymmetryGuidesAndHandles(ctx) {
+                if (!ctx) return;
+                
+                const cx = symmetryCenter.x;
+                const cy = symmetryCenter.y;
+                const r = 8; // logical radius for center handle
+                
+                // 1. Draw Symmetry Guides if showSymmetryGuides is checked and mode !== 'OFF'
+                if (showSymmetryGuides && symmetryMode !== 'OFF') {
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(255, 107, 74, 0.6)'; // dashed/colored lines
+                    ctx.lineWidth = 1.5 / zoomLevel;
+                    ctx.setLineDash([5 / zoomLevel, 5 / zoomLevel]);
+                    
+                    const angleRad = customSymmetryAngle * Math.PI / 180;
+                    const len = Math.max(DEFAULT_LOGICAL_WIDTH, DEFAULT_LOGICAL_HEIGHT) * 2;
+                    
+                    if (symmetryMode === 'Y') {
+                        // Mirror across a line perpendicular to custom angle (i.e. angleRad + PI/2)
+                        const theta = angleRad + Math.PI / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(cx - len * Math.cos(theta), cy - len * Math.sin(theta));
+                        ctx.lineTo(cx + len * Math.cos(theta), cy + len * Math.sin(theta));
+                        ctx.stroke();
+                    } else if (symmetryMode === 'X') {
+                        // Mirror across custom angle line
+                        ctx.beginPath();
+                        ctx.moveTo(cx - len * Math.cos(angleRad), cy - len * Math.sin(angleRad));
+                        ctx.lineTo(cx + len * Math.cos(angleRad), cy + len * Math.sin(angleRad));
+                        ctx.stroke();
+                    } else if (symmetryMode === 'XY') {
+                        // Draw both axes
+                        const thetaY = angleRad + Math.PI / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(cx - len * Math.cos(angleRad), cy - len * Math.sin(angleRad));
+                        ctx.lineTo(cx + len * Math.cos(angleRad), cy + len * Math.sin(angleRad));
+                        ctx.moveTo(cx - len * Math.cos(thetaY), cy - len * Math.sin(thetaY));
+                        ctx.lineTo(cx + len * Math.cos(thetaY), cy + len * Math.sin(thetaY));
+                        ctx.stroke();
+                    } else if (symmetryMode === 'ROTATIONAL') {
+                        // Draw radial lines at multiples of (360 / divisions)
+                        for (let i = 0; i < rotationalDivisions; i++) {
+                            const theta = angleRad + (i * 2 * Math.PI) / rotationalDivisions;
+                            ctx.beginPath();
+                            ctx.moveTo(cx, cy);
+                            ctx.lineTo(cx + len * Math.cos(theta), cy + len * Math.sin(theta));
+                            ctx.stroke();
+                        }
+                    } else if (symmetryMode === 'KALEIDOSCOPE') {
+                        // Draw radial sectors
+                        for (let i = 0; i < rotationalDivisions; i++) {
+                            const theta = angleRad + (i * 2 * Math.PI) / rotationalDivisions;
+                            ctx.beginPath();
+                            ctx.moveTo(cx - len * Math.cos(theta), cy - len * Math.sin(theta));
+                            ctx.lineTo(cx + len * Math.cos(theta), cy + len * Math.sin(theta));
+                            ctx.stroke();
+                        }
+                    }
+                    ctx.restore();
+                }
+                
+                // 2. Draw Interactive Target Handle if Set Symmetry Center or Move tool is active
+                if (currentTool === 'setSymmetryCenter' || currentTool === 'move') {
+                    ctx.save();
+                    
+                    // Render handle circle and crosshair
+                    ctx.strokeStyle = '#FF6B4A';
+                    ctx.fillStyle = isDraggingSymmetryCenter ? 'rgba(255, 107, 74, 0.4)' : 'rgba(255, 107, 74, 0.15)';
+                    ctx.lineWidth = 2 / zoomLevel;
+                    
+                    // Target circle
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r / zoomLevel, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    
+                    // Outer crosshair ticks
+                    const tickLen = 6 / zoomLevel;
+                    const offset = 3 / zoomLevel;
+                    ctx.lineWidth = 1.5 / zoomLevel;
+                    ctx.beginPath();
+                    // Left tick
+                    ctx.moveTo(cx - r / zoomLevel - offset, cy);
+                    ctx.lineTo(cx - r / zoomLevel - offset - tickLen, cy);
+                    // Right tick
+                    ctx.moveTo(cx + r / zoomLevel + offset, cy);
+                    ctx.lineTo(cx + r / zoomLevel + offset + tickLen, cy);
+                    // Top tick
+                    ctx.moveTo(cx, cy - r / zoomLevel - offset);
+                    ctx.lineTo(cx, cy - r / zoomLevel - offset - tickLen);
+                    // Bottom tick
+                    ctx.moveTo(cx, cy + r / zoomLevel + offset);
+                    ctx.lineTo(cx, cy + r / zoomLevel + offset + tickLen);
+                    ctx.stroke();
+                    
+                    // Center dot
+                    ctx.fillStyle = '#FF6B4A';
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 2 / zoomLevel, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.restore();
+                }
             }
 
             function drawGridHandles(targetCtx) {
