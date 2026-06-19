@@ -524,6 +524,14 @@
             align-items: center;
             gap: 12px;
             transition: opacity 0.3s ease, transform 0.3s ease;
+            max-width: 90vw;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        #mobileQuickDock::-webkit-scrollbar {
+            display: none;
         }
         body.light-theme #mobileQuickDock {
             background: rgba(255, 255, 255, 0.85);
@@ -544,6 +552,7 @@
             cursor: pointer;
             transition: background-color 0.2s, transform 0.1s;
             position: relative;
+            flex-shrink: 0;
         }
         #mobileQuickDock button:active {
             transform: scale(0.92);
@@ -1705,8 +1714,15 @@
                 const resetCenterBtn = document.getElementById('resetSymmetryCenterBtn');
                 if (resetCenterBtn) {
                     resetCenterBtn.addEventListener('click', () => {
-                        symmetryCenter.x = DEFAULT_LOGICAL_WIDTH / 2;
-                        symmetryCenter.y = DEFAULT_LOGICAL_HEIGHT / 2;
+                        let cx = DEFAULT_LOGICAL_WIDTH / 2;
+                        let cy = DEFAULT_LOGICAL_HEIGHT / 2;
+                        if (snapToGrid) {
+                            const snapped = snapPoint(cx, cy);
+                            cx = snapped.x;
+                            cy = snapped.y;
+                        }
+                        symmetryCenter.x = cx;
+                        symmetryCenter.y = cy;
                         if (sxInput) sxInput.value = Math.round(symmetryCenter.x);
                         if (syInput) syInput.value = Math.round(symmetryCenter.y);
                         renderComposite();
@@ -2391,10 +2407,25 @@
                     case 'fontFamily':currentFontFamily=target.value;break;
                     case 'textAlign':currentTextAlign=target.value;break;
                     case 'showGridCheckbox': showGrid = target.checked; updateColorPropertiesUI(); renderComposite(); break;
-                    case 'snapToGridCheckbox': snapToGrid = target.checked; break;
-                    case 'gridSizeInput': gridSize = Math.max(5, parseInt(target.value, 10) || 20); target.value = gridSize; if(showGrid) renderComposite(); break;
-                    case 'gridColorPicker': gridColor = target.value; if(showGrid) renderComposite(); break;
-                    case 'gridTypeSelect': gridType = target.value; if(showGrid) renderComposite(); break;
+                    case 'snapToGridCheckbox': 
+                        snapToGrid = target.checked; 
+                        if (snapToGrid) { snapSymmetryCenterToGrid(); renderComposite(); } 
+                        break;
+                    case 'gridSizeInput': 
+                        gridSize = Math.max(5, parseInt(target.value, 10) || 20); 
+                        target.value = gridSize; 
+                        if (snapToGrid) snapSymmetryCenterToGrid();
+                        if (showGrid) renderComposite(); 
+                        break;
+                    case 'gridColorPicker': 
+                        gridColor = target.value; 
+                        if (showGrid) renderComposite(); 
+                        break;
+                    case 'gridTypeSelect': 
+                        gridType = target.value; 
+                        if (snapToGrid) snapSymmetryCenterToGrid();
+                        if (showGrid) renderComposite(); 
+                        break;
                 }
             }
 
@@ -3490,6 +3521,18 @@
                 return { x: snapX, y: snapY };
             }
 
+            function snapSymmetryCenterToGrid() {
+                if (snapToGrid) {
+                    const snapped = snapPoint(symmetryCenter.x, symmetryCenter.y);
+                    symmetryCenter.x = snapped.x;
+                    symmetryCenter.y = snapped.y;
+                    const sxInput = document.getElementById('symmetryCenterXInput');
+                    const syInput = document.getElementById('symmetryCenterYInput');
+                    if (sxInput) sxInput.value = Math.round(symmetryCenter.x);
+                    if (syInput) syInput.value = Math.round(symmetryCenter.y);
+                }
+            }
+
             function checkAlignmentGuides(cx, cy, halfW, halfH, currentId = null) {
                 alignmentGuides = [];
                 let snappedX = cx - halfW;
@@ -3591,8 +3634,10 @@
                     activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
                     drawingPointerId = e.pointerId;
                     isDraggingSymmetryCenter = true;
-                    symmetryCenter.x = initWX;
-                    symmetryCenter.y = initWY;
+                    let pt = { x: initWX, y: initWY };
+                    if (snapToGrid) pt = snapPoint(initWX, initWY);
+                    symmetryCenter.x = pt.x;
+                    symmetryCenter.y = pt.y;
                     const sxInput = document.getElementById('symmetryCenterXInput');
                     const syInput = document.getElementById('symmetryCenterYInput');
                     if (sxInput) sxInput.value = Math.round(symmetryCenter.x);
@@ -3689,8 +3734,10 @@
 
                 if (isDraggingSymmetryCenter && e.pointerId === drawingPointerId) {
                     const {x: wX, y: wY} = screenToWorld(e.clientX, e.clientY);
-                    symmetryCenter.x = wX;
-                    symmetryCenter.y = wY;
+                    let pt = { x: wX, y: wY };
+                    if (snapToGrid) pt = snapPoint(wX, wY);
+                    symmetryCenter.x = pt.x;
+                    symmetryCenter.y = pt.y;
                     const sxInput = document.getElementById('symmetryCenterXInput');
                     const syInput = document.getElementById('symmetryCenterYInput');
                     if (sxInput) sxInput.value = Math.round(symmetryCenter.x);
