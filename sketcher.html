@@ -874,8 +874,10 @@
                 <button id="gridbucketTool" title="Grid Bucket Fill (B)">🔳</button>
                 <button id="gridselectTool" title="Grid Selection Tool (Shift+M)">🏁</button>
                 <button id="isostampTool" title="Isometric Stamp (K)">🧊</button>
+                <button id="voxelTool" title="Voxel Painter (V)">🧱</button>
+                <button id="extruderTool" title="Path Extruder (R)">🏗️</button>
                 <button id="selectTool" title="Selection Tool (M)">⬚</button> 
-                <button id="moveTool" title="Move Tool (V)">✥</button> 
+                <button id="moveTool" title="Move Tool (Shift+V)">✥</button> 
             </div></div>
             <div class="tool-section"><h3>Properties</h3>
                 <div class="tool-row" id="colorTypeRow"><label for="colorTypeSelect">Color Type</label><select id="colorTypeSelect"><option value="solid">Solid</option><option value="linear">Linear Gradient</option></select></div>
@@ -934,7 +936,17 @@
                         <option value="perspective1">1-Pt Perspective</option>
                         <option value="perspective2">2-Pt Perspective</option>
                         <option value="perspective3">3-Pt Perspective</option>
+                        <option value="military">Military (45°/45°)</option>
+                        <option value="cabinet">Cabinet Oblique</option>
                     </select>
+                </div>
+                <div class="tool-row" id="isoPlaneRow" style="display: none; align-items: center; gap: 4px;">
+                    <label style="min-width: 60px;">3D Plane</label>
+                    <div style="display: flex; gap: 4px; flex-grow: 1;">
+                        <button id="isoPlaneTopBtn" class="active" style="flex-grow: 1; font-size: 0.8em; padding: 4px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-color); cursor: pointer;">Top</button>
+                        <button id="isoPlaneLeftBtn" style="flex-grow: 1; font-size: 0.8em; padding: 4px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-color); cursor: pointer;">Left</button>
+                        <button id="isoPlaneRightBtn" style="flex-grow: 1; font-size: 0.8em; padding: 4px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--input-bg); color: var(--text-color); cursor: pointer;">Right</button>
+                    </div>
                 </div>
                 <div class="tool-row" id="guidelinesRow">
                     <label style="min-width: 80px;">Guidelines</label>
@@ -1415,7 +1427,12 @@
             let customSymmetryAngle = 0;
             let showSymmetryGuides = false;
             let gridOutlineMode = false;
+            let activeIsoPlane = 'top'; // 'top', 'left', or 'right'
             let tilingPreview = false;
+            let voxelPaintedCellsDuringDrag = new Set();
+            let extruderPoints = [];
+            let extruderPhase = 0; // 0: idle, 1: drawing path, 2: extruding
+            let extruderHeight = 0;
             let tilingCacheCanvas = document.createElement('canvas');
             let tilingCacheCtx = tilingCacheCanvas.getContext('2d');
             let paletteColors = [];
@@ -1629,8 +1646,28 @@
                     sidebarBackdrop.classList.add('hidden');
                 }
             }
+
+            function setIsoPlane(plane) {
+                if (!['top', 'left', 'right'].includes(plane)) return;
+                activeIsoPlane = plane;
+                
+                const topBtn = document.getElementById('isoPlaneTopBtn');
+                const leftBtn = document.getElementById('isoPlaneLeftBtn');
+                const rightBtn = document.getElementById('isoPlaneRightBtn');
+                
+                if (topBtn) topBtn.classList.toggle('active', plane === 'top');
+                if (leftBtn) leftBtn.classList.toggle('active', plane === 'left');
+                if (rightBtn) rightBtn.classList.toggle('active', plane === 'right');
+                
+                updateStatus(`Active 3D plane set to: ${plane.toUpperCase()}`);
+                renderComposite();
+            }
             
             function setupEventListeners() {
+                document.getElementById('isoPlaneTopBtn')?.addEventListener('click', () => setIsoPlane('top'));
+                document.getElementById('isoPlaneLeftBtn')?.addEventListener('click', () => setIsoPlane('left'));
+                document.getElementById('isoPlaneRightBtn')?.addEventListener('click', () => setIsoPlane('right'));
+
                 startSketchingBtn.addEventListener('click', hideIntro);
                 toggleSidebarBtn.addEventListener('click', () => {
                     sidebar.classList.toggle('collapsed');
@@ -2340,6 +2377,12 @@
                 updateMobileColorUI();
                 updateCursor();
                 updateColorHarmonies();
+
+                const isAxon = ['isometric', 'dimetric', 'trimetric', 'military'].includes(gridType);
+                const isoPlaneRow = document.getElementById('isoPlaneRow');
+                if (isoPlaneRow) {
+                    isoPlaneRow.style.display = (isAxon && showGrid) ? 'flex' : 'none';
+                }
             }
 
 
@@ -2424,6 +2467,7 @@
                     case 'gridTypeSelect': 
                         gridType = target.value; 
                         if (snapToGrid) snapSymmetryCenterToGrid();
+                        updateColorPropertiesUI();
                         if (showGrid) renderComposite(); 
                         break;
                 }
@@ -2454,7 +2498,7 @@
                     const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
                     const isUndoRedo = ctrlKey && (keyLower === 'z' || keyLower === 'y');
                     const isToolMap = !e.ctrlKey && !e.metaKey && !e.altKey && (
-                        ['p','e','g','x','l','h','f','t','i','s','m','v','b','k'].includes(keyLower) ||
+                        ['p','e','g','x','l','h','f','t','i','s','m','v','b','k','r'].includes(keyLower) ||
                         e.key === '[' || e.key === ']'
                     );
                     const isOtherShortcuts = (ctrlKey && (keyLower === 'x' || keyLower === 'g')) ||
@@ -2467,6 +2511,29 @@
                 if (isCanvasLocked()) {
                     if (e && e.preventDefault) e.preventDefault();
                     return;
+                }
+                if (e.key === 'Escape') {
+                    if (currentTool === 'extruder' && extruderPhase > 0) {
+                        e.preventDefault();
+                        extruderPhase = 0;
+                        extruderPoints = [];
+                        extruderHeight = 0;
+                        updateStatus("Extrusion cancelled.");
+                        renderComposite();
+                        return;
+                    }
+                }
+                if (e.key === 'Enter') {
+                    if (currentTool === 'extruder' && extruderPhase === 1) {
+                        e.preventDefault();
+                        if (extruderPoints.length >= 2) {
+                            extruderPhase = 2;
+                            extruderHeight = 0;
+                            updateStatus("Floor path closed. Move mouse vertically to extrude, click to bake.");
+                            renderComposite();
+                        }
+                        return;
+                    }
                 }
                 if (activeUploadedImage) {
                     if (e.key === 'Escape') {
@@ -2502,6 +2569,9 @@
                 if (keyName === 'm' && e.shiftKey) {
                     keyName = 'shift_m';
                 }
+                if (keyName === 'v' && e.shiftKey) {
+                    keyName = 'shift_v';
+                }
                 const toolMap = {
                     p: 'penTool',
                     e: 'eraserTool',
@@ -2518,7 +2588,9 @@
                     m: 'selectTool',
                     shift_m: 'gridselectTool',
                     k: 'isostampTool',
-                    v: 'moveTool'
+                    v: 'voxelTool',
+                    shift_v: 'moveTool',
+                    r: 'extruderTool'
                 };
                 if(!e.ctrlKey && !e.metaKey && !e.altKey) {
                     if (toolMap[keyName]) {
@@ -2532,6 +2604,15 @@
                         e.preventDefault();
                         lineWidthSlider.value = Math.min(100, parseInt(lineWidthSlider.value) + 1);
                         handlePropertyChange({target: lineWidthSlider});
+                    }
+                }
+                if (e.key === 'F5') {
+                    const isAxon = ['isometric', 'dimetric', 'trimetric', 'military'].includes(gridType);
+                    if (isAxon && showGrid) {
+                        e.preventDefault();
+                        const planes = ['top', 'left', 'right'];
+                        const nextIndex = (planes.indexOf(activeIsoPlane) + 1) % planes.length;
+                        setIsoPlane(planes[nextIndex]);
                     }
                 }
                 if(ctrlKey && e.key.toLowerCase()==='x') { e.preventDefault(); symmetryToggleBtn.click(); }
@@ -2669,6 +2750,7 @@
                     updateMergeButtonState();
                     if(layers[i])updateStatus(`Active layer: ${layers[i].name}.`);
                     updateGridCellPalette();
+                    if (newL) rebuildVoxelStacks(newL.name);
                 }else{
                     activeLayerIndex=-1;
                     updateMergeButtonState();
@@ -2886,7 +2968,7 @@
                     targetCtx.globalAlpha = 0.3;
                     targetCtx.setLineDash([]);
 
-                    if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric') {
+                    if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric' || gridType === 'military') {
                         let alpha = Math.PI / 6; // 30 degrees default (isometric)
                         let beta = Math.PI / 6;  // 30 degrees default (isometric)
                         
@@ -2896,6 +2978,9 @@
                         } else if (gridType === 'trimetric') {
                             alpha = 15 * Math.PI / 180;
                             beta = 35 * Math.PI / 180;
+                        } else if (gridType === 'military') {
+                            alpha = 45 * Math.PI / 180;
+                            beta = 45 * Math.PI / 180;
                         }
 
                         const W = gridSize * Math.cos(alpha);
@@ -2935,6 +3020,41 @@
                         for (let j = jStart2; j <= jEnd2; j++) {
                             const yLeft = -worldLeft * tanBeta + j * H_spacing;
                             const yRight = -worldRight * tanBeta + j * H_spacing;
+                            targetCtx.beginPath();
+                            targetCtx.moveTo(worldLeft, yLeft);
+                            targetCtx.lineTo(worldRight, yRight);
+                            targetCtx.stroke();
+                        }
+                    } else if (gridType === 'cabinet') {
+                        // 1. Horizontal lines
+                        const startGridY = Math.floor(worldTop / gridSize) * gridSize;
+                        const endGridY = Math.ceil(worldBottom / gridSize) * gridSize;
+                        for (let y = startGridY; y <= endGridY; y += gridSize) {
+                            targetCtx.beginPath();
+                            targetCtx.moveTo(worldLeft, y);
+                            targetCtx.lineTo(worldRight, y);
+                            targetCtx.stroke();
+                        }
+
+                        // 2. Vertical lines
+                        const startGridX = Math.floor(worldLeft / gridSize) * gridSize;
+                        const endGridX = Math.ceil(worldRight / gridSize) * gridSize;
+                        for (let x = startGridX; x <= endGridX; x += gridSize) {
+                            targetCtx.beginPath();
+                            targetCtx.moveTo(x, worldTop);
+                            targetCtx.lineTo(x, worldBottom);
+                            targetCtx.stroke();
+                        }
+
+                        // 3. Cabinet Diagonal lines (slope -1, angle -45 deg)
+                        const H_spacing = gridSize;
+                        const cMin = worldTop + worldLeft;
+                        const cMax = worldBottom + worldRight;
+                        const jStart = Math.floor(cMin / H_spacing);
+                        const jEnd = Math.ceil(cMax / H_spacing);
+                        for (let j = jStart; j <= jEnd; j++) {
+                            const yLeft = -worldLeft + j * H_spacing;
+                            const yRight = -worldRight + j * H_spacing;
                             targetCtx.beginPath();
                             targetCtx.moveTo(worldLeft, yLeft);
                             targetCtx.lineTo(worldRight, yRight);
@@ -3332,6 +3452,38 @@
                 drawUserGuidelines(mainCtx);
                 drawGridHandles(mainCtx);
                 drawSymmetryGuidesAndHandles(mainCtx);
+
+                if (currentTool === 'extruder' && extruderPhase > 0) {
+                    mainCtx.save();
+                    
+                    if (extruderPhase === 1) {
+                        mainCtx.strokeStyle = currentSolidColor;
+                        mainCtx.lineWidth = 2 * deviceScale;
+                        mainCtx.setLineDash([]);
+                        mainCtx.beginPath();
+                        if (extruderPoints.length > 0) {
+                            mainCtx.moveTo(extruderPoints[0].x * deviceScale, extruderPoints[0].y * deviceScale);
+                            for (let i = 1; i < extruderPoints.length; i++) {
+                                mainCtx.lineTo(extruderPoints[i].x * deviceScale, extruderPoints[i].y * deviceScale);
+                            }
+                            mainCtx.stroke();
+                            
+                            const snapped = snapPoint(lastX, lastY);
+                            mainCtx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                            mainCtx.setLineDash([5, 5]);
+                            mainCtx.beginPath();
+                            mainCtx.moveTo(extruderPoints[extruderPoints.length - 1].x * deviceScale, extruderPoints[extruderPoints.length - 1].y * deviceScale);
+                            mainCtx.lineTo(snapped.x * deviceScale, snapped.y * deviceScale);
+                            mainCtx.stroke();
+                            mainCtx.setLineDash([]);
+                        }
+                    } else if (extruderPhase === 2) {
+                        drawExtrusion(mainCtx, extruderPoints, extruderHeight, currentSolidColor);
+                    }
+                    
+                    mainCtx.restore();
+                }
+
                 mainCtx.restore();
 
                 if (currentTool === 'move' && isMovingSelection && movingSelectionData && movingSelectionData.imageData) {
@@ -3418,7 +3570,7 @@
                 });
                 
                 if (!snappedToGuide && snapToGrid) {
-                    if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric') {
+                    if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric' || gridType === 'military') {
                         let alpha = Math.PI / 6;
                         let beta = Math.PI / 6;
                         if (gridType === 'dimetric') {
@@ -3427,6 +3579,9 @@
                         } else if (gridType === 'trimetric') {
                             alpha = 15 * Math.PI / 180;
                             beta = 35 * Math.PI / 180;
+                        } else if (gridType === 'military') {
+                            alpha = 45 * Math.PI / 180;
+                            beta = 45 * Math.PI / 180;
                         }
                         
                         const W = gridSize * Math.cos(alpha);
@@ -3440,6 +3595,9 @@
                         const y2 = -snapX * Math.tan(beta) + m * gridSize;
 
                         snapY = Math.abs(y - y1) < Math.abs(y - y2) ? y1 : y2;
+                    } else if (gridType === 'cabinet') {
+                        snapX = Math.round(x / gridSize) * gridSize;
+                        snapY = Math.round(y / gridSize) * gridSize;
                     } else if (gridType === 'triangular') {
                         const H_spacing = gridSize * 0.8660254;
                         let bestDist = Infinity;
@@ -4655,7 +4813,7 @@
                 
                 const activeL = getActiveLayer();
                 if (activeL && activeL.locked) {
-                    const isEditTool = ['pen', 'eraser', 'line', 'shape', 'pixel', 'grideraser', 'fill', 'text', 'spray', 'gridbucket', 'isostamp'].includes(currentTool);
+                    const isEditTool = ['pen', 'eraser', 'line', 'shape', 'pixel', 'grideraser', 'fill', 'text', 'spray', 'gridbucket', 'isostamp', 'voxel', 'extruder'].includes(currentTool);
                     const isSelectionMove = (currentTool === 'move' && selectionRect && 
                         ((worldX >= selectionRect.x && worldX <= selectionRect.x + (selectionRect.width < 0 ? 0 : selectionRect.width) && 
                           worldY >= selectionRect.y && worldY <= selectionRect.y + (selectionRect.height < 0 ? 0 : selectionRect.height)) ||
@@ -4751,6 +4909,148 @@
                     isDrawing=true; isSelecting = false; isMovingSelection = false;
                     const noSym=['fill','eyedropper','select','move','gridselect'].includes(currentTool);
                     const sym=symmetryMode!=='OFF'&&!noSym;
+
+                    if (currentTool === 'extruder') {
+                        const isAxon = ['isometric', 'dimetric', 'trimetric', 'military'].includes(gridType);
+                        if (!isAxon) {
+                            gridType = 'isometric';
+                            const select = document.getElementById('gridTypeSelect');
+                            if (select) select.value = 'isometric';
+                            updateColorPropertiesUI();
+                            renderComposite();
+                        }
+                        
+                        const snapped = snapPoint(worldX, worldY);
+                        
+                        if (extruderPhase === 0) {
+                            extruderPhase = 1;
+                            extruderPoints = [{ x: snapped.x, y: snapped.y }];
+                            startX = snapped.x;
+                            startY = snapped.y;
+                            isDrawing = true;
+                            updateStatus("Floor plan started. Click to add points, Enter or click start point to finalize path.");
+                            renderComposite();
+                        } else if (extruderPhase === 1) {
+                            if (extruderPoints.length >= 3 && Math.hypot(snapped.x - extruderPoints[0].x, snapped.y - extruderPoints[0].y) < 15) {
+                                extruderPhase = 2;
+                                startX = snapped.x;
+                                startY = snapped.y;
+                                extruderHeight = 0;
+                                updateStatus("Floor path closed. Move mouse vertically to extrude, click to bake.");
+                            } else {
+                                extruderPoints.push({ x: snapped.x, y: snapped.y });
+                                updateStatus(`Added point ${extruderPoints.length}. Click start point or press Enter to extrude.`);
+                            }
+                            renderComposite();
+                        } else if (extruderPhase === 2) {
+                            saveHistory(activeLayerIndex);
+                            
+                            vectorStrokes.push({
+                                layer: layer.name,
+                                tool: 'extruder',
+                                points: JSON.parse(JSON.stringify(extruderPoints)),
+                                height: extruderHeight,
+                                color: currentSolidColor,
+                                gridType: gridType,
+                                symmetryMode: sym ? symmetryMode : 'OFF',
+                                symmetrySlices: symmetryMode === 'KALEIDOSCOPE' ? (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8) : 8,
+                                symmetryCenterX: symmetryCenter.x,
+                                symmetryCenterY: symmetryCenter.y,
+                                customSymmetryAngle: customSymmetryAngle,
+                                rotationalDivisions: rotationalDivisions
+                            });
+                            
+                            redrawLayerWithVoxels(layer);
+                            extruderPhase = 0;
+                            extruderPoints = [];
+                            extruderHeight = 0;
+                            isDrawing = false;
+                            isStaticCacheValid = false;
+                            renderComposite();
+                            updateGridCellPalette();
+                            updateStatus("Path extruded and baked.");
+                        }
+                        return;
+                    }
+
+                    if (currentTool === 'voxel') {
+                        const isAxon = ['isometric', 'dimetric', 'trimetric', 'military'].includes(gridType);
+                        if (!isAxon) {
+                            gridType = 'isometric';
+                            const select = document.getElementById('gridTypeSelect');
+                            if (select) select.value = 'isometric';
+                            updateColorPropertiesUI();
+                            renderComposite();
+                        }
+                        
+                        const resolved = resolveCell(worldX, worldY);
+                        if (resolved) {
+                            const { key, cellData } = resolved;
+                            saveHistory(activeLayerIndex);
+                            
+                            // Initialize drag tracking set
+                            voxelPaintedCellsDuringDrag = new Set();
+                            voxelPaintedCellsDuringDrag.add(key);
+                            
+                            rebuildVoxelStacks(layer.name);
+                            const stack = layer.voxels.get(key) || [];
+                            const hIdx = stack.length;
+                            
+                            // Add main voxel
+                            vectorStrokes.push({
+                                layer: layer.name,
+                                tool: 'voxel',
+                                cellKey: key,
+                                heightIndex: hIdx,
+                                color: currentSolidColor,
+                                gridType: gridType,
+                                symmetryMode: sym ? symmetryMode : 'OFF',
+                                symmetrySlices: symmetryMode === 'KALEIDOSCOPE' ? (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8) : 8,
+                                symmetryCenterX: symmetryCenter.x,
+                                symmetryCenterY: symmetryCenter.y,
+                                customSymmetryAngle: customSymmetryAngle,
+                                rotationalDivisions: rotationalDivisions
+                            });
+                            
+                            // Add to local database representation
+                            stack.push(currentSolidColor);
+                            layer.voxels.set(key, stack);
+                            
+                            if (sym) {
+                                const refPoints = getSymmetricPoints(cellData.x, cellData.y);
+                                refPoints.forEach(rp => {
+                                    const symPt = applySymmetryToPoint(cellData.x, cellData.y, rp.mirrorType);
+                                    const symResolved = resolveCell(symPt.x, symPt.y);
+                                    if (symResolved) {
+                                        const symKey = symResolved.key;
+                                        const symStack = layer.voxels.get(symKey) || [];
+                                        const symHIdx = symStack.length;
+                                        
+                                        vectorStrokes.push({
+                                            layer: layer.name,
+                                            tool: 'voxel',
+                                            cellKey: symKey,
+                                            heightIndex: symHIdx,
+                                            color: currentSolidColor,
+                                            gridType: gridType,
+                                            symmetryMode: 'OFF'
+                                        });
+                                        
+                                        symStack.push(currentSolidColor);
+                                        layer.voxels.set(symKey, symStack);
+                                    }
+                                });
+                            }
+                            
+                            redrawLayerWithVoxels(layer);
+                            isStaticCacheValid = false;
+                            renderComposite();
+                            updateGridCellPalette();
+                            updateStatus("Voxel painted.");
+                        }
+                        isDrawing = true;
+                        return;
+                    }
 
                     if (currentTool === 'isostamp') {
                         const resolved = resolveCell(worldX, worldY);
@@ -4874,6 +5174,8 @@
                             customSymmetryAngle: customSymmetryAngle,
                             rotationalDivisions: rotationalDivisions,
                             brushEffect: document.getElementById('brushEffectSelect') ? document.getElementById('brushEffectSelect').value : 'normal',
+                            activeIsoPlane: activeIsoPlane,
+                            gridType: gridType,
                             points: [{x: worldX, y: worldY, w: currentWidth, t: time}]
                         };
 
@@ -4978,6 +5280,74 @@
                                     currentVectorStroke.points.push({x: cx, y: cy, mirrorType: mType});
                                 }
                             });
+                        }
+                    }
+                    else if (currentTool === 'extruder') {
+                        if (extruderPhase === 2) {
+                            extruderHeight = Math.round((startY - worldY) / gridSize) * gridSize;
+                        }
+                    }
+                    else if (currentTool === 'voxel') {
+                        const resolved = resolveCell(worldX, worldY);
+                        if (resolved) {
+                            const { key, cellData } = resolved;
+                            if (!voxelPaintedCellsDuringDrag.has(key)) {
+                                voxelPaintedCellsDuringDrag.add(key);
+                                
+                                rebuildVoxelStacks(layer.name);
+                                const stack = layer.voxels.get(key) || [];
+                                const hIdx = stack.length;
+                                
+                                // Add main voxel
+                                vectorStrokes.push({
+                                    layer: layer.name,
+                                    tool: 'voxel',
+                                    cellKey: key,
+                                    heightIndex: hIdx,
+                                    color: currentSolidColor,
+                                    gridType: gridType,
+                                    symmetryMode: sym ? symmetryMode : 'OFF',
+                                    symmetrySlices: symmetryMode === 'KALEIDOSCOPE' ? (parseInt(document.getElementById('symmetrySliceInput')?.value) || 8) : 8,
+                                    symmetryCenterX: symmetryCenter.x,
+                                    symmetryCenterY: symmetryCenter.y,
+                                    customSymmetryAngle: customSymmetryAngle,
+                                    rotationalDivisions: rotationalDivisions
+                                });
+                                
+                                stack.push(currentSolidColor);
+                                layer.voxels.set(key, stack);
+                                
+                                if (sym) {
+                                    const refPoints = getSymmetricPoints(cellData.x, cellData.y);
+                                    refPoints.forEach(rp => {
+                                        const symPt = applySymmetryToPoint(cellData.x, cellData.y, rp.mirrorType);
+                                        const symResolved = resolveCell(symPt.x, symPt.y);
+                                        if (symResolved) {
+                                            const symKey = symResolved.key;
+                                            const symStack = layer.voxels.get(symKey) || [];
+                                            const symHIdx = symStack.length;
+                                            
+                                            vectorStrokes.push({
+                                                layer: layer.name,
+                                                tool: 'voxel',
+                                                cellKey: symKey,
+                                                heightIndex: symHIdx,
+                                                color: currentSolidColor,
+                                                gridType: gridType,
+                                                symmetryMode: 'OFF'
+                                            });
+                                            
+                                            symStack.push(currentSolidColor);
+                                            layer.voxels.set(symKey, symStack);
+                                        }
+                                    });
+                                }
+                                
+                                redrawLayerWithVoxels(layer);
+                                isStaticCacheValid = false;
+                                renderComposite();
+                                updateGridCellPalette();
+                            }
                         }
                     }
                     else if (currentTool === 'pen') {
@@ -5183,6 +5553,16 @@
                             renderComposite(); saveHistory();
                         },10);
                         isDrawing = false; isSelecting = false; isMovingSelection = false; renderComposite(); updateCursor(); return;
+                    }
+                    else if (currentTool === 'voxel') {
+                        isDrawing = false;
+                        voxelPaintedCellsDuringDrag = new Set();
+                        saveHistory();
+                        renderComposite();
+                        return;
+                    }
+                    else if (currentTool === 'extruder') {
+                        return;
                     }
                     else if(currentTool==='text'){
                         addText(startX,startY,sym); 
@@ -5546,7 +5926,7 @@
                 let key = '';
                 let cellData = { type: gridType, x: worldX, y: worldY };
 
-                if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric') {
+                if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric' || gridType === 'military') {
                     let alpha = Math.PI / 6;
                     let beta = Math.PI / 6;
                     if (gridType === 'dimetric') {
@@ -5555,6 +5935,9 @@
                     } else if (gridType === 'trimetric') {
                         alpha = 15 * Math.PI / 180;
                         beta = 35 * Math.PI / 180;
+                    } else if (gridType === 'military') {
+                        alpha = 45 * Math.PI / 180;
+                        beta = 45 * Math.PI / 180;
                     }
                     const cosA = Math.cos(alpha);
                     const sinA = Math.sin(alpha);
@@ -6100,6 +6483,320 @@
                 return svg;
             }
 
+            function drawVoxel(ctx, cellData, heightIndex, color) {
+                if (!cellData || !cellData.vertices || cellData.vertices.length < 4) return;
+                
+                const scale = deviceScale;
+                const gs = gridSize;
+                
+                const p0 = cellData.vertices[0];
+                const p1 = cellData.vertices[1];
+                const p2 = cellData.vertices[2];
+                const p3 = cellData.vertices[3];
+                
+                const hOffset = heightIndex * gs;
+                const hOffsetNext = (heightIndex + 1) * gs;
+                
+                const topFace = [
+                    { x: p0.x, y: p0.y - hOffsetNext },
+                    { x: p1.x, y: p1.y - hOffsetNext },
+                    { x: p2.x, y: p2.y - hOffsetNext },
+                    { x: p3.x, y: p3.y - hOffsetNext }
+                ];
+                
+                const leftFace = [
+                    { x: p3.x, y: p3.y - hOffset },
+                    { x: p2.x, y: p2.y - hOffset },
+                    { x: p2.x, y: p2.y - hOffsetNext },
+                    { x: p3.x, y: p3.y - hOffsetNext }
+                ];
+                
+                const rightFace = [
+                    { x: p2.x, y: p2.y - hOffset },
+                    { x: p1.x, y: p1.y - hOffset },
+                    { x: p1.x, y: p1.y - hOffsetNext },
+                    { x: p2.x, y: p2.y - hOffsetNext }
+                ];
+                
+                const drawFace = (face, fillColor) => {
+                    ctx.fillStyle = fillColor;
+                    ctx.strokeStyle = adjustColorBrightness(fillColor, -15);
+                    ctx.lineWidth = 0.5 * scale;
+                    ctx.beginPath();
+                    ctx.moveTo(face[0].x * scale, face[0].y * scale);
+                    for (let i = 1; i < face.length; i++) {
+                        ctx.lineTo(face[i].x * scale, face[i].y * scale);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                };
+                
+                drawFace(leftFace, adjustColorBrightness(color, -15));
+                drawFace(rightFace, adjustColorBrightness(color, -30));
+                drawFace(topFace, color);
+            }
+
+            function getVoxelSvgString(cellData, heightIndex, color) {
+                if (!cellData || !cellData.vertices || cellData.vertices.length < 4) return '';
+                
+                const gs = gridSize;
+                const p0 = cellData.vertices[0];
+                const p1 = cellData.vertices[1];
+                const p2 = cellData.vertices[2];
+                const p3 = cellData.vertices[3];
+                
+                const hOffset = heightIndex * gs;
+                const hOffsetNext = (heightIndex + 1) * gs;
+                
+                const leftColor = adjustColorBrightness(color, -15);
+                const rightColor = adjustColorBrightness(color, -30);
+                const strokeColor = adjustColorBrightness(color, -25);
+                
+                const topPts = [
+                    `${p0.x.toFixed(1)},${(p0.y - hOffsetNext).toFixed(1)}`,
+                    `${p1.x.toFixed(1)},${(p1.y - hOffsetNext).toFixed(1)}`,
+                    `${p2.x.toFixed(1)},${(p2.y - hOffsetNext).toFixed(1)}`,
+                    `${p3.x.toFixed(1)},${(p3.y - hOffsetNext).toFixed(1)}`
+                ].join(' ');
+                
+                const leftPts = [
+                    `${p3.x.toFixed(1)},${(p3.y - hOffset).toFixed(1)}`,
+                    `${p2.x.toFixed(1)},${(p2.y - hOffset).toFixed(1)}`,
+                    `${p2.x.toFixed(1)},${(p2.y - hOffsetNext).toFixed(1)}`,
+                    `${p3.x.toFixed(1)},${(p3.y - hOffsetNext).toFixed(1)}`
+                ].join(' ');
+                
+                const rightPts = [
+                    `${p2.x.toFixed(1)},${(p2.y - hOffset).toFixed(1)}`,
+                    `${p1.x.toFixed(1)},${(p1.y - hOffset).toFixed(1)}`,
+                    `${p1.x.toFixed(1)},${(p1.y - hOffsetNext).toFixed(1)}`,
+                    `${p2.x.toFixed(1)},${(p2.y - hOffsetNext).toFixed(1)}`
+                ].join(' ');
+                
+                return `    <polygon points="${leftPts}" fill="${leftColor}" stroke="${strokeColor}" stroke-width="0.5"/>\n` +
+                       `    <polygon points="${rightPts}" fill="${rightColor}" stroke="${strokeColor}" stroke-width="0.5"/>\n` +
+                       `    <polygon points="${topPts}" fill="${color}" stroke="${strokeColor}" stroke-width="0.5"/>\n`;
+            }
+
+            function rebuildVoxelStacks(layerName) {
+                const l = layers.find(lay => lay.name === layerName);
+                if (!l) return;
+                
+                l.voxels = new Map();
+                
+                const strokes = vectorStrokes.filter(vs => vs.layer === layerName && vs.tool === 'voxel');
+                strokes.forEach(s => {
+                    const key = s.cellKey;
+                    const stack = l.voxels.get(key) || [];
+                    stack.push(s.color);
+                    l.voxels.set(key, stack);
+                });
+            }
+
+            function redrawLayerWithVoxels(layer) {
+                const ctx = layer.context;
+                ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
+                
+                const layerStrokes = vectorStrokes.filter(vs => vs.layer === layer.name);
+                const elements3D = [];
+                const nonVoxels = [];
+                
+                layerStrokes.forEach(s => {
+                    if (s.tool === 'voxel') {
+                        const match = s.cellKey.match(/axon_(-?[\d.]+),(-?[\d.]+)/);
+                        if (match) {
+                            const uu = parseFloat(match[1]);
+                            const vv = parseFloat(match[2]);
+                            
+                            let alpha = Math.PI / 6;
+                            let beta = Math.PI / 6;
+                            if (s.gridType === 'dimetric') {
+                                alpha = 15 * Math.PI / 180;
+                                beta = 15 * Math.PI / 180;
+                            } else if (s.gridType === 'trimetric') {
+                                alpha = 15 * Math.PI / 180;
+                                beta = 35 * Math.PI / 180;
+                            } else if (s.gridType === 'military') {
+                                alpha = 45 * Math.PI / 180;
+                                beta = 45 * Math.PI / 180;
+                            }
+                            const gs = gridSize;
+                            const uCenter = uu + gs / 2;
+                            const vCenter = vv + gs / 2;
+                            const cy = uCenter * Math.sin(alpha) - vCenter * Math.sin(beta);
+                            
+                            elements3D.push({
+                                type: 'voxel',
+                                stroke: s,
+                                depth: cy,
+                                heightIndex: s.heightIndex
+                            });
+                        }
+                    } else if (s.tool === 'extruder') {
+                        const avgY = s.points.reduce((sum, pt) => sum + pt.y, 0) / s.points.length;
+                        elements3D.push({
+                            type: 'extruder',
+                            stroke: s,
+                            depth: avgY
+                        });
+                    } else {
+                        nonVoxels.push(s);
+                    }
+                });
+                
+                elements3D.sort((a, b) => {
+                    if (Math.abs(a.depth - b.depth) > 0.1) {
+                        return a.depth - b.depth;
+                    }
+                    const hA = a.heightIndex !== undefined ? a.heightIndex : 0;
+                    const hB = b.heightIndex !== undefined ? b.heightIndex : 0;
+                    return hA - hB;
+                });
+                
+                elements3D.forEach(el => {
+                    const s = el.stroke;
+                    if (el.type === 'voxel') {
+                        const match = s.cellKey.match(/axon_(-?[\d.]+),(-?[\d.]+)/);
+                        if (match) {
+                            const uu = parseFloat(match[1]);
+                            const vv = parseFloat(match[2]);
+                            
+                            let alpha = Math.PI / 6;
+                            let beta = Math.PI / 6;
+                            if (s.gridType === 'dimetric') {
+                                alpha = 15 * Math.PI / 180;
+                                beta = 15 * Math.PI / 180;
+                            } else if (s.gridType === 'trimetric') {
+                                alpha = 15 * Math.PI / 180;
+                                beta = 35 * Math.PI / 180;
+                            } else if (s.gridType === 'military') {
+                                alpha = 45 * Math.PI / 180;
+                                beta = 45 * Math.PI / 180;
+                            }
+                            const gs = gridSize;
+                            const uCenter = uu + gs / 2;
+                            const vCenter = vv + gs / 2;
+                            const cx = uCenter * Math.cos(alpha) + vCenter * Math.cos(beta);
+                            const cy = uCenter * Math.sin(alpha) - vCenter * Math.sin(beta);
+                            
+                            const resolved = resolveCell(cx, cy);
+                            if (resolved && resolved.cellData) {
+                                drawVoxel(ctx, resolved.cellData, s.heightIndex, s.color);
+                            }
+                        }
+                    } else if (el.type === 'extruder') {
+                        drawExtrusion(ctx, s.points, s.height, s.color);
+                    }
+                });
+                
+                nonVoxels.forEach(s => {
+                    if (s.tool === 'pen' || s.tool === 'eraser') {
+                        drawFreehandStroke(ctx, s.points, s.tool === 'eraser', s);
+                    } else if (s.tool === 'line' || s.tool === 'shape') {
+                        drawShape(ctx, s.points[0].x, s.points[0].y, s.points[1].x, s.points[1].y, false, null, s);
+                    }
+                });
+            }
+
+            function drawExtrusion(ctx, points, height, color) {
+                if (!points || points.length < 2) return;
+                
+                const scale = deviceScale;
+                const h = height; // vertical height offset (in world pixels)
+                
+                const panels = [];
+                for (let i = 0; i < points.length; i++) {
+                    const p1 = points[i];
+                    const p2 = points[(i + 1) % points.length];
+                    if (Math.hypot(p2.x - p1.x, p2.y - p1.y) < 1) continue;
+                    
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    const angle = Math.atan2(dy, dx);
+                    const shadeFactor = Math.cos(angle - Math.PI / 6) * 0.2 - 0.1;
+                    const panelColor = adjustColorBrightness(color, shadeFactor * 100);
+                    const avgY = (p1.y + p2.y) / 2;
+                    
+                    panels.push({
+                        p1: p1,
+                        p2: p2,
+                        color: panelColor,
+                        depth: avgY
+                    });
+                }
+                
+                panels.sort((a, b) => a.depth - b.depth);
+                
+                panels.forEach(p => {
+                    ctx.fillStyle = p.color;
+                    ctx.strokeStyle = adjustColorBrightness(p.color, -25);
+                    ctx.lineWidth = 0.5 * scale;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(p.p1.x * scale, p.p1.y * scale);
+                    ctx.lineTo(p.p2.x * scale, p.p2.y * scale);
+                    ctx.lineTo(p.p2.x * scale, (p.p2.y - h) * scale);
+                    ctx.lineTo(p.p1.x * scale, (p.p1.y - h) * scale);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                });
+                
+                ctx.fillStyle = color;
+                ctx.strokeStyle = adjustColorBrightness(color, -25);
+                ctx.lineWidth = 0.5 * scale;
+                ctx.beginPath();
+                ctx.moveTo(points[0].x * scale, (points[0].y - h) * scale);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x * scale, (points[i].y - h) * scale);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            function getExtrusionSvgString(points, height, color) {
+                if (!points || points.length < 2) return '';
+                
+                const h = height;
+                const panels = [];
+                for (let i = 0; i < points.length; i++) {
+                    const p1 = points[i];
+                    const p2 = points[(i + 1) % points.length];
+                    if (Math.hypot(p2.x - p1.x, p2.y - p1.y) < 1) continue;
+                    
+                    const dx = p2.x - p1.x;
+                    const dy = p2.y - p1.y;
+                    const angle = Math.atan2(dy, dx);
+                    const shadeFactor = Math.cos(angle - Math.PI / 6) * 0.2 - 0.1;
+                    const panelColor = adjustColorBrightness(color, shadeFactor * 100);
+                    const avgY = (p1.y + p2.y) / 2;
+                    
+                    panels.push({ p1, p2, color: panelColor, depth: avgY });
+                }
+                
+                panels.sort((a, b) => a.depth - b.depth);
+                
+                let svg = '';
+                panels.forEach(p => {
+                    const pts = [
+                        `${p.p1.x.toFixed(1)},${p.p1.y.toFixed(1)}`,
+                        `${p.p2.x.toFixed(1)},${p.p2.y.toFixed(1)}`,
+                        `${p.p2.x.toFixed(1)},${(p.p2.y - h).toFixed(1)}`,
+                        `${p.p1.x.toFixed(1)},${(p.p1.y - h).toFixed(1)}`
+                    ].join(' ');
+                    const strokeColor = adjustColorBrightness(p.color, -25);
+                    svg += `    <polygon points="${pts}" fill="${p.color}" stroke="${strokeColor}" stroke-width="0.5"/>\n`;
+                });
+                
+                const topPts = points.map(v => `${v.x.toFixed(1)},${(v.y - h).toFixed(1)}`).join(' ');
+                const topStroke = adjustColorBrightness(color, -25);
+                svg += `    <polygon points="${topPts}" fill="${color}" stroke="${topStroke}" stroke-width="0.5"/>\n`;
+                
+                return svg;
+            }
+
             function gridBucketFill(worldStartX, worldStartY) {
                 const l = getActiveLayer();
                 if (!l) return;
@@ -6175,7 +6872,7 @@
                     cellsToFill.push(currCell);
                     iterations++;
                     
-                    if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric') {
+                    if (gridType === 'isometric' || gridType === 'dimetric' || gridType === 'trimetric' || gridType === 'military') {
                         let alpha = Math.PI / 6;
                         let beta = Math.PI / 6;
                         if (gridType === 'dimetric') {
@@ -6184,6 +6881,9 @@
                         } else if (gridType === 'trimetric') {
                             alpha = 15 * Math.PI / 180;
                             beta = 35 * Math.PI / 180;
+                        } else if (gridType === 'military') {
+                            alpha = 45 * Math.PI / 180;
+                            beta = 45 * Math.PI / 180;
                         }
                         const cosA = Math.cos(alpha);
                         const sinA = Math.sin(alpha);
@@ -6509,6 +7209,11 @@
                         }
                     });
                     
+                    const hasVoxels = vectorStrokes.some(vs => vs.layer === l.name && vs.tool === 'voxel');
+                    if (hasVoxels) {
+                        redrawLayerWithVoxels(l);
+                    }
+                    
                     isStaticCacheValid = false;
                     renderComposite();
                     updateGridCellPalette();
@@ -6691,30 +7396,148 @@
                     const px2 = _wx2 * deviceScale, py2 = _wy2 * deviceScale;
                     const pRadius = currentCornerRadius * deviceScale; 
 
-                    switch(shapeToDraw){
-                        case 'line':_ctx.moveTo(px1,py1);_ctx.lineTo(px2,py2);_ctx.stroke();break;
-                        case 'rectangle':const w=px2-px1,h=py2-py1;if(fillShapeCheckbox.checked)_ctx.fillRect(px1,py1,w,h);_ctx.strokeRect(px1,py1,w,h);break; 
-                        case 'roundedRect': 
-                            _ctx.beginPath();
-                            _ctx.moveTo(px1 + pRadius, py1);
-                            _ctx.lineTo(px1 + (px2-px1) - pRadius, py1);
-                            _ctx.arcTo(px1 + (px2-px1), py1, px1 + (px2-px1), py1 + pRadius, pRadius);
-                            _ctx.lineTo(px1 + (px2-px1), py1 + (py2-py1) - pRadius);
-                            _ctx.arcTo(px1 + (px2-px1), py1 + (py2-py1), px1 + (px2-px1) - pRadius, py1 + (py2-py1), pRadius);
-                            _ctx.lineTo(px1 + pRadius, py1 + (py2-py1));
-                            _ctx.arcTo(px1, py1 + (py2-py1), px1, py1 + (py2-py1) - pRadius, pRadius);
-                            _ctx.lineTo(px1, py1 + pRadius);
-                            _ctx.arcTo(px1, py1, px1 + pRadius, py1, pRadius);
-                            _ctx.closePath();
-                            if(fillShapeCheckbox.checked)_ctx.fill();
-                            _ctx.stroke();
-                            break;
-                        case 'circle':const r=Math.hypot(px2-px1,py2-py1)/2,cx=px1+(px2-px1)/2,cy=py1+(py2-py1)/2;_ctx.arc(cx,cy,Math.abs(r),0,Math.PI*2);if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
-                        case 'ellipse': const el_cx = px1+(px2-px1)/2; const el_cy = py1+(py2-py1)/2; const el_rx = Math.abs(px2-px1)/2; const el_ry = Math.abs(py2-py1)/2; _ctx.ellipse(el_cx, el_cy, el_rx, el_ry, 0, 0, 2 * Math.PI); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
-                        case 'triangle': _ctx.moveTo((px1+px2)/2, py1); _ctx.lineTo(px2, py2); _ctx.lineTo(px1, py2); _ctx.closePath(); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
-                        case 'star': const spikes=5,outerR=Math.hypot(px2-px1, py2-py1)/2,innerR=outerR/2.5,rot=Math.PI/2*3;let starCX=px1+(px2-px1)/2,starCY=py1+(py2-py1)/2;_ctx.moveTo(starCX,starCY-outerR*Math.sin(rot));for(let i=0;i<spikes;i++){_ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*i*2)*outerR,starCY+Math.sin(rot+Math.PI/spikes*i*2)*outerR);_ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*(i*2+1))*innerR,starCY+Math.sin(rot+Math.PI/spikes*(i*2+1))*innerR);}_ctx.closePath();if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
-                        case 'polygon': const sides=currentPolygonSides,polyR=Math.hypot(px2-px1,py2-py1)/2;const polyCX=px1+(px2-px1)/2,polyCY=poly1+(polyCX-px1)/2;_ctx.moveTo(polyCX+polyR*Math.cos(0),polyCY+polyR*Math.sin(0));for(let i=1;i<=sides;i++)_ctx.lineTo(polyCX+polyR*Math.cos(i*2*Math.PI/sides),polyCY+polyR*Math.sin(i*2*Math.PI/sides));_ctx.closePath();if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
-                        case 'rhombus': _ctx.moveTo((px1+px2)/2, py1); _ctx.lineTo(px2, (py1+py2)/2); _ctx.lineTo((px1+px2)/2, py2); _ctx.lineTo(px1, (py1+py2)/2); _ctx.closePath(); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
+                    const gType = strokeOpts ? strokeOpts.gridType : gridType;
+                    const plane = strokeOpts ? (strokeOpts.activeIsoPlane || 'top') : activeIsoPlane;
+                    const isAxon = ['isometric', 'dimetric', 'trimetric', 'military'].includes(gType);
+                    
+                    if (isAxon) {
+                        let alpha = Math.PI / 6;
+                        let beta = Math.PI / 6;
+                        if (gType === 'dimetric') {
+                            alpha = 15 * Math.PI / 180;
+                            beta = 15 * Math.PI / 180;
+                        } else if (gType === 'trimetric') {
+                            alpha = 15 * Math.PI / 180;
+                            beta = 35 * Math.PI / 180;
+                        } else if (gType === 'military') {
+                            alpha = 45 * Math.PI / 180;
+                            beta = 45 * Math.PI / 180;
+                        }
+
+                        let a = 1, b = 0, c = 0, d = 1;
+                        if (plane === 'top') {
+                            a = Math.cos(alpha); b = Math.sin(alpha);
+                            c = -Math.cos(beta); d = Math.sin(beta);
+                        } else if (plane === 'left') {
+                            a = -Math.cos(beta); b = Math.sin(beta);
+                            c = 0; d = 1;
+                        } else if (plane === 'right') {
+                            a = Math.cos(alpha); b = Math.sin(alpha);
+                            c = 0; d = 1;
+                        }
+
+                        const det = a * d - b * c;
+                        const xdiff = px2 - px1;
+                        const ydiff = py2 - py1;
+                        const u = det !== 0 ? (d * xdiff - c * ydiff) / det : xdiff;
+                        const v = det !== 0 ? (-b * xdiff + a * ydiff) / det : ydiff;
+
+                        _ctx.save();
+                        _ctx.translate(px1, py1);
+                        _ctx.transform(a, b, c, d, 0, 0);
+
+                        switch(shapeToDraw){
+                            case 'line':
+                                _ctx.moveTo(0,0);
+                                _ctx.lineTo(u,v);
+                                _ctx.stroke();
+                                break;
+                            case 'rectangle':
+                                if(fillShapeCheckbox.checked) _ctx.fillRect(0,0,u,v);
+                                _ctx.strokeRect(0,0,u,v);
+                                break; 
+                            case 'roundedRect': 
+                                _ctx.beginPath();
+                                _ctx.moveTo(pRadius, 0);
+                                _ctx.lineTo(u - pRadius, 0);
+                                _ctx.arcTo(u, 0, u, pRadius, pRadius);
+                                _ctx.lineTo(u, v - pRadius);
+                                _ctx.arcTo(u, v, u - pRadius, v, pRadius);
+                                _ctx.lineTo(pRadius, v);
+                                _ctx.arcTo(0, v, 0, v - pRadius, pRadius);
+                                _ctx.lineTo(0, pRadius);
+                                _ctx.arcTo(0, 0, pRadius, 0, pRadius);
+                                _ctx.closePath();
+                                if(fillShapeCheckbox.checked) _ctx.fill();
+                                _ctx.stroke();
+                                break;
+                            case 'circle':
+                                const r=Math.hypot(u,v)/2,cx=u/2,cy=v/2;
+                                _ctx.arc(cx,cy,Math.abs(r),0,Math.PI*2);
+                                if(fillShapeCheckbox.checked) _ctx.fill();
+                                _ctx.stroke();
+                                break; 
+                            case 'ellipse': 
+                                _ctx.ellipse(u/2, v/2, Math.abs(u)/2, Math.abs(v)/2, 0, 0, 2 * Math.PI);
+                                if(fillShapeCheckbox.checked) _ctx.fill();
+                                _ctx.stroke();
+                                break; 
+                            case 'triangle': 
+                                _ctx.moveTo(u/2, 0);
+                                _ctx.lineTo(u, v);
+                                _ctx.lineTo(0, v);
+                                _ctx.closePath();
+                                if(fillShapeCheckbox.checked) _ctx.fill();
+                                _ctx.stroke();
+                                break; 
+                            case 'star': 
+                                const spikes=5,outerR=Math.hypot(u, v)/2,innerR=outerR/2.5,rot=Math.PI/2*3;
+                                let starCX=u/2,starCY=v/2;
+                                _ctx.moveTo(starCX,starCY-outerR*Math.sin(rot));
+                                for(let i=0;i<spikes;i++){
+                                    _ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*i*2)*outerR,starCY+Math.sin(rot+Math.PI/spikes*i*2)*outerR);
+                                    _ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*(i*2+1))*innerR,starCY+Math.sin(rot+Math.PI/spikes*(i*2+1))*innerR);
+                                }
+                                _ctx.closePath();
+                                if(fillShapeCheckbox.checked) _ctx.fill();
+                                _ctx.stroke();
+                                break; 
+                            case 'polygon': 
+                                const sides=currentPolygonSides,polyR=Math.hypot(u,v)/2;
+                                const polyCX=u/2,polyCY=v/2;
+                                _ctx.moveTo(polyCX+polyR*Math.cos(0),polyCY+polyR*Math.sin(0));
+                                for(let i=1;i<=sides;i++) _ctx.lineTo(polyCX+polyR*Math.cos(i*2*Math.PI/sides),polyCY+polyR*Math.sin(i*2*Math.PI/sides));
+                                _ctx.closePath();
+                                if(fillShapeCheckbox.checked) _ctx.fill();
+                                _ctx.stroke();
+                                break; 
+                            case 'rhombus': 
+                                _ctx.moveTo(u/2, 0);
+                                _ctx.lineTo(u, v/2);
+                                _ctx.lineTo(u/2, v);
+                                _ctx.lineTo(0, v/2);
+                                _ctx.closePath();
+                                if(fillShapeCheckbox.checked) _ctx.fill();
+                                _ctx.stroke();
+                                break; 
+                        }
+                        _ctx.restore();
+                    } else {
+                        switch(shapeToDraw){
+                            case 'line':_ctx.moveTo(px1,py1);_ctx.lineTo(px2,py2);_ctx.stroke();break;
+                            case 'rectangle':const w=px2-px1,h=py2-py1;if(fillShapeCheckbox.checked)_ctx.fillRect(px1,py1,w,h);_ctx.strokeRect(px1,py1,w,h);break; 
+                            case 'roundedRect': 
+                                _ctx.beginPath();
+                                _ctx.moveTo(px1 + pRadius, py1);
+                                _ctx.lineTo(px1 + (px2-px1) - pRadius, py1);
+                                _ctx.arcTo(px1 + (px2-px1), py1, px1 + (px2-px1), py1 + pRadius, pRadius);
+                                _ctx.lineTo(px1 + (px2-px1), py1 + (py2-py1) - pRadius);
+                                _ctx.arcTo(px1 + (px2-px1), py1 + (py2-py1), px1 + (px2-px1) - pRadius, py1 + (py2-py1), pRadius);
+                                _ctx.lineTo(px1 + pRadius, py1 + (py2-py1));
+                                _ctx.arcTo(px1, py1 + (py2-py1), px1, py1 + (py2-py1) - pRadius, pRadius);
+                                _ctx.lineTo(px1, py1 + pRadius);
+                                _ctx.arcTo(px1, py1, px1 + pRadius, py1, pRadius);
+                                _ctx.closePath();
+                                if(fillShapeCheckbox.checked)_ctx.fill();
+                                _ctx.stroke();
+                                break;
+                            case 'circle':const r=Math.hypot(px2-px1,py2-py1)/2,cx=px1+(px2-px1)/2,cy=py1+(py2-py1)/2;_ctx.arc(cx,cy,Math.abs(r),0,Math.PI*2);if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
+                            case 'ellipse': const el_cx = px1+(px2-px1)/2; const el_cy = py1+(py2-py1)/2; const el_rx = Math.abs(px2-px1)/2; const el_ry = Math.abs(py2-py1)/2; _ctx.ellipse(el_cx, el_cy, el_rx, el_ry, 0, 0, 2 * Math.PI); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
+                            case 'triangle': _ctx.moveTo((px1+px2)/2, py1); _ctx.lineTo(px2, py2); _ctx.lineTo(px1, py2); _ctx.closePath(); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
+                            case 'star': const spikes=5,outerR=Math.hypot(px2-px1, py2-py1)/2,innerR=outerR/2.5,rot=Math.PI/2*3;let starCX=px1+(px2-px1)/2,starCY=py1+(py2-py1)/2;_ctx.moveTo(starCX,starCY-outerR*Math.sin(rot));for(let i=0;i<spikes;i++){_ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*i*2)*outerR,starCY+Math.sin(rot+Math.PI/spikes*i*2)*outerR);_ctx.lineTo(starCX+Math.cos(rot+Math.PI/spikes*(i*2+1))*innerR,starCY+Math.sin(rot+Math.PI/spikes*(i*2+1))*innerR);}_ctx.closePath();if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
+                            case 'polygon': const sides=currentPolygonSides,polyR=Math.hypot(px2-px1,py2-py1)/2;const polyCX=px1+(px2-px1)/2,polyCY=py1+(py2-py1)/2;_ctx.moveTo(polyCX+polyR*Math.cos(0),polyCY+polyR*Math.sin(0));for(let i=1;i<=sides;i++)_ctx.lineTo(polyCX+polyR*Math.cos(i*2*Math.PI/sides),polyCY+polyR*Math.sin(i*2*Math.PI/sides));_ctx.closePath();if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke();break; 
+                            case 'rhombus': _ctx.moveTo((px1+px2)/2, py1); _ctx.lineTo(px2, (py1+py2)/2); _ctx.lineTo((px1+px2)/2, py2); _ctx.lineTo(px1, (py1+py2)/2); _ctx.closePath(); if(fillShapeCheckbox.checked)_ctx.fill();_ctx.stroke(); break; 
+                        }
                     }
                 };
                 _draw(ctx,worldX1,worldY1,worldX2,worldY2,gradPoints, 'none'); 
@@ -6857,9 +7680,11 @@
                     isostampPropsRow.classList.add('visible');
                 } else if (currentTool === 'gridselect') {
                     gridPaletteRow.classList.add('visible');
+                } else if (currentTool === 'voxel' || currentTool === 'extruder') {
+                    // No extra property rows needed for voxel/extruder
                 }
                 const showColorControls = !['select', 'move', 'eyedropper', 'fill', 'grideraser', 'gridselect'].includes(currentTool);
-                if (currentTool === 'pixel' || currentTool === 'sticky' || currentTool === 'gridbucket' || currentTool === 'isostamp') {
+                if (currentTool === 'pixel' || currentTool === 'sticky' || currentTool === 'gridbucket' || currentTool === 'isostamp' || currentTool === 'voxel' || currentTool === 'extruder') {
                     colorTypeRow.style.display = 'none';
                     solidColorPropsRow.classList.add('visible');
                     gradientPropsRow1.classList.remove('visible');
@@ -6880,7 +7705,7 @@
                 document.getElementById('brushEffectRow').style.display = showBrushSettings ? 'flex' : 'none';
                 document.getElementById('smartShapeRow').style.display = currentTool === 'pen' ? 'flex' : 'none';
                 document.getElementById('stabilizerRow').style.display = ['pen', 'eraser'].includes(currentTool) ? 'flex' : 'none';
-                if ((currentTool === 'pixel' || currentTool === 'grideraser' || currentTool === 'gridbucket' || currentTool === 'isostamp' || currentTool === 'gridselect') && !showGrid) {
+                if ((currentTool === 'pixel' || currentTool === 'grideraser' || currentTool === 'gridbucket' || currentTool === 'isostamp' || currentTool === 'gridselect' || currentTool === 'voxel' || currentTool === 'extruder') && !showGrid) {
                     showGrid = true;
                     showGridCheckbox.checked = true;
                     updateColorPropertiesUI();
@@ -6892,6 +7717,19 @@
                     if (select) select.value = 'isometric';
                     isStaticCacheValid = false;
                     updateStatus("Grid type auto-switched to isometric for stamps.");
+                }
+                if ((currentTool === 'voxel' || currentTool === 'extruder') && !['isometric', 'dimetric', 'trimetric', 'military'].includes(gridType)) {
+                    gridType = 'isometric';
+                    const select = document.getElementById('gridTypeSelect');
+                    if (select) select.value = 'isometric';
+                    isStaticCacheValid = false;
+                    updateStatus("Grid type auto-switched to isometric for 3D tools.");
+                }
+                if (currentTool !== 'extruder' && extruderPhase > 0) {
+                    extruderPhase = 0;
+                    extruderPoints = [];
+                    extruderHeight = 0;
+                    renderComposite();
                 }
                  
                 updateColorPropertiesUI(); 
@@ -8055,25 +8893,208 @@
                             if (stroke.points.length < 2) return '';
                             const px1 = stroke.points[0].x, py1 = stroke.points[0].y;
                             const px2 = stroke.points[1].x, py2 = stroke.points[1].y;
-                            const w = px2 - px1, h = py2 - py1;
-                            const cx = px1 + w/2, cy = py1 + h/2;
-                            switch(stroke.shapeType) {
-                                case 'rectangle': case 'roundedRect': return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
-                                case 'circle': case 'ellipse': 
-                                    const rx = Math.abs(w/2), ry = Math.abs(h/2);
-                                    return `M ${(cx-rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx+rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx-rx).toFixed(1)} ${cy.toFixed(1)}`;
-                                case 'triangle': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
-                                case 'rhombus': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${cy.toFixed(1)} L ${cx.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${cy.toFixed(1)} Z`;
-                                default: return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                            
+                            const gType = stroke.gridType;
+                            const plane = stroke.activeIsoPlane || 'top';
+                            const isAxon = ['isometric', 'dimetric', 'trimetric', 'military'].includes(gType);
+                            
+                            if (isAxon) {
+                                let alpha = Math.PI / 6;
+                                let beta = Math.PI / 6;
+                                if (gType === 'dimetric') {
+                                    alpha = 15 * Math.PI / 180;
+                                    beta = 15 * Math.PI / 180;
+                                } else if (gType === 'trimetric') {
+                                    alpha = 15 * Math.PI / 180;
+                                    beta = 35 * Math.PI / 180;
+                                } else if (gType === 'military') {
+                                    alpha = 45 * Math.PI / 180;
+                                    beta = 45 * Math.PI / 180;
+                                }
+
+                                let a = 1, b = 0, c = 0, d = 1;
+                                if (plane === 'top') {
+                                    a = Math.cos(alpha); b = Math.sin(alpha);
+                                    c = -Math.cos(beta); d = Math.sin(beta);
+                                } else if (plane === 'left') {
+                                    a = -Math.cos(beta); b = Math.sin(beta);
+                                    c = 0; d = 1;
+                                } else if (plane === 'right') {
+                                    a = Math.cos(alpha); b = Math.sin(alpha);
+                                    c = 0; d = 1;
+                                }
+
+                                const det = a * d - b * c;
+                                const xdiff = px2 - px1;
+                                const ydiff = py2 - py1;
+                                const u = det !== 0 ? (d * xdiff - c * ydiff) / det : xdiff;
+                                const v = det !== 0 ? (-b * xdiff + a * ydiff) / det : ydiff;
+                                const cx = u / 2, cy = v / 2;
+                                
+                                switch(stroke.shapeType) {
+                                    case 'rectangle': case 'roundedRect': return `M 0 0 L ${u.toFixed(1)} 0 L ${u.toFixed(1)} ${v.toFixed(1)} L 0 ${v.toFixed(1)} Z`;
+                                    case 'circle': case 'ellipse': 
+                                        const rx = Math.abs(u/2), ry = Math.abs(v/2);
+                                        return `M ${(cx-rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx+rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx-rx).toFixed(1)} ${cy.toFixed(1)}`;
+                                    case 'triangle': return `M ${cx.toFixed(1)} 0 L ${u.toFixed(1)} ${v.toFixed(1)} L 0 ${v.toFixed(1)} Z`;
+                                    case 'rhombus': return `M ${cx.toFixed(1)} 0 L ${u.toFixed(1)} ${cy.toFixed(1)} L ${cx.toFixed(1)} ${v.toFixed(1)} L 0 ${cy.toFixed(1)} Z`;
+                                    default: return `M 0 0 L ${u.toFixed(1)} 0 L ${u.toFixed(1)} ${v.toFixed(1)} L 0 ${v.toFixed(1)} Z`;
+                                }
+                            } else {
+                                const w = px2 - px1, h = py2 - py1;
+                                const cx = px1 + w/2, cy = py1 + h/2;
+                                switch(stroke.shapeType) {
+                                    case 'rectangle': case 'roundedRect': return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                    case 'circle': case 'ellipse': 
+                                        const rx = Math.abs(w/2), ry = Math.abs(h/2);
+                                        return `M ${(cx-rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx+rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx-rx).toFixed(1)} ${cy.toFixed(1)}`;
+                                    case 'triangle': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                    case 'rhombus': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${cy.toFixed(1)} L ${cx.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${cy.toFixed(1)} Z`;
+                                    default: return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                }
                             }
                         }
                         return '';
                     };
 
                     const writeStrokePaths = (stroke, isMask) => {
+                        if (stroke.tool === 'extruder') {
+                            let svg = getExtrusionSvgString(stroke.points, stroke.height, stroke.color);
+                            let paths = [{ d: svg, xForm: "" }];
+                            const cw = DEFAULT_LOGICAL_WIDTH;
+                            const ch = DEFAULT_LOGICAL_HEIGHT;
+                            const scx = cw / 2;
+                            const scy = ch / 2;
+                            if (stroke.symmetryMode === 'Y') { paths.push({ d: svg, xForm: `translate(${cw}, 0) scale(-1, 1)` }); }
+                            else if (stroke.symmetryMode === 'X') { paths.push({ d: svg, xForm: `translate(0, ${ch}) scale(1, -1)` }); }
+                            else if (stroke.symmetryMode === 'XY') {
+                                paths.push({ d: svg, xForm: `translate(${cw}, 0) scale(-1, 1)` });
+                                paths.push({ d: svg, xForm: `translate(0, ${ch}) scale(1, -1)` });
+                                paths.push({ d: svg, xForm: `translate(${cw}, ${ch}) scale(-1, -1)` });
+                            } else if (stroke.symmetryMode === 'KALEIDOSCOPE') {
+                                const S = stroke.symmetrySlices || 8;
+                                for (let i = 0; i < S; i++) {
+                                    const deg = (i * 360) / S;
+                                    if (i > 0) {
+                                        paths.push({ d: svg, xForm: `rotate(${deg.toFixed(1)}, ${scx}, ${scy})` });
+                                    }
+                                    paths.push({ d: svg, xForm: `rotate(${deg.toFixed(1)}, ${scx}, ${scy}) translate(${scx}, 0) scale(-1, 1) translate(-${scx}, 0)` });
+                                }
+                            }
+                            
+                            let out = '';
+                            paths.forEach(p => {
+                                if (p.xForm) {
+                                    out += `    <g transform="${p.xForm}">\n${p.d}    </g>\n`;
+                                } else {
+                                    out += p.d;
+                                }
+                            });
+                            return out;
+                        }
+
+                        if (stroke.tool === 'voxel') {
+                            const match = stroke.cellKey.match(/axon_(-?[\d.]+),(-?[\d.]+)/);
+                            if (match) {
+                                const uu = parseFloat(match[1]);
+                                const vv = parseFloat(match[2]);
+                                
+                                let alpha = Math.PI / 6;
+                                let beta = Math.PI / 6;
+                                if (stroke.gridType === 'dimetric') {
+                                    alpha = 15 * Math.PI / 180;
+                                    beta = 15 * Math.PI / 180;
+                                } else if (stroke.gridType === 'trimetric') {
+                                    alpha = 15 * Math.PI / 180;
+                                    beta = 35 * Math.PI / 180;
+                                } else if (stroke.gridType === 'military') {
+                                    alpha = 45 * Math.PI / 180;
+                                    beta = 45 * Math.PI / 180;
+                                }
+                                const gs = gridSize;
+                                const uCenter = uu + gs / 2;
+                                const vCenter = vv + gs / 2;
+                                const cx = uCenter * Math.cos(alpha) + vCenter * Math.cos(beta);
+                                const cy = uCenter * Math.sin(alpha) - vCenter * Math.sin(beta);
+                                
+                                const resolved = resolveCell(cx, cy);
+                                if (resolved && resolved.cellData) {
+                                    let svg = getVoxelSvgString(resolved.cellData, stroke.heightIndex, stroke.color);
+                                    let paths = [{ d: svg, xForm: "" }];
+                                    const cw = DEFAULT_LOGICAL_WIDTH;
+                                    const ch = DEFAULT_LOGICAL_HEIGHT;
+                                    const scx = cw / 2;
+                                    const scy = ch / 2;
+                                    if (stroke.symmetryMode === 'Y') { paths.push({ d: svg, xForm: `translate(${cw}, 0) scale(-1, 1)` }); }
+                                    else if (stroke.symmetryMode === 'X') { paths.push({ d: svg, xForm: `translate(0, ${ch}) scale(1, -1)` }); }
+                                    else if (stroke.symmetryMode === 'XY') {
+                                        paths.push({ d: svg, xForm: `translate(${cw}, 0) scale(-1, 1)` });
+                                        paths.push({ d: svg, xForm: `translate(0, ${ch}) scale(1, -1)` });
+                                        paths.push({ d: svg, xForm: `translate(${cw}, ${ch}) scale(-1, -1)` });
+                                    } else if (stroke.symmetryMode === 'KALEIDOSCOPE') {
+                                        const S = stroke.symmetrySlices || 8;
+                                        for (let i = 0; i < S; i++) {
+                                            const deg = (i * 360) / S;
+                                            if (i > 0) {
+                                                paths.push({ d: svg, xForm: `rotate(${deg.toFixed(1)}, ${scx}, ${scy})` });
+                                            }
+                                            paths.push({ d: svg, xForm: `rotate(${deg.toFixed(1)}, ${scx}, ${scy}) translate(${scx}, 0) scale(-1, 1) translate(-${scx}, 0)` });
+                                        }
+                                    }
+                                    
+                                    let out = '';
+                                    paths.forEach(p => {
+                                        if (p.xForm) {
+                                            out += `    <g transform="${p.xForm}">\n${p.d}    </g>\n`;
+                                        } else {
+                                            out += p.d;
+                                        }
+                                    });
+                                    return out;
+                                }
+                            }
+                            return '';
+                        }
+
                         let out = '';
                         const dRaw = getShapeDPath(stroke);
                         if (!dRaw) return out;
+                        
+                        let initialXForm = "";
+                        const gType = stroke.gridType;
+                        const plane = stroke.activeIsoPlane || 'top';
+                        const isAxon = ['isometric', 'dimetric', 'trimetric', 'military'].includes(gType) && stroke.tool === 'shape';
+                        
+                        if (isAxon) {
+                            let alpha = Math.PI / 6;
+                            let beta = Math.PI / 6;
+                            if (gType === 'dimetric') {
+                                alpha = 15 * Math.PI / 180;
+                                beta = 15 * Math.PI / 180;
+                            } else if (gType === 'trimetric') {
+                                alpha = 15 * Math.PI / 180;
+                                beta = 35 * Math.PI / 180;
+                            } else if (gType === 'military') {
+                                alpha = 45 * Math.PI / 180;
+                                beta = 45 * Math.PI / 180;
+                            }
+
+                            let a = 1, b = 0, c = 0, d = 1;
+                            if (plane === 'top') {
+                                a = Math.cos(alpha); b = Math.sin(alpha);
+                                c = -Math.cos(beta); d = Math.sin(beta);
+                            } else if (plane === 'left') {
+                                a = -Math.cos(beta); b = Math.sin(beta);
+                                c = 0; d = 1;
+                            } else if (plane === 'right') {
+                                a = Math.cos(alpha); b = Math.sin(alpha);
+                                c = 0; d = 1;
+                            }
+                            
+                            const px1 = stroke.points[0].x, py1 = stroke.points[0].y;
+                            initialXForm = `translate(${px1.toFixed(1)}, ${py1.toFixed(1)}) matrix(${a.toFixed(4)} ${b.toFixed(4)} ${c.toFixed(4)} ${d.toFixed(4)} 0 0)`;
+                        }
+
                         let paths = [{ d: dRaw, xForm: "" }];
                         const cw = DEFAULT_LOGICAL_WIDTH;
                         const ch = DEFAULT_LOGICAL_HEIGHT;
@@ -8098,7 +9119,8 @@
                             }
                         }
                         paths.forEach(p => {
-                            const tAttr = p.xForm ? ` transform="${p.xForm}"` : '';
+                            const combinedXForm = p.xForm ? (isAxon ? `${p.xForm} ${initialXForm}` : p.xForm) : (isAxon ? initialXForm : "");
+                            const tAttr = combinedXForm ? ` transform="${combinedXForm}"` : '';
                             if (isMask) out += `      <path d="${p.d}"${tAttr} stroke="black" stroke-width="${stroke.width}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>\n`;
                             else {
                                 let strokeColorStr = stroke.colorMode === 'linear' ? `url(#grad_${stroke._globalIdx}_none)` : stroke.color;
@@ -8761,26 +9783,208 @@
                             if (stroke.points.length < 2) return '';
                             const px1 = stroke.points[0].x, py1 = stroke.points[0].y;
                             const px2 = stroke.points[1].x, py2 = stroke.points[1].y;
-                            const w = px2 - px1, h = py2 - py1;
-                            const cx = px1 + w/2, cy = py1 + h/2;
-                            switch(stroke.shapeType) {
-                                case 'rectangle': case 'roundedRect': return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
-                                case 'circle': case 'ellipse': 
-                                    const rx = Math.abs(w/2), ry = Math.abs(h/2);
-                                    return `M ${(cx-rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx+rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx-rx).toFixed(1)} ${cy.toFixed(1)}`;
-                                case 'triangle': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
-                                case 'rhombus': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${cy.toFixed(1)} L ${cx.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${cy.toFixed(1)} Z`;
-                                default: return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                            
+                            const gType = stroke.gridType;
+                            const plane = stroke.activeIsoPlane || 'top';
+                            const isAxon = ['isometric', 'dimetric', 'trimetric', 'military'].includes(gType);
+                            
+                            if (isAxon) {
+                                let alpha = Math.PI / 6;
+                                let beta = Math.PI / 6;
+                                if (gType === 'dimetric') {
+                                    alpha = 15 * Math.PI / 180;
+                                    beta = 15 * Math.PI / 180;
+                                } else if (gType === 'trimetric') {
+                                    alpha = 15 * Math.PI / 180;
+                                    beta = 35 * Math.PI / 180;
+                                } else if (gType === 'military') {
+                                    alpha = 45 * Math.PI / 180;
+                                    beta = 45 * Math.PI / 180;
+                                }
+
+                                let a = 1, b = 0, c = 0, d = 1;
+                                if (plane === 'top') {
+                                    a = Math.cos(alpha); b = Math.sin(alpha);
+                                    c = -Math.cos(beta); d = Math.sin(beta);
+                                } else if (plane === 'left') {
+                                    a = -Math.cos(beta); b = Math.sin(beta);
+                                    c = 0; d = 1;
+                                } else if (plane === 'right') {
+                                    a = Math.cos(alpha); b = Math.sin(alpha);
+                                    c = 0; d = 1;
+                                }
+
+                                const det = a * d - b * c;
+                                const xdiff = px2 - px1;
+                                const ydiff = py2 - py1;
+                                const u = det !== 0 ? (d * xdiff - c * ydiff) / det : xdiff;
+                                const v = det !== 0 ? (-b * xdiff + a * ydiff) / det : ydiff;
+                                const cx = u / 2, cy = v / 2;
+                                
+                                switch(stroke.shapeType) {
+                                    case 'rectangle': case 'roundedRect': return `M 0 0 L ${u.toFixed(1)} 0 L ${u.toFixed(1)} ${v.toFixed(1)} L 0 ${v.toFixed(1)} Z`;
+                                    case 'circle': case 'ellipse': 
+                                        const rx = Math.abs(u/2), ry = Math.abs(v/2);
+                                        return `M ${(cx-rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx+rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx-rx).toFixed(1)} ${cy.toFixed(1)}`;
+                                    case 'triangle': return `M ${cx.toFixed(1)} 0 L ${u.toFixed(1)} ${v.toFixed(1)} L 0 ${v.toFixed(1)} Z`;
+                                    case 'rhombus': return `M ${cx.toFixed(1)} 0 L ${u.toFixed(1)} ${cy.toFixed(1)} L ${cx.toFixed(1)} ${v.toFixed(1)} L 0 ${cy.toFixed(1)} Z`;
+                                    default: return `M 0 0 L ${u.toFixed(1)} 0 L ${u.toFixed(1)} ${v.toFixed(1)} L 0 ${v.toFixed(1)} Z`;
+                                }
+                            } else {
+                                const w = px2 - px1, h = py2 - py1;
+                                const cx = px1 + w/2, cy = py1 + h/2;
+                                switch(stroke.shapeType) {
+                                    case 'rectangle': case 'roundedRect': return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                    case 'circle': case 'ellipse': 
+                                        const rx = Math.abs(w/2), ry = Math.abs(h/2);
+                                        return `M ${(cx-rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx+rx).toFixed(1)} ${cy.toFixed(1)} A ${rx.toFixed(1)} ${ry.toFixed(1)} 0 1 0 ${(cx-rx).toFixed(1)} ${cy.toFixed(1)}`;
+                                    case 'triangle': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                    case 'rhombus': return `M ${cx.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${cy.toFixed(1)} L ${cx.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${cy.toFixed(1)} Z`;
+                                    default: return `M ${px1.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py1.toFixed(1)} L ${px2.toFixed(1)} ${py2.toFixed(1)} L ${px1.toFixed(1)} ${py2.toFixed(1)} Z`;
+                                }
                             }
                         }
                         return '';
                     };
 
                     const writeStrokePaths = (stroke, isMask) => {
+                        if (stroke.tool === 'extruder') {
+                            let svg = getExtrusionSvgString(stroke.points, stroke.height, stroke.color);
+                            let paths = [{ d: svg, xForm: "" }];
+                            const cw = DEFAULT_LOGICAL_WIDTH;
+                            const ch = DEFAULT_LOGICAL_HEIGHT;
+                            const scx = cw / 2;
+                            const scy = ch / 2;
+                            if (stroke.symmetryMode === 'Y') { paths.push({ d: svg, xForm: `translate(${cw}, 0) scale(-1, 1)` }); }
+                            else if (stroke.symmetryMode === 'X') { paths.push({ d: svg, xForm: `translate(0, ${ch}) scale(1, -1)` }); }
+                            else if (stroke.symmetryMode === 'XY') {
+                                paths.push({ d: svg, xForm: `translate(${cw}, 0) scale(-1, 1)` });
+                                paths.push({ d: svg, xForm: `translate(0, ${ch}) scale(1, -1)` });
+                                paths.push({ d: svg, xForm: `translate(${cw}, ${ch}) scale(-1, -1)` });
+                            } else if (stroke.symmetryMode === 'KALEIDOSCOPE') {
+                                const S = stroke.symmetrySlices || 8;
+                                for (let i = 0; i < S; i++) {
+                                    const deg = (i * 360) / S;
+                                    if (i > 0) {
+                                        paths.push({ d: svg, xForm: `rotate(${deg.toFixed(1)}, ${scx}, ${scy})` });
+                                    }
+                                    paths.push({ d: svg, xForm: `rotate(${deg.toFixed(1)}, ${scx}, ${scy}) translate(${scx}, 0) scale(-1, 1) translate(-${scx}, 0)` });
+                                }
+                            }
+                            
+                            let out = '';
+                            paths.forEach(p => {
+                                if (p.xForm) {
+                                    out += `    <g transform="${p.xForm}">\n${p.d}    </g>\n`;
+                                } else {
+                                    out += p.d;
+                                }
+                            });
+                            return out;
+                        }
+
+                        if (stroke.tool === 'voxel') {
+                            const match = stroke.cellKey.match(/axon_(-?[\d.]+),(-?[\d.]+)/);
+                            if (match) {
+                                const uu = parseFloat(match[1]);
+                                const vv = parseFloat(match[2]);
+                                
+                                let alpha = Math.PI / 6;
+                                let beta = Math.PI / 6;
+                                if (stroke.gridType === 'dimetric') {
+                                    alpha = 15 * Math.PI / 180;
+                                    beta = 15 * Math.PI / 180;
+                                } else if (stroke.gridType === 'trimetric') {
+                                    alpha = 15 * Math.PI / 180;
+                                    beta = 35 * Math.PI / 180;
+                                } else if (stroke.gridType === 'military') {
+                                    alpha = 45 * Math.PI / 180;
+                                    beta = 45 * Math.PI / 180;
+                                }
+                                const gs = gridSize;
+                                const uCenter = uu + gs / 2;
+                                const vCenter = vv + gs / 2;
+                                const cx = uCenter * Math.cos(alpha) + vCenter * Math.cos(beta);
+                                const cy = uCenter * Math.sin(alpha) - vCenter * Math.sin(beta);
+                                
+                                const resolved = resolveCell(cx, cy);
+                                if (resolved && resolved.cellData) {
+                                    let svg = getVoxelSvgString(resolved.cellData, stroke.heightIndex, stroke.color);
+                                    let paths = [{ d: svg, xForm: "" }];
+                                    const cw = DEFAULT_LOGICAL_WIDTH;
+                                    const ch = DEFAULT_LOGICAL_HEIGHT;
+                                    const scx = cw / 2;
+                                    const scy = ch / 2;
+                                    if (stroke.symmetryMode === 'Y') { paths.push({ d: svg, xForm: `translate(${cw}, 0) scale(-1, 1)` }); }
+                                    else if (stroke.symmetryMode === 'X') { paths.push({ d: svg, xForm: `translate(0, ${ch}) scale(1, -1)` }); }
+                                    else if (stroke.symmetryMode === 'XY') {
+                                        paths.push({ d: svg, xForm: `translate(${cw}, 0) scale(-1, 1)` });
+                                        paths.push({ d: svg, xForm: `translate(0, ${ch}) scale(1, -1)` });
+                                        paths.push({ d: svg, xForm: `translate(${cw}, ${ch}) scale(-1, -1)` });
+                                    } else if (stroke.symmetryMode === 'KALEIDOSCOPE') {
+                                        const S = stroke.symmetrySlices || 8;
+                                        for (let i = 0; i < S; i++) {
+                                            const deg = (i * 360) / S;
+                                            if (i > 0) {
+                                                paths.push({ d: svg, xForm: `rotate(${deg.toFixed(1)}, ${scx}, ${scy})` });
+                                            }
+                                            paths.push({ d: svg, xForm: `rotate(${deg.toFixed(1)}, ${scx}, ${scy}) translate(${scx}, 0) scale(-1, 1) translate(-${scx}, 0)` });
+                                        }
+                                    }
+                                    
+                                    let out = '';
+                                    paths.forEach(p => {
+                                        if (p.xForm) {
+                                            out += `    <g transform="${p.xForm}">\n${p.d}    </g>\n`;
+                                        } else {
+                                            out += p.d;
+                                        }
+                                    });
+                                    return out;
+                                }
+                            }
+                            return '';
+                        }
+
                         let out = '';
                         const dRaw = getShapeDPath(stroke);
                         if (!dRaw) return out;
                         
+                        let initialXForm = "";
+                        const gType = stroke.gridType;
+                        const plane = stroke.activeIsoPlane || 'top';
+                        const isAxon = ['isometric', 'dimetric', 'trimetric', 'military'].includes(gType) && stroke.tool === 'shape';
+                        
+                        if (isAxon) {
+                            let alpha = Math.PI / 6;
+                            let beta = Math.PI / 6;
+                            if (gType === 'dimetric') {
+                                alpha = 15 * Math.PI / 180;
+                                beta = 15 * Math.PI / 180;
+                            } else if (gType === 'trimetric') {
+                                alpha = 15 * Math.PI / 180;
+                                beta = 35 * Math.PI / 180;
+                            } else if (gType === 'military') {
+                                alpha = 45 * Math.PI / 180;
+                                beta = 45 * Math.PI / 180;
+                            }
+
+                            let a = 1, b = 0, c = 0, d = 1;
+                            if (plane === 'top') {
+                                a = Math.cos(alpha); b = Math.sin(alpha);
+                                c = -Math.cos(beta); d = Math.sin(beta);
+                            } else if (plane === 'left') {
+                                a = -Math.cos(beta); b = Math.sin(beta);
+                                c = 0; d = 1;
+                            } else if (plane === 'right') {
+                                a = Math.cos(alpha); b = Math.sin(alpha);
+                                c = 0; d = 1;
+                            }
+                            
+                            const px1 = stroke.points[0].x, py1 = stroke.points[0].y;
+                            initialXForm = `translate(${px1.toFixed(1)}, ${py1.toFixed(1)}) matrix(${a.toFixed(4)} ${b.toFixed(4)} ${c.toFixed(4)} ${d.toFixed(4)} 0 0)`;
+                        }
+
                         tempPath.setAttribute('d', dRaw);
                         const length = Math.ceil(tempPath.getTotalLength()) + 5; 
                         
@@ -8807,7 +10011,8 @@
                         }
                         
                         paths.forEach((p, pIdx) => {
-                            const tAttr = p.xForm ? ` transform="${p.xForm}"` : '';
+                            const combinedXForm = p.xForm ? (isAxon ? `${p.xForm} ${initialXForm}` : p.xForm) : (isAxon ? initialXForm : "");
+                            const tAttr = combinedXForm ? ` transform="${combinedXForm}"` : '';
                             const id = `stroke_${stroke._globalIdx}_${pIdx}`;
                             
                             if (isAnimated) {
@@ -8968,6 +10173,7 @@
                                 c.drawImage(state.canvas, 0, 0);
                                 if (state.strokes) {
                                     vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                                    rebuildVoxelStacks(l.name);
                                 }
                                 renderComposite();
                                 updateStatus(`Undo performed on ${l.name}.`);
@@ -8977,6 +10183,7 @@
                                     c.drawImage(i, 0, 0);
                                     if (state.strokes) {
                                         vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                                        rebuildVoxelStacks(l.name);
                                     }
                                     renderComposite();
                                     updateStatus(`Undo performed on ${l.name}.`);
@@ -9014,6 +10221,7 @@
                                 c.drawImage(state.canvas, 0, 0);
                                 if (state.strokes) {
                                     vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                                    rebuildVoxelStacks(l.name);
                                 }
                                 renderComposite();
                                 updateStatus(`Redo performed on ${l.name}.`);
@@ -9023,6 +10231,7 @@
                                     c.drawImage(i, 0, 0);
                                     if (state.strokes) {
                                         vectorStrokes = vectorStrokes.filter(vs => vs.layer !== l.name).concat(JSON.parse(JSON.stringify(state.strokes)));
+                                        rebuildVoxelStacks(l.name);
                                     }
                                     renderComposite();
                                     updateStatus(`Redo performed on ${l.name}.`);
