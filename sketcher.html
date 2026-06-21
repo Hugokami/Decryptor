@@ -1193,6 +1193,7 @@
         </button>
         <button id="mobileUndoBtn" title="Undo">↩️</button>
         <button id="mobileRedoBtn" title="Redo">↪️</button>
+        <button id="mobileClearBtn" title="Clear Canvas">🗑️</button>
         <button id="mobileRecordBtn" class="mobile-record-btn" title="Record Process">⏺️</button>
         <button id="mobileMenuBtn" title="Menu">☰</button>
     </div>
@@ -2187,6 +2188,7 @@
                 const sizeBtn = document.getElementById('mobileSizeBtn');
                 const undoBtn = document.getElementById('mobileUndoBtn');
                 const redoBtn = document.getElementById('mobileRedoBtn');
+                const clearBtn = document.getElementById('mobileClearBtn');
                 const recordBtn = document.getElementById('mobileRecordBtn');
                 const menuBtn = document.getElementById('mobileMenuBtn');
                 
@@ -2318,6 +2320,11 @@
                 
                 bindPressEvent(redoBtn, () => {
                     redoLast();
+                    hideMobileFloatingPanels();
+                });
+                
+                bindPressEvent(clearBtn, () => {
+                    clearCanvas();
                     hideMobileFloatingPanels();
                 });
                 
